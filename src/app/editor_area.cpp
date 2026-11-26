@@ -34,6 +34,7 @@
 #include <QMimeData>
 #include <QPalette>
 #include <QPointer>
+#include <QScrollArea>
 #include <QScrollBar>
 #include <QSet>
 #include <QSizePolicy>
@@ -51,6 +52,7 @@
 #include <QVariantList>
 #include <QVariantMap>
 #include <QVBoxLayout>
+#include <QWheelEvent>
 
 #include <algorithm>
 #include <vector>
@@ -299,9 +301,14 @@ struct EditorPane::Document {
     // T5: identity a tab drag carries. It follows the Document record through an
     // in-bar reorder, so a drop resolves the tab's CURRENT index.
     quint64 serial = 0;
+    QString auxiliaryId;
+    QString title;
+    AuxiliaryTabCallbacks callbacks;
 };
 
 namespace {
+
+constexpr int kDocumentTabWidth = 160;
 
 // T5: document serials are unique for the whole process; the drag payload names
 // the document, not a tab index (a native reorder can change the index).
@@ -315,6 +322,8 @@ bool isEditorTabMime(const QMimeData *data)
 {
     return data != nullptr && data->hasFormat(QString::fromLatin1(kEditorTabMimeType));
 }
+
+} // namespace
 
 // T5: the tab strip's only job in a drag is to notice the gesture. The drop is
 // resolved by the pane overlays, so QTabBar's OWN drag is never allowed to start:
@@ -330,8 +339,31 @@ public:
     }
 
     std::function<void(int, const QPoint &)> onContextMenu;
+    std::function<void()> onLayoutChanged;
+    std::function<void(QWheelEvent *)> onWheel;
 
 protected:
+    QSize tabSizeHint(int index) const override
+    {
+        QSize size = QTabBar::tabSizeHint(index);
+        size.setWidth(kDocumentTabWidth);
+        return size;
+    }
+
+    QSize minimumTabSizeHint(int index) const override { return tabSizeHint(index); }
+
+    void tabLayoutChange() override
+    {
+        if (onLayoutChanged) {
+            onLayoutChanged();
+        }
+    }
+
+    void wheelEvent(QWheelEvent *event) override
+    {
+        onWheel(event);
+    }
+
     void contextMenuEvent(QContextMenuEvent *event) override
     {
         const bool keyboard = event->reason() == QContextMenuEvent::Keyboard;
@@ -400,7 +432,91 @@ private:
     bool dragStarted_ = false;
 };
 
-} // namespace
+class DocumentTabScrollArea final : public QScrollArea {
+public:
+    explicit DocumentTabScrollArea(QWidget *parent)
+        : QScrollArea(parent)
+        , tabs(new DocumentTabBar)
+    {
+        setObjectName(QStringLiteral("editor-tab-scroll-area"));
+        setFrameShape(QFrame::NoFrame);
+        setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+        setFocusPolicy(Qt::NoFocus);
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        setWidget(tabs);
+        tabs->setAutoFillBackground(false);
+        horizontalScrollBar()->setObjectName(QStringLiteral("editor-tab-scrollbar"));
+        horizontalScrollBar()->setSingleStep(kDocumentTabWidth / 2);
+        tabs->onWheel = [this](QWheelEvent *event) { wheelEvent(event); };
+        tabs->onLayoutChanged = [this]() {
+            if (!layoutPending_) {
+                layoutPending_ = true;
+                QTimer::singleShot(0, this, [this]() {
+                    layoutPending_ = false;
+                    updateContents();
+                });
+            }
+        };
+    }
+
+    void updateContents()
+    {
+        const int contentWidth = tabs->count() * kDocumentTabWidth;
+        const QSize contentSize(std::max(width(), contentWidth), tabs->sizeHint().height());
+        if (tabs->size() != contentSize) {
+            tabs->setFixedSize(contentSize);
+        }
+        const int scrollHeight = contentWidth > width()
+                                     ? horizontalScrollBar()->sizeHint().height() : 0;
+        const int stripHeight = contentSize.height() + scrollHeight;
+        if (height() != stripHeight) {
+            setFixedHeight(stripHeight);
+        }
+    }
+
+    void revealCurrentTab()
+    {
+        const QRect tab = tabs->tabRect(tabs->currentIndex());
+        if (!tab.isValid() || viewport()->width() <= 0) {
+            return;
+        }
+        const int left = tabs->mapTo(viewport(), tab.topLeft()).x();
+        const int right = left + tab.width();
+        const int viewportWidth = viewport()->width();
+        const bool rtl = layoutDirection() == Qt::RightToLeft;
+        const int delta = tab.width() > viewportWidth ? (rtl ? right - viewportWidth : left)
+                         : left < 0                  ? left
+                         : right > viewportWidth      ? right - viewportWidth
+                                                       : 0;
+        auto *bar = horizontalScrollBar();
+        bar->setValue(bar->value() + (rtl ? -delta : delta));
+    }
+
+    DocumentTabBar *const tabs;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override
+    {
+        QScrollArea::resizeEvent(event);
+        updateContents();
+        revealCurrentTab();
+    }
+
+    void wheelEvent(QWheelEvent *event) override
+    {
+        const QPoint pixels = event->pixelDelta();
+        const QPoint angle = event->angleDelta();
+        const int delta = !pixels.isNull() ? (pixels.x() != 0 ? pixels.x() : pixels.y())
+                        : (angle.x() != 0 ? angle.x() : angle.y()) * (kDocumentTabWidth / 2) / 120;
+        auto *bar = horizontalScrollBar();
+        bar->setValue(bar->value() - delta);
+        event->accept();
+    }
+
+private:
+    bool layoutPending_ = false;
+};
 
 EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent)
     : QWidget(parent)
@@ -425,7 +541,8 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
 
     // T5: the tab strip is a drag-aware QTabBar; a gesture that crosses the
     // drag threshold becomes a document drag (see DocumentTabBar).
-    auto *documentTabs = new DocumentTabBar(tabRow);
+    tabScroll_ = new DocumentTabScrollArea(tabRow);
+    auto *documentTabs = tabScroll_->tabs;
     tabs_ = documentTabs;
     documentTabs->setOnDragRequested([this](int index) { startTabDrag(index); });
     tabs_->setObjectName(QStringLiteral("editor-tab-bar"));
@@ -433,9 +550,7 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     tabs_->setDrawBase(false);
     tabs_->setExpanding(false);
     tabs_->setElideMode(Qt::ElideMiddle);
-    // AC-9.5: an overflowing strip scrolls inside this row instead of widening
-    // the pane (a QTabBar's minimumSizeHint stays small with scroll buttons).
-    tabs_->setUsesScrollButtons(true);
+    tabs_->setUsesScrollButtons(false);
     // Batch 20261110d (T7): tabs are reorderable AND draggable. A QTabBar move
     // alone would leave the parallel `documents_` list at the old indices — the
     // pane would then show the wrong file under the clicked tab — so `tabMoved`
@@ -447,7 +562,7 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     tabs_->setFocusPolicy(Qt::TabFocus);
     tabs_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     tabs_->setSelectionBehaviorOnRemove(QTabBar::SelectRightTab);
-    tabRowLayout->addWidget(tabs_, 1);
+    tabRowLayout->addWidget(tabScroll_, 1);
 
     // The one part of the old header worth keeping: which pane of a split holds
     // the keyboard focus. It names no provider.
@@ -498,8 +613,8 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     stack_->setObjectName(QStringLiteral("editor-pane-stack"));
     layout_->addWidget(stack_, 1);
 
-    QObject::connect(tabs_, &QTabBar::currentChanged, this, [this](int index) {
-        Q_UNUSED(index);
+    QObject::connect(tabs_, &QTabBar::currentChanged, this, [this](int) {
+        QTimer::singleShot(0, tabScroll_, [this]() { tabScroll_->revealCurrentTab(); });
         syncCurrentEditor();
         updateBreadcrumb();
         notifyStateChanged();
@@ -507,7 +622,10 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     // Clicking a tab is also "use this pane": activate it and move the keyboard
     // focus into the document the user just picked.
     QObject::connect(tabs_, &QTabBar::tabBarClicked, this, [this](int index) {
-        Q_UNUSED(index);
+        if (index < 0) {
+            return;
+        }
+        QTimer::singleShot(0, tabScroll_, [this]() { tabScroll_->revealCurrentTab(); });
         if (onFocusRequested_ != nullptr) {
             onFocusRequested_(this);
         }
@@ -568,7 +686,7 @@ void EditorPane::releaseListeners()
 {
     for (Document *document : documents_) {
         if (document != nullptr) {
-            unwireEditor(provider_, document->editor);
+            unwireEditor(provider_, *document);
         }
     }
 }
@@ -661,15 +779,25 @@ void EditorPane::addTabForDocument(QWidget *editor, const QString &absolutePath)
     if (editor == nullptr) {
         return;
     }
-    auto *document = new Document;
+    auto document = std::make_unique<Document>();
     document->editor = editor;
     document->path = absolutePath;
-    document->serial = newDocumentSerial();
-    documents_.append(document);
-    stack_->addWidget(editor);
-    wireEditor(editor);
+    addDocument(std::move(document));
+}
+
+void EditorPane::addDocument(std::unique_ptr<Document> document)
+{
+    if (document->serial == 0) {
+        document->serial = newDocumentSerial();
+    }
+    const quint64 serial = document->serial;
+    Document *installed = document.release();
+    documents_.append(installed);
+    stack_->addWidget(installed->editor);
+    wireEditor(*installed);
 
     const int index = tabs_->addTab(QString());
+    tabScroll_->updateContents();
     auto *close = new QToolButton(tabs_);
     close->setObjectName(QString::fromLatin1(kTabCloseButtonName));
     close->setText(QStringLiteral("×"));
@@ -680,23 +808,8 @@ void EditorPane::addTabForDocument(QWidget *editor, const QString &absolutePath)
     // The button belongs to this document, not to a tab index (indices move);
     // the close is deferred because removing the tab destroys this very button,
     // which must never happen inside its own clicked() emission.
-    const QPointer<QWidget> guardedEditor(editor);
-    QObject::connect(close, &QToolButton::clicked, this, [this, guardedEditor]() {
-        if (guardedEditor.isNull()) {
-            return;
-        }
-        QTimer::singleShot(0, this, [this, guardedEditor]() {
-            const QWidget *editor = guardedEditor.data();
-            if (editor == nullptr) {
-                return;
-            }
-            for (int i = 0; i < documents_.size(); ++i) {
-                if (documents_.at(i) != nullptr && documents_.at(i)->editor == editor) {
-                    closeTab(i);
-                    return;
-                }
-            }
-        });
+    QObject::connect(close, &QToolButton::clicked, this, [this, serial]() {
+        QTimer::singleShot(0, this, [this, serial]() { closeTab(tabIndexForSerial(serial)); });
     });
     tabs_->setTabButton(index, QTabBar::RightSide, close);
     refreshTab(index);
@@ -707,76 +820,23 @@ void EditorPane::showSharedDocument(QWidget *editor, const QString &absolutePath
     if (editor == nullptr) {
         return;
     }
-    // A pane is born with one untouched empty tab. Splitting should SHOW the
-    // shared document, not leave that blank tab next to it, so the fresh tab is
-    // replaced only while it is provably untouched (no path, not modified).
-    Document *current = documentAt(0);
-    const bool untouchedEmptyPane =
-        documents_.size() == 1 && current != nullptr && current->editor != nullptr &&
-        current->path.isEmpty() && provider_ != nullptr &&
-        provider_->currentFilePath(current->editor).isEmpty() &&
-        !provider_->isModified(current->editor);
-    if (untouchedEmptyPane) {
-        QWidget *stale = current->editor;
-        unwireEditor(provider_, stale);
-        const int stackIndex = stack_->indexOf(stale);
-        if (stackIndex >= 0) {
-            stack_->removeWidget(stale);
-        }
-        current->editor = editor;
-        current->path = absolutePath;
-        stack_->addWidget(editor);
-        wireEditor(editor);
-        stale->setParent(nullptr);
-        delete stale;
-        refreshTab(0);
-        tabs_->setCurrentIndex(0);
-    } else {
-        addTabForDocument(editor, absolutePath);
-        tabs_->setCurrentIndex(documents_.size() - 1);
-    }
-    syncCurrentEditor();
-    updateBreadcrumb();
-    notifyStateChanged();
+    auto document = std::make_unique<Document>();
+    document->editor = editor;
+    document->path = absolutePath;
+    adoptDocument(std::move(document), -1, true);
 }
 
 void EditorPane::removeTab(int index)
 {
-    Document *document = documentAt(index);
-    if (document == nullptr) {
-        return;
+    const auto document = detachDocument(index);
+    if (document != nullptr) {
+        delete document->editor;
     }
-    documents_.removeAt(index);
-    QWidget *editor = document->editor;
-    if (editor != nullptr) {
-        pendingPositions_.remove(editor);
-        unwireEditor(provider_, editor);
-        const int stackIndex = stack_->indexOf(editor);
-        if (stackIndex >= 0) {
-            stack_->removeWidget(editor);
-        }
-        editor->setParent(nullptr);
-        delete editor;
-    }
-    delete document;
-    // The tab's close button is owned by the tab bar and dies with the tab.
-    tabs_->removeTab(index);
 }
 
-void EditorPane::replaceTabEditor(int index, QWidget *editor)
+void EditorPane::wireEditor(const Document &document)
 {
-    Document *document = documentAt(index);
-    if (document == nullptr || editor == nullptr) {
-        return;
-    }
-    document->editor = editor;
-    stack_->addWidget(editor);
-    wireEditor(editor);
-    refreshTab(index);
-}
-
-void EditorPane::wireEditor(QWidget *editor)
-{
+    QWidget *editor = document.editor;
     if (editor == nullptr) {
         return;
     }
@@ -794,7 +854,7 @@ void EditorPane::wireEditor(QWidget *editor)
             clearOwnedShortcuts(guarded.data(), owned);
         }
     });
-    if (provider_ == nullptr) {
+    if (provider_ == nullptr || !document.auxiliaryId.isEmpty()) {
         return;
     }
     // T94: the provider pushes breadcrumb changes for THIS tab's document; the
@@ -814,13 +874,14 @@ void EditorPane::wireEditor(QWidget *editor)
     });
 }
 
-void EditorPane::unwireEditor(EditorProvider *provider, QWidget *editor)
+void EditorPane::unwireEditor(EditorProvider *provider, const Document &document)
 {
+    QWidget *editor = document.editor;
     if (editor == nullptr) {
         return;
     }
     editor->removeEventFilter(this);
-    if (provider != nullptr) {
+    if (provider != nullptr && document.auxiliaryId.isEmpty()) {
         provider->setStatusListener(editor, nullptr);
         provider->setModifiedListener(editor, nullptr);
     }
@@ -856,6 +917,9 @@ void EditorPane::applyPendingPosition(QWidget *editor)
 
 QString EditorPane::documentLabel(const Document &document) const
 {
+    if (!document.auxiliaryId.isEmpty()) {
+        return document.title;
+    }
     if (document.path.isEmpty()) {
         return QStringLiteral("untitled");
     }
@@ -869,8 +933,7 @@ void EditorPane::refreshTab(int index)
     if (document == nullptr) {
         return;
     }
-    const bool dirty = provider_ != nullptr && document->editor != nullptr
-                       && provider_->isModified(document->editor);
+    const bool dirty = isTabModified(index);
     // AC-8.1: the dirty marker is part of the TAB LABEL ("● name"), so it is
     // visible without hovering and never depends on the tab's colours. AC-8.2:
     // a save clears the document flag, the listener fires and the label is
@@ -885,7 +948,7 @@ void EditorPane::refreshTab(int index)
     // otherwise). The tab TEXT stays the file name: it is a name, not a path,
     // and the open key stays absolute.
     tabs_->setTabToolTip(index, document->path.isEmpty()
-                                    ? QStringLiteral("untitled")
+                                    ? documentLabel(*document)
                                     : vedit::paths::displayPath(displayRoot_, document->path));
 }
 
@@ -991,19 +1054,18 @@ QString EditorPane::breadcrumbText() const
 
 void EditorPane::updateBreadcrumb()
 {
+    QWidget *editor = editorWidget();
 #if defined(VEDIT_APP_HAVE_BREADCRUMB)
     // The semantic path comes from the editor lane through the view's
     // "veditBreadcrumbEntries" property (fold_breadcrumb.h): the shell never
     // includes a KTextEditor header. The bar hides itself while the path (or the
     // file path) is empty, exactly like the QLabel it replaced.
     if (breadcrumbBar_ != nullptr) {
-        const QString file =
-            provider_ != nullptr && editor_ != nullptr ? provider_->currentFilePath(editor_)
-                                                       : QString();
+        const QString file = provider_ != nullptr && editor != nullptr
+                                 ? provider_->currentFilePath(editor) : QString();
         std::vector<vedit::breadcrumb::Entry> entries;
-        if (editor_ != nullptr) {
-            const QVariantList published =
-                editor_->property("veditBreadcrumbEntries").toList();
+        if (editor != nullptr) {
+            const QVariantList published = editor->property("veditBreadcrumbEntries").toList();
             entries.reserve(static_cast<std::size_t>(published.size()));
             for (const QVariant &value : published) {
                 const QVariantMap item = value.toMap();
@@ -1021,7 +1083,8 @@ void EditorPane::updateBreadcrumb()
     if (breadcrumb_ == nullptr) {
         return;
     }
-    const QString text = provider_ != nullptr ? provider_->statusText(editor_) : QString();
+    const QString text = provider_ != nullptr && editor != nullptr
+                             ? provider_->statusText(editor) : QString();
     breadcrumb_->setText(text);
     breadcrumb_->setVisible(!text.isEmpty());
 }
@@ -1056,12 +1119,12 @@ void EditorPane::setProvider(EditorProvider *provider)
     // can open a file, so this is the demo placeholder being replaced).
     for (int index = 0; index < documents_.size(); ++index) {
         Document *document = documents_.at(index);
-        if (document == nullptr) {
+        if (document == nullptr || !document->auxiliaryId.isEmpty()) {
             continue;
         }
         QWidget *stale = document->editor;
         if (stale != nullptr) {
-            unwireEditor(previous, stale);
+            unwireEditor(previous, *document);
             const int stackIndex = stack_->indexOf(stale);
             if (stackIndex >= 0) {
                 stack_->removeWidget(stale);
@@ -1073,7 +1136,7 @@ void EditorPane::setProvider(EditorProvider *provider)
         QWidget *fresh = createEditorWidget();
         document->editor = fresh;
         stack_->addWidget(fresh);
-        wireEditor(fresh);
+        wireEditor(*document);
         if (!document->path.isEmpty() && provider_ != nullptr) {
             QString error;
             if (!provider_->openFile(fresh, document->path, &error) && !error.isEmpty()) {
@@ -1125,12 +1188,10 @@ void EditorPane::newDocument()
     }
     // Reuse the untouched empty tab: the first New must not leave a second blank
     // tab behind (the same rule openFile() applies for its first document).
-    if (const Document *current = documentAt(tabs_->currentIndex())) {
-        if (current->path.isEmpty() && !provider_->isModified(current->editor)) {
-            setActiveTab(tabs_->currentIndex());
-            requestFocus();
-            return;
-        }
+    if (isUntouchedTab(activeTabIndex())) {
+        setActiveTab(activeTabIndex());
+        requestFocus();
+        return;
     }
     addTabForDocument(createEditorWidget());
     tabs_->setCurrentIndex(documents_.size() - 1);
@@ -1143,6 +1204,10 @@ void EditorPane::newDocument()
 bool EditorPane::triggerEditorAction(const QStringList &objectNames,
                                      const QString &fallbackMethod)
 {
+    if (isAuxiliaryTab(activeTabIndex())) {
+        const auto trigger = documentAt(activeTabIndex())->callbacks.triggerAction;
+        return trigger && trigger(objectNames, fallbackMethod.toUtf8().constData());
+    }
     QWidget *editor = editorWidget();
     if (editor == nullptr) {
         return false;
@@ -1168,6 +1233,10 @@ bool EditorPane::triggerEditorAction(const QStringList &objectNames,
 
 bool EditorPane::editorActionEnabled(const QStringList &objectNames) const
 {
+    if (isAuxiliaryTab(activeTabIndex())) {
+        const auto &enabled = documentAt(activeTabIndex())->callbacks.actionEnabled;
+        return enabled && enabled(objectNames);
+    }
     QWidget *editor = editorWidget();
     if (editor == nullptr) {
         return false;
@@ -1203,42 +1272,39 @@ bool EditorPane::openFile(const QString &absolutePath, QString *error)
         }
         return true;
     }
-    int target = -1;
-    bool created = false;
-    if (const Document *current = documentAt(tabs_->currentIndex())) {
-        // Reuse the untouched "untitled" tab: the first File > Open must not
-        // leave an empty tab next to the file it opened.
-        if (current->path.isEmpty() && !provider_->isModified(current->editor)) {
-            target = tabs_->currentIndex();
-        }
-    }
-    if (target < 0) {
-        addTabForDocument(createEditorWidget());
-        target = documents_.size() - 1;
-        created = true;
-    }
-    Document *document = documentAt(target);
-    if (document == nullptr) {
-        if (error != nullptr) {
-            *error = QStringLiteral("open: the pane could not create a tab");
-        }
-        return false;
-    }
-    if (!provider_->openFile(document->editor, absolute, error)) {
+    if (QWidget *shared = provider_->createEditorForOpenComparison(absolute, this)) {
+        showSharedDocument(shared, absolute);
+    } else {
+        // Reuse an untouched untitled tab before opening a new one.
+        int target = activeTabIndex();
+        const bool created = !isUntouchedTab(target);
         if (created) {
-            removeTab(target);
-            if (documents_.isEmpty()) {
-                addTabForDocument(createEditorWidget());
-                tabs_->setCurrentIndex(0);
-            }
-            syncCurrentEditor();
-            notifyStateChanged();
+            addTabForDocument(createEditorWidget());
+            target = documents_.size() - 1;
         }
-        return false;
+        Document *document = documentAt(target);
+        if (document == nullptr) {
+            if (error != nullptr) {
+                *error = QStringLiteral("open: the pane could not create a tab");
+            }
+            return false;
+        }
+        if (!provider_->openFile(document->editor, absolute, error)) {
+            if (created) {
+                removeTab(target);
+                if (documents_.isEmpty()) {
+                    addTabForDocument(createEditorWidget());
+                    tabs_->setCurrentIndex(0);
+                }
+                syncCurrentEditor();
+                notifyStateChanged();
+            }
+            return false;
+        }
+        document->path = absolute;
+        refreshTab(target);
+        setActiveTab(target);
     }
-    document->path = absolute;
-    refreshTab(target);
-    setActiveTab(target);
     syncCurrentEditor();
     updateBreadcrumb();
     notifyStateChanged();
@@ -1256,10 +1322,13 @@ bool EditorPane::openFile(const QString &absolutePath, QString *error)
 QString EditorPane::currentFilePath() const
 {
     const Document *document = documentAt(tabs_ != nullptr ? tabs_->currentIndex() : -1);
-    if (document != nullptr && !document->path.isEmpty()) {
+    if (document == nullptr || !document->auxiliaryId.isEmpty()) {
+        return {};
+    }
+    if (!document->path.isEmpty()) {
         return document->path;
     }
-    return provider_ != nullptr ? provider_->currentFilePath(editor_) : QString();
+    return provider_ != nullptr ? provider_->currentFilePath(document->editor) : QString();
 }
 
 bool EditorPane::saveFile(QString *error)
@@ -1270,6 +1339,22 @@ bool EditorPane::saveFile(QString *error)
 bool EditorPane::saveTab(int index, QString *error)
 {
     Document *document = documentAt(index);
+    if (document != nullptr && !document->auxiliaryId.isEmpty()) {
+        const auto save = document->callbacks.save;
+        const quint64 serial = document->serial;
+        if (!save) {
+            if (error != nullptr) {
+                *error = tr("This tab cannot be saved.");
+            }
+            return false;
+        }
+        if (!save(error)) {
+            return false;
+        }
+        refreshTab(tabIndexForSerial(serial));
+        notifyStateChanged();
+        return true;
+    }
     if (document == nullptr || provider_ == nullptr) {
         if (error != nullptr) {
             *error = QStringLiteral("save: the pane holds no such document");
@@ -1292,7 +1377,8 @@ bool EditorPane::saveTab(int index, QString *error)
 bool EditorPane::saveAsFile(const QString &absolutePath, QString *error)
 {
     Document *document = documentAt(activeTabIndex());
-    if (document == nullptr || document->editor == nullptr || provider_ == nullptr) {
+    if (document == nullptr || !document->auxiliaryId.isEmpty() || document->editor == nullptr
+        || provider_ == nullptr) {
         if (error != nullptr) {
             *error = QCoreApplication::translate("VEdit", "Save As: the pane has no active document");
         }
@@ -1307,21 +1393,9 @@ bool EditorPane::saveAsFile(const QString &absolutePath, QString *error)
         return false;
     }
 
-    // The path a document is saved to is the one property both providers resolve
-    // through (editor_provider.h's currentFilePath, which the edit-core provider
-    // consults before the KTextEditor document URL). Pointing it at the target and
-    // then using the provider's own saveFile() keeps ONE write path: the demo
-    // provider writes its QPlainTextEdit with QSaveFile, the edit-core provider
-    // writes the KTextEditor buffer with the kernel's atomic save, and both clear
-    // the modified flag themselves (AC-1.4: the tab marker must clear).
-    const QString previousPath = provider_->currentFilePath(document->editor);
-    document->editor->setProperty("vedit.openFilePath", target.absoluteFilePath());
+    QWidget *replacement = nullptr;
     QString saveError;
-    if (!provider_->saveFile(document->editor, &saveError)) {
-        // A refused save must not leave the tab claiming a file that was never
-        // written: restore the path the document had (empty for an untitled tab).
-        document->editor->setProperty("vedit.openFilePath",
-                                      previousPath.isEmpty() ? QVariant() : QVariant(previousPath));
+    if (!provider_->saveFileAs(document->editor, target.absoluteFilePath(), &replacement, &saveError)) {
         if (error != nullptr) {
             *error = saveError.isEmpty()
                          ? QCoreApplication::translate("VEdit", "Save As: %1 could not be written")
@@ -1332,6 +1406,19 @@ bool EditorPane::saveAsFile(const QString &absolutePath, QString *error)
     }
 
     document->path = target.absoluteFilePath();
+    if (replacement != nullptr) {
+        QWidget *savedAsSource = document->editor;
+        unwireEditor(provider_, *document);
+        pendingPositions_.remove(savedAsSource);
+        stack_->removeWidget(savedAsSource);
+        document->editor = replacement;
+        stack_->addWidget(replacement);
+        wireEditor(*document);
+        syncCurrentEditor();
+        delete savedAsSource;
+        updateBreadcrumb();
+        requestFocus();
+    }
     refreshTab(activeTabIndex());
     notifyStateChanged();
     // R3: Save As is a successful write too (and the tab just adopted a path).
@@ -1359,6 +1446,7 @@ void EditorPane::setActiveTab(int index)
     if (tabs_->currentIndex() != index) {
         tabs_->setCurrentIndex(index);
     }
+    tabScroll_->revealCurrentTab();
     syncCurrentEditor();
     updateBreadcrumb();
     notifyStateChanged();
@@ -1373,7 +1461,58 @@ QString EditorPane::tabFilePath(int index) const
 QWidget *EditorPane::tabEditorWidget(int index) const
 {
     const Document *document = documentAt(index);
-    return document != nullptr ? document->editor : nullptr;
+    return document != nullptr && document->auxiliaryId.isEmpty() ? document->editor : nullptr;
+}
+
+bool EditorPane::isAuxiliaryTab(int index) const
+{
+    const Document *document = documentAt(index);
+    return document != nullptr && !document->auxiliaryId.isEmpty();
+}
+
+QString EditorPane::tabDisplayName(int index) const
+{
+    const Document *document = documentAt(index);
+    return document != nullptr ? documentLabel(*document) : QString();
+}
+
+bool EditorPane::isUntouchedTab(int index) const
+{
+    const Document *document = documentAt(index);
+    return document != nullptr && document->auxiliaryId.isEmpty() && document->path.isEmpty()
+           && document->editor != nullptr && provider_ != nullptr
+           && provider_->currentFilePath(document->editor).isEmpty() && !isTabModified(index);
+}
+
+bool EditorPane::canCloseTab(int index) const
+{
+    if (!isAuxiliaryTab(index)) {
+        return true;
+    }
+    const auto canClose = documentAt(index)->callbacks.canClose;
+    return !canClose || canClose();
+}
+
+bool EditorPane::canCloseAuxiliaryTabs() const
+{
+    for (int index = 0; index < tabCount(); ++index) {
+        if (!canCloseTab(index)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int EditorPane::auxiliaryTabIndex(const QString &id) const
+{
+    if (!id.isEmpty()) {
+        for (int index = 0; index < tabCount(); ++index) {
+            if (documents_.at(index)->auxiliaryId == id) {
+                return index;
+            }
+        }
+    }
+    return -1;
 }
 
 QStringList EditorPane::openFilePaths() const
@@ -1398,6 +1537,10 @@ QString EditorPane::tabText(int index) const
 bool EditorPane::isTabModified(int index) const
 {
     const Document *document = documentAt(index);
+    if (document != nullptr && !document->auxiliaryId.isEmpty()) {
+        const auto &modified = document->callbacks.isModified;
+        return modified && modified();
+    }
     return document != nullptr && provider_ != nullptr && document->editor != nullptr
            && provider_->isModified(document->editor);
 }
@@ -1418,11 +1561,13 @@ int EditorPane::tabIndexForPath(const QString &absolutePath) const
 
 bool EditorPane::closeTab(int index)
 {
-    Document *document = documentAt(index);
-    if (document == nullptr) {
+    const Document *document = documentAt(index);
+    if (document == nullptr || !canCloseTab(index)) {
         return false;
     }
-    if (isTabModified(index)) {
+    const quint64 serial = document->serial;
+    const auto needsPrompt = document->callbacks.needsClosePrompt;
+    if (needsPrompt ? needsPrompt() : isTabModified(index)) {
         // AC-8.3: a dirty document is never discarded by a bare close. Without
         // an installed prompt the close is refused outright.
         if (!onTabCloseRequested_) {
@@ -1432,26 +1577,19 @@ bool EditorPane::closeTab(int index)
         if (decision == SaveDecision::Cancel) {
             return false;
         }
-        if (decision == SaveDecision::Save) {
+        index = tabIndexForSerial(serial);
+        if (decision == SaveDecision::Save && index >= 0) {
             QString error;
             if (!saveTab(index, &error)) {
                 return false;
             }
         }
     }
-    removeTab(index);
-    if (documents_.isEmpty()) {
-        // A pane always shows one tab; the last one closing leaves a fresh
-        // empty document instead of an empty strip.
-        addTabForDocument(createEditorWidget());
-        tabs_->setCurrentIndex(0);
-    } else {
-        // AC-9.4: the neighbouring tab becomes active.
-        tabs_->setCurrentIndex(std::clamp(index, 0, tabCount() - 1));
+    index = tabIndexForSerial(serial);
+    if (index >= 0) {
+        removeTab(index);
+        finishTabRemoval(index);
     }
-    syncCurrentEditor();
-    updateBreadcrumb();
-    notifyStateChanged();
     return true;
 }
 
@@ -1588,43 +1726,45 @@ int EditorPane::tabIndexForSerial(quint64 serial) const
     return -1;
 }
 
+std::unique_ptr<EditorPane::Document> EditorPane::detachDocument(int index)
+{
+    if (documentAt(index) == nullptr) {
+        return nullptr;
+    }
+    std::unique_ptr<Document> document(documents_.takeAt(index));
+    if (QWidget *editor = document->editor) {
+        pendingPositions_.remove(editor);
+        unwireEditor(provider_, *document);
+        stack_->removeWidget(editor);
+        editor->setParent(nullptr);
+    }
+    tabs_->removeTab(index);
+    tabScroll_->updateContents();
+    return document;
+}
+
+void EditorPane::finishTabRemoval(int index)
+{
+    if (documents_.isEmpty()) {
+        addTabForDocument(createEditorWidget());
+    }
+    setActiveTab(std::clamp(index, 0, tabCount() - 1));
+}
+
 QWidget *EditorPane::detachTab(int index, QString *absolutePath)
 {
-    Document *document = documentAt(index);
+    if (isAuxiliaryTab(index)) {
+        return nullptr;
+    }
+    auto document = detachDocument(index);
     if (document == nullptr) {
         return nullptr;
     }
-    QWidget *editor = document->editor;
     if (absolutePath != nullptr) {
         *absolutePath = document->path;
     }
-    documents_.removeAt(index);
-    if (editor != nullptr) {
-        // Stop the listeners, but do NOT delete the widget: the receiving pane
-        // adopts the very same editor, so the buffer, its undo history and its
-        // caret never leave the process (no disk re-read, no close prompt).
-        pendingPositions_.remove(editor);
-        unwireEditor(provider_, editor);
-        const int stackIndex = stack_->indexOf(editor);
-        if (stackIndex >= 0) {
-            stack_->removeWidget(editor);
-        }
-        editor->setParent(nullptr);
-    }
-    delete document;
-    tabs_->removeTab(index);
-    if (documents_.isEmpty()) {
-        // A pane always shows one tab; losing the last one leaves a fresh empty
-        // document, exactly like closing the last tab (AC-6.2).
-        addTabForDocument(createEditorWidget());
-        tabs_->setCurrentIndex(0);
-    } else {
-        tabs_->setCurrentIndex(std::clamp(index, 0, tabCount() - 1));
-    }
-    syncCurrentEditor();
-    updateBreadcrumb();
-    notifyStateChanged();
-    return editor;
+    finishTabRemoval(index);
+    return document->editor;
 }
 
 int EditorPane::adoptTab(QWidget *editor, const QString &absolutePath, int insertAt)
@@ -1632,11 +1772,21 @@ int EditorPane::adoptTab(QWidget *editor, const QString &absolutePath, int inser
     if (editor == nullptr) {
         return -1;
     }
-    addTabForDocument(editor, absolutePath);
-    int index = documents_.size() - 1;
-    if (insertAt >= 0 && insertAt < index) {
-        // tabMoved permutes documents_ in the same step (see the constructor);
-        // the moved tab is the one the user dropped.
+    auto document = std::make_unique<Document>();
+    document->editor = editor;
+    document->path = absolutePath;
+    return adoptDocument(std::move(document), insertAt, false);
+}
+
+int EditorPane::adoptDocument(std::unique_ptr<Document> document, int insertAt, bool reuseEmpty)
+{
+    const bool replaceEmpty = reuseEmpty && tabCount() == 1 && isUntouchedTab(0);
+    addDocument(std::move(document));
+    int index = tabCount() - 1;
+    if (replaceEmpty) {
+        removeTab(0);
+        index = 0;
+    } else if (insertAt >= 0 && insertAt < index) {
         tabs_->moveTab(index, insertAt);
         index = insertAt;
     }
@@ -1684,10 +1834,11 @@ bool EditorPane::dropOverlayVisible() const
 
 QRect EditorPane::tabBarRect() const
 {
-    if (tabs_ == nullptr) {
+    if (tabScroll_ == nullptr) {
         return QRect();
     }
-    return QRect(tabs_->mapTo(this, QPoint(0, 0)), tabs_->size());
+    QWidget *viewport = tabScroll_->viewport();
+    return QRect(viewport->mapTo(this, QPoint(0, 0)), viewport->size());
 }
 
 TabDropZone EditorPane::dropZoneAt(const QPoint &pos) const
@@ -1764,7 +1915,7 @@ QString EditorPane::paneId() const
 
 QWidget *EditorPane::editorWidget() const
 {
-    return editor_;
+    return isAuxiliaryTab(activeTabIndex()) ? nullptr : editor_;
 }
 
 bool EditorPane::containsEditorWidget(const QWidget *widget) const
@@ -1875,9 +2026,8 @@ bool EditorPane::eventFilter(QObject *watched, QEvent *event)
             }
             const QPoint pos = dropEvent->position().toPoint();
             const TabDropZone zone = dropZoneAt(pos);
-            const int index = zone == TabDropZone::TabBar && tabs_ != nullptr
-                                  ? tabs_->tabAt(pos)
-                                  : -1;
+            const QPoint tabPos = tabs_->mapFrom(this, pos);
+            const int index = zone == TabDropZone::TabBar ? tabs_->tabAt(tabPos) : -1;
             updateDropHighlight(TabDropZone::None);
             if (zone != TabDropZone::None && onTabDrop_ != nullptr) {
                 onTabDrop_(this, zone, index);
@@ -2141,6 +2291,67 @@ void EditorArea::setProvider(EditorProvider *provider)
 EditorProvider *EditorArea::provider() const
 {
     return provider_;
+}
+
+QWidget *EditorArea::openAuxiliaryTab(const QString &id, const QString &title, QWidget *page,
+                                     AuxiliaryTabCallbacks callbacks)
+{
+    if (QWidget *existing = findAuxiliaryTab(id)) {
+        if (page != existing) {
+            delete page;
+        }
+        activateAuxiliaryTab(id);
+        return existing;
+    }
+    if (id.isEmpty() || page == nullptr) {
+        delete page;
+        return nullptr;
+    }
+    EditorPane *pane = ensurePane();
+    auto document = std::make_unique<EditorPane::Document>();
+    document->editor = page;
+    document->auxiliaryId = id;
+    document->title = title;
+    document->callbacks = std::move(callbacks);
+    pane->adoptDocument(std::move(document), -1, true);
+    pane->requestFocus();
+    return page;
+}
+
+QWidget *EditorArea::findAuxiliaryTab(const QString &id) const
+{
+    for (const EditorPane *pane : panes()) {
+        if (const auto *document = pane->documentAt(pane->auxiliaryTabIndex(id))) {
+            return document->editor;
+        }
+    }
+    return nullptr;
+}
+
+bool EditorArea::activateAuxiliaryTab(const QString &id)
+{
+    for (EditorPane *pane : panes()) {
+        const int index = pane->auxiliaryTabIndex(id);
+        if (index >= 0) {
+            pane->setActiveTab(index);
+            setActivePane(pane);
+            pane->requestFocus();
+            return true;
+        }
+    }
+    return false;
+}
+
+void EditorArea::refreshAuxiliaryTab(const QString &id)
+{
+    for (EditorPane *pane : panes()) {
+        const int index = pane->auxiliaryTabIndex(id);
+        if (index >= 0) {
+            pane->refreshTab(index);
+            pane->notifyStateChanged();
+            return;
+        }
+    }
 }
 
 EditorPane *EditorArea::createPane(const QString &paneId)
@@ -2499,35 +2710,16 @@ bool EditorArea::moveTabIntoPane(EditorPane *source, int sourceIndex, EditorPane
     if (source == nullptr || target == nullptr) {
         return false;
     }
-    QString path;
-    // The SAME editor widget travels: its document (text, dirty flag, undo stack,
-    // caret) never passes through a file or a copy.
-    QWidget *editor = source->detachTab(sourceIndex, &path);
-    if (editor == nullptr) {
+    const auto *record = source->documentAt(sourceIndex);
+    if (record == nullptr || record->editor == nullptr) {
         return false;
     }
-    int adopted = -1;
-    // A freshly split pane starts with one untouched empty tab. Install the moved
-    // document into THAT tab (the same rule openFile() uses) instead of leaving an
-    // empty strip next to the document the user dropped.
-    const bool replaceUnusedEmptyTab =
-        target->tabCount() == 1 && target->currentFilePath().isEmpty() && !target->isTabModified(0);
-    if (replaceUnusedEmptyTab) {
-        target->showSharedDocument(editor, path);
-        adopted = 0;
-    } else {
-        adopted = target->adoptTab(editor, path, insertAt);
-    }
-    if (adopted < 0) {
-        // A refused move must never lose a buffer: put it back where it came from.
-        source->adoptTab(editor, path);
-        return false;
-    }
-    target->setActiveTab(adopted);
+    // Transfer the page, its tab identity and any auxiliary callbacks together.
+    auto document = source->detachDocument(sourceIndex);
+    source->finishTabRemoval(sourceIndex);
+    target->adoptDocument(std::move(document), insertAt, true);
     setActivePane(target);
-    if (QWidget *editorWidget = target->editorWidget()) {
-        editorWidget->setFocus(Qt::OtherFocusReason);
-    }
+    target->requestFocus();
     if (onLayoutChanged_ != nullptr) {
         onLayoutChanged_();
     }
@@ -2566,6 +2758,7 @@ bool EditorArea::dropTab(EditorPane *source, quint64 serial, EditorPane *target,
             if (to != sourceIndex) {
                 source->tabBar()->moveTab(sourceIndex, to);
             }
+            source->tabScroll_->revealCurrentTab();
             return true;
         }
         if (zone == TabDropZone::Center) {
@@ -2604,7 +2797,8 @@ bool EditorArea::closePane(EditorPane *closing)
     if (closing == nullptr || !panes().contains(closing)) {
         return false;
     }
-    if (onClosePaneRequested_ != nullptr && !onClosePaneRequested_(closing)) {
+    if (!closing->canCloseAuxiliaryTabs() ||
+        (onClosePaneRequested_ != nullptr && !onClosePaneRequested_(closing))) {
         return false;
     }
     Node *leaf = findLeaf(root_.get(), closing);
@@ -2641,9 +2835,7 @@ bool EditorArea::closePane(EditorPane *closing)
     const auto remaining = panes();
     if (!remaining.isEmpty()) {
         setActivePane(remaining.first());
-        if (remaining.first()->editorWidget() != nullptr) {
-            remaining.first()->editorWidget()->setFocus(Qt::OtherFocusReason);
-        }
+        remaining.first()->requestFocus();
     }
     rebuild();
     return true;
@@ -2658,9 +2850,7 @@ void EditorArea::focusNextPane()
     const int index = all.indexOf(active_);
     const int next = (index + 1) % all.size();
     setActivePane(all.at(next));
-    if (active_->editorWidget() != nullptr) {
-        active_->editorWidget()->setFocus(Qt::OtherFocusReason);
-    }
+    active_->requestFocus();
 }
 
 void EditorArea::resetLayout()

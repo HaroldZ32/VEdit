@@ -15,6 +15,7 @@
 #include <QMainWindow>
 #include <QString>
 #include <QMetaObject>
+#include <QPointer>
 #include <QStringList>
 
 #include <functional>
@@ -258,11 +259,15 @@ signals:
     // case-insensitive, so a `.flist` is not a filelist.
     void fileOpened(const QString &absolutePath);
 
+    // Emitted when the active regular editor view or its file path changes.
+    void activeEditorChanged();
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    CloseChoice promptUnsaved(const QString &displayName, const QString &path);
+    CloseChoice promptUnsaved(const QString &displayName, const QString &path,
+                              bool saveWithoutPath);
     // Several dirty documents, ONE dialog. Lists every affected document (one
     // line each) and offers Save All / Discard All / Cancel; headless (offscreen)
     // answers Cancel like promptUnsaved() does, never "discard because no dialog
@@ -383,6 +388,8 @@ private:
     QLabel *statusProject_ = nullptr;
     QLabel *statusTheme_ = nullptr;
     QLabel *statusLayout_ = nullptr;
+    QPointer<QWidget> activeEditorView_;
+    QString activeEditorPath_;
     // T12: "● 未保存的更改" — the explicit, always-visible unsaved indicator
     // (AC-8.1); hidden while the active document is clean (AC-8.2).
     QLabel *statusDirty_ = nullptr;

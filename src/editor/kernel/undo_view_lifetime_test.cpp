@@ -34,7 +34,9 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QFileInfo>
 #include <QPoint>
+#include <QProcess>
 #include <QTabBar>
 #include <QTemporaryDir>
 #include <QTest>
@@ -42,6 +44,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <sys/stat.h>
 
 namespace {
 
@@ -98,6 +101,117 @@ bool typeText(KTextEditor::View *view, const QString &text)
     return true;
 }
 
+bool putBytes(const QString &path, const QByteArray &bytes)
+{
+    QFile file(path);
+    return file.open(QIODevice::WriteOnly) && file.write(bytes) == bytes.size();
+}
+
+std::unique_ptr<QWidget> openComparison(vedit::app::EditorProvider &provider, const QString &path,
+                                        QWidget *source, QString *error)
+{
+    const vedit::app::ComparisonEditorInput input{path, path, path, false};
+    return std::unique_ptr<QWidget>(provider.createComparisonEditor(source, nullptr, input, error));
+}
+
+int fifoSaveAsChild(const QString &source, const QString &destination)
+{
+    auto provider = vedit::editor::makeEditCoreProvider();
+    QString error;
+    const auto comparison = openComparison(*provider, source, nullptr, &error);
+    if (!comparison) {
+        check(QStringLiteral("save-as.fifo-comparison-open"), false, error);
+        return 1;
+    }
+    auto *document = vedit::editor::documentFor(comparison.get());
+    if (!document || !document->insertText({0, 0}, QStringLiteral("dirty "))) {
+        check(QStringLiteral("save-as.fifo-dirty-fixture"), false);
+        return 1;
+    }
+    std::printf("FIFO-SAVE-AS begin\n");
+    std::fflush(stdout);
+    QWidget *replacement = nullptr;
+    const bool saved = provider->saveFileAs(comparison.get(), destination, &replacement, &error);
+    const bool refused = !saved && replacement == nullptr && !error.isEmpty() && document->isModified()
+                         && provider->currentFilePath(comparison.get()) == source;
+    delete replacement;
+    check(QStringLiteral("save-as.fifo-refused"), refused, error);
+    return refused ? 0 : 1;
+}
+
+void checkFifoDestination(const QTemporaryDir &directory)
+{
+    const QString source = directory.filePath(QStringLiteral("save-as-source.txt"));
+    const QString destination = directory.filePath(QStringLiteral("save-as-fifo"));
+    const QByteArray fifo = QFile::encodeName(destination);
+    const bool ready = putBytes(source, "original\r\nlast") && ::mkfifo(fifo.constData(), 0600) == 0;
+    check(QStringLiteral("save-as.fifo-fixture"), ready);
+    if (!ready) {
+        return;
+    }
+    QProcess child;
+    child.setProcessChannelMode(QProcess::MergedChannels);
+    child.start(QCoreApplication::applicationFilePath(),
+                {QStringLiteral("--fifo-save-as"), source, destination});
+    const bool finished = child.waitForFinished(5000);
+    if (!finished) {
+        child.kill();
+        child.waitForFinished(1000);
+    }
+    const auto output = child.readAll();
+    check(QStringLiteral("save-as.fifo-returned-before-watchdog"),
+          finished && child.exitStatus() == QProcess::NormalExit && child.exitCode() == 0,
+          QString::fromUtf8(output).trimmed());
+    struct stat info {};
+    QFile original(source);
+    check(QStringLiteral("save-as.fifo-and-source-intact"),
+          ::lstat(fifo.constData(), &info) == 0 && S_ISFIFO(info.st_mode)
+          && original.open(QIODevice::ReadOnly) && original.readAll() == "original\r\nlast");
+}
+
+void checkMixedEndingUndo(const QTemporaryDir &directory)
+{
+    constexpr int removedLines = 420;
+    const QString path = directory.filePath(QStringLiteral("mixed-large-hunk.txt"));
+    QByteArray original;
+    QString text;
+    for (int line = 0; line < removedLines; ++line) {
+        const QByteArray content = "line-" + QByteArray::number(line);
+        original += content + (line % 3 == 0 ? "\n" : "\r\n");
+        text += QString::fromLatin1(content) + QLatin1Char('\n');
+    }
+    const qsizetype removedSize = text.size();
+    original += "tail";
+    text += QStringLiteral("tail");
+    auto provider = vedit::editor::makeEditCoreProvider();
+    vedit::app::EditorPane pane(QStringLiteral("mixed-undo"), provider.get());
+    QString error;
+    const bool opened = putBytes(path, original) && pane.openFile(path, &error);
+    const auto comparison = opened ? openComparison(*provider, path, pane.editorWidget(), &error) : nullptr;
+    auto *document = vedit::editor::documentFor(pane.editorWidget());
+    const bool ready = comparison && document && vedit::editor::documentFor(comparison.get()) == document
+                       && document->text() == text;
+    check(QStringLiteral("mixed.large-undo-shared-fixture"), ready, error);
+    if (!ready) {
+        return;
+    }
+    const bool typed = document->insertText({removedLines, 4}, QStringLiteral("!"));
+    const bool removed = provider->replaceComparisonText(comparison.get(), 0, removedSize, QString());
+    check(QStringLiteral("mixed.large-hunk-replaced"), typed && removed && document->text() == QStringLiteral("tail!"));
+    const bool undone = pane.triggerEditorAction({QStringLiteral("edit_undo"), QStringLiteral("undo")},
+                                               QStringLiteral("undo"));
+    check(QStringLiteral("mixed.large-hunk-undo-retains-dirty-edit"),
+          undone && document->isModified() && document->text() == text + QLatin1Char('!'));
+    const bool saved = pane.saveFile(&error);
+    QFile file(path);
+    const QByteArray expected = original + '!';
+    const QByteArray actual = file.open(QIODevice::ReadOnly) ? file.readAll() : QByteArray();
+    check(QStringLiteral("mixed.large-hunk-undo-restores-disk-bytes"), saved && actual == expected,
+          QStringLiteral("bytes=%1 expected=%2 crlf=%3 expected-crlf=%4 error=%5")
+              .arg(actual.size()).arg(expected.size()).arg(actual.count("\r\n"))
+              .arg(expected.count("\r\n")).arg(error));
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -109,11 +223,17 @@ int main(int argc, char **argv)
         return 77;
     }
 
+    if (argc == 4 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--fifo-save-as")) {
+        return fifoSaveAsChild(QString::fromLocal8Bit(argv[2]), QString::fromLocal8Bit(argv[3]));
+    }
+
     QTemporaryDir dir;
     check(QStringLiteral("setup.temp-dir"), dir.isValid());
     if (!dir.isValid()) {
         return 1;
     }
+    checkFifoDestination(dir);
+    checkMixedEndingUndo(dir);
     const QString path = dir.filePath(QStringLiteral("rm5_undo_top.sv"));
     const QString openedText =
         QStringLiteral("module rm5_undo_top;\n  wire a;\n  wire b;\nendmodule\n");

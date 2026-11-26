@@ -201,12 +201,13 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
             return SaveDecision::Cancel;
         }
         const QString path = pane->tabFilePath(index);
-        const QString display =
-            path.isEmpty() ? QStringLiteral("untitled") : QFileInfo(path).fileName();
-        switch (promptUnsaved(display, path)) {
+        const QString display = pane->tabDisplayName(index);
+        const quint64 serial = pane->tabSerial(index);
+        switch (promptUnsaved(display, path, pane->isAuxiliaryTab(index))) {
         case CloseChoice::Save: {
             QString error;
-            if (!pane->saveTab(index, &error)) {
+            const int saveIndex = pane->tabIndexForSerial(serial);
+            if (saveIndex >= 0 && !pane->saveTab(saveIndex, &error)) {
                 const QString message = error.isEmpty()
                                             ? tr("Save failed: %1").arg(display)
                                             : tr("Save failed: %1").arg(error);
@@ -1436,7 +1437,7 @@ bool ApplicationShell::saveAllDocuments()
                 continue;
             }
             const QString path = pane->tabFilePath(index);
-            if (path.isEmpty()) {
+            if (path.isEmpty() && !pane->isAuxiliaryTab(index)) {
                 // An untitled document has no target; it needs Save As. Reported,
                 // never silently discarded.
                 untitled.append(pane->tabText(index));
@@ -1446,7 +1447,7 @@ bool ApplicationShell::saveAllDocuments()
             if (pane->saveTab(index, &error)) {
                 ++saved;
             } else {
-                errors.append(error.isEmpty() ? path : error);
+                errors.append(error.isEmpty() ? pane->tabDisplayName(index) : error);
             }
         }
     }
@@ -1916,7 +1917,7 @@ bool ApplicationShell::saveActiveDocument()
     }
     // AC-1.4 (batch 1b): an untitled document has nothing to save TO, so Ctrl+S
     // (and File > Save) is the Save As entry for it instead of a failure message.
-    if (pane->currentFilePath().isEmpty()) {
+    if (pane->currentFilePath().isEmpty() && !pane->isAuxiliaryTab(pane->activeTabIndex())) {
         return saveActiveDocumentAs();
     }
     const QString path = pane->currentFilePath();
@@ -1975,6 +1976,11 @@ bool ApplicationShell::saveActiveDocumentAs()
     };
     if (pane == nullptr) {
         reportFailure(QCoreApplication::translate("VEdit", "no active editor pane"));
+        return false;
+    }
+
+    if (pane->isAuxiliaryTab(pane->activeTabIndex())) {
+        reportFailure(tr("Save As is unavailable for this tab."));
         return false;
     }
 
@@ -2207,6 +2213,12 @@ void ApplicationShell::updateStatusBar()
     }
     const EditorPane *active = editorArea_ != nullptr ? editorArea_->activePane() : nullptr;
     const QString path = active != nullptr ? active->currentFilePath() : QString();
+    auto *view = active != nullptr ? active->editorWidget() : nullptr;
+    if (activeEditorView_ != view || activeEditorPath_ != path) {
+        activeEditorView_ = view;
+        activeEditorPath_ = path;
+        emit activeEditorChanged();
+    }
     // FIX 1: every path this bar renders goes through the ONE display rule.
     const QString displayedPath = vedit::paths::displayPath(options_.projectRoot, path);
     const bool dirty = active != nullptr && active->isActiveTabModified();
@@ -2266,7 +2278,8 @@ void ApplicationShell::updateStatusBar()
 }
 
 ApplicationShell::CloseChoice ApplicationShell::promptUnsaved(const QString &displayName,
-                                                             const QString &path)
+                                                             const QString &path,
+                                                             bool saveWithoutPath)
 {
     // Headless (ctest's --selfcheck and the offscreen lane selftests) has nobody
     // to ask: the only safe answer is Cancel, never "discard because no dialog
@@ -2283,12 +2296,15 @@ ApplicationShell::CloseChoice ApplicationShell::promptUnsaved(const QString &dis
     box.setIcon(QMessageBox::Warning);
     box.setWindowTitle(tr("Unsaved changes"));
     box.setText(tr("%1 has unsaved changes.").arg(displayName));
-    box.setInformativeText(
-        path.isEmpty()
-            ? tr("This document has no file path yet, so it cannot be saved here.")
-                  + QStringLiteral("\n\n") + tr("Close it and discard the changes?")
-            : path + QStringLiteral("\n\n")
-                  + tr("Save the document before closing, or discard the changes?"));
+    const QString saveQuestion = tr("Save the document before closing, or discard the changes?");
+    if (!path.isEmpty()) {
+        box.setInformativeText(path + QStringLiteral("\n\n") + saveQuestion);
+    } else if (saveWithoutPath) {
+        box.setInformativeText(saveQuestion);
+    } else {
+        box.setInformativeText(tr("This document has no file path yet, so it cannot be saved here.")
+                               + QStringLiteral("\n\n") + tr("Close it and discard the changes?"));
+    }
     QPushButton *saveButton = box.addButton(tr("Save"), QMessageBox::AcceptRole);
     QPushButton *discardButton = box.addButton(tr("Discard"), QMessageBox::DestructiveRole);
     QPushButton *cancelButton = box.addButton(tr("Cancel"), QMessageBox::RejectRole);
@@ -2317,12 +2333,13 @@ bool ApplicationShell::confirmPaneClose(EditorPane *pane)
             continue;
         }
         const QString path = pane->tabFilePath(index);
-        const QString display =
-            path.isEmpty() ? QStringLiteral("untitled") : QFileInfo(path).fileName();
-        switch (promptUnsaved(display, path)) {
+        const QString display = pane->tabDisplayName(index);
+        const quint64 serial = pane->tabSerial(index);
+        switch (promptUnsaved(display, path, pane->isAuxiliaryTab(index))) {
         case CloseChoice::Save: {
             QString error;
-            if (!pane->saveTab(index, &error)) {
+            const int saveIndex = pane->tabIndexForSerial(serial);
+            if (saveIndex >= 0 && !pane->saveTab(saveIndex, &error)) {
                 const QString message = error.isEmpty()
                                             ? tr("Save failed: %1").arg(display)
                                             : tr("Save failed: %1").arg(error);
@@ -2359,14 +2376,18 @@ bool ApplicationShell::confirmUnsavedDocuments()
     // (AC-4.2). The single-document case keeps the T19 prompt exactly as it was.
     struct DirtyDocument {
         EditorPane *pane = nullptr;
-        int tab = -1;
+        quint64 serial = 0;
         QString display;
         QString path;
+        bool saveWithoutPath = false;
     };
     QVector<DirtyDocument> dirty;
     for (EditorPane *pane : editorArea_->panes()) {
         if (pane == nullptr) {
             continue;
+        }
+        if (!pane->canCloseAuxiliaryTabs()) {
+            return false;
         }
         for (int index = 0; index < pane->tabCount(); ++index) {
             if (!pane->isTabModified(index)) {
@@ -2374,10 +2395,10 @@ bool ApplicationShell::confirmUnsavedDocuments()
             }
             DirtyDocument document;
             document.pane = pane;
-            document.tab = index;
+            document.serial = pane->tabSerial(index);
             document.path = pane->tabFilePath(index);
-            document.display =
-                document.path.isEmpty() ? tr("untitled") : QFileInfo(document.path).fileName();
+            document.display = pane->tabDisplayName(index);
+            document.saveWithoutPath = pane->isAuxiliaryTab(index);
             dirty.append(document);
         }
     }
@@ -2397,7 +2418,8 @@ bool ApplicationShell::confirmUnsavedDocuments()
         // Test seam: ONE call for the whole set — that is the "one dialog" rule.
         choice = unsavedPromptProvider_(displays, paths);
     } else if (dirty.size() == 1) {
-        choice = promptUnsaved(dirty.first().display, dirty.first().path);
+        const DirtyDocument &document = dirty.first();
+        choice = promptUnsaved(document.display, document.path, document.saveWithoutPath);
     } else {
         choice = promptUnsavedBatch(displays, paths);
     }
@@ -2405,8 +2427,12 @@ bool ApplicationShell::confirmUnsavedDocuments()
     switch (choice) {
     case CloseChoice::Save:
         for (const DirtyDocument &document : dirty) {
+            const int index = document.pane->tabIndexForSerial(document.serial);
+            if (!document.pane->isTabModified(index)) {
+                continue;
+            }
             QString error;
-            if (!document.pane->saveTab(document.tab, &error)) {
+            if (!document.pane->saveTab(index, &error)) {
                 const QString message = error.isEmpty()
                                             ? tr("Save failed: %1").arg(document.display)
                                             : tr("Save failed: %1").arg(error);

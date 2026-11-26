@@ -34,15 +34,24 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDir>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFile>
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QKeySequence>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMimeData>
+#include <QMouseEvent>
 #include <QPlainTextEdit>
+#include <QPointer>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QStyleOptionSlider>
 #include <QTabBar>
 #include <QTemporaryDir>
+#include <QWheelEvent>
 
 #include <cstdio>
 
@@ -124,6 +133,256 @@ QWidget *innerWidget(KTextEditor::View *view)
 }
 #endif
 
+void checkScrollingTabs(const QString &directory)
+{
+    vedit::app::DemoEditorProvider provider;
+    vedit::app::EditorArea area;
+    area.setProvider(&provider);
+    area.resize(540, 380);
+    area.show();
+    auto *pane = area.ensurePane();
+    auto *tabs = pane->tabBar();
+    auto *strip = pane->findChild<QScrollArea *>(QStringLiteral("editor-tab-scroll-area"));
+    check(QStringLiteral("scroll.strip"), strip != nullptr);
+    if (strip == nullptr) {
+        return;
+    }
+    auto *scrollbar = strip->horizontalScrollBar();
+    const auto visible = [&]() {
+        const QRect tab = tabs->tabRect(pane->activeTabIndex());
+        return strip->viewport()->rect().contains(QRect(tabs->mapTo(strip->viewport(), tab.topLeft()),
+                                                        tab.size()));
+    };
+
+    const QString name = QStringLiteral("long_%1.txt").arg(QString(90, QLatin1Char('x')));
+    const QString first = writeFile(directory, name, QStringLiteral("first\n"));
+    bool opened = pane->openFile(first);
+    QApplication::processEvents();
+    const int singleWidth = tabs->tabRect(0).width();
+    check(QStringLiteral("scroll.fits-hidden"), !scrollbar->isVisible() && visible());
+    check(QStringLiteral("scroll.long-full-tooltip"), tabs->tabToolTip(0).endsWith(name));
+
+    for (int index = 1; index < 12; ++index) {
+        const QString path = writeFile(directory, QStringLiteral("scroll-%1.txt").arg(index),
+                                       QStringLiteral("next\n"));
+        opened = pane->openFile(path) && opened;
+    }
+    QApplication::processEvents();
+    bool sameWidths = singleWidth > 0;
+    for (int index = 0; index < tabs->count(); ++index) {
+        sameWidths = sameWidths && tabs->tabRect(index).width() == singleWidth;
+    }
+    check(QStringLiteral("scroll.fixed-width"), opened && tabs->count() == 12 && sameWidths,
+          QStringLiteral("single=%1 first=%2 last=%3")
+              .arg(singleWidth).arg(tabs->tabRect(0).width()).arg(tabs->tabRect(11).width()));
+    check(QStringLiteral("scroll.overflow"), scrollbar->isVisible() && scrollbar->maximum() > 0,
+          QStringLiteral("maximum=%1").arg(scrollbar->maximum()));
+    check(QStringLiteral("scroll.open-reveals"), pane->activeTabIndex() == 11 && visible());
+    pane->setActiveTab(0);
+    QApplication::processEvents();
+    check(QStringLiteral("scroll.select-reveals"), visible() && scrollbar->value() == 0);
+
+    const auto wheel = [&](const QPoint &pixelDelta, const QPoint &angleDelta) {
+        const QPoint position = tabs->mapFrom(strip->viewport(), QPoint(30, 8));
+        QWheelEvent event(QPointF(position), QPointF(tabs->mapToGlobal(position)), pixelDelta,
+                          angleDelta, Qt::NoButton, Qt::NoModifier, Qt::ScrollUpdate, false);
+        QApplication::sendEvent(tabs, &event);
+        QApplication::processEvents();
+    };
+    wheel({}, QPoint(0, -120));
+    const int afterWheel = scrollbar->value();
+    check(QStringLiteral("scroll.wheel-keeps-file"), afterWheel > 0 && pane->currentFilePath() == first);
+    wheel(QPoint(-35, 0), {});
+    check(QStringLiteral("scroll.trackpad-keeps-file"),
+          scrollbar->value() > afterWheel && pane->currentFilePath() == first);
+
+    scrollbar->setValue(0);
+    QStyleOptionSlider option;
+    option.initFrom(scrollbar);
+    option.orientation = Qt::Horizontal;
+    option.minimum = scrollbar->minimum();
+    option.maximum = scrollbar->maximum();
+    option.sliderPosition = scrollbar->sliderPosition();
+    option.sliderValue = scrollbar->value();
+    option.singleStep = scrollbar->singleStep();
+    option.pageStep = scrollbar->pageStep();
+    const QPoint thumb = scrollbar->style()
+                             ->subControlRect(QStyle::CC_ScrollBar, &option,
+                                              QStyle::SC_ScrollBarSlider, scrollbar)
+                             .center();
+    const QPoint target = thumb + QPoint(scrollbar->width() / 3, 0);
+    const auto mouse = [scrollbar](QEvent::Type type, QPoint position, Qt::MouseButton button,
+                                  Qt::MouseButtons buttons) {
+        QMouseEvent event(type, QPointF(position), QPointF(scrollbar->mapToGlobal(position)),
+                          button, buttons, Qt::NoModifier);
+        QApplication::sendEvent(scrollbar, &event);
+    };
+    mouse(QEvent::MouseButtonPress, thumb, Qt::LeftButton, Qt::LeftButton);
+    const bool grabbed = scrollbar->isSliderDown();
+    mouse(QEvent::MouseMove, target, Qt::NoButton, Qt::LeftButton);
+    mouse(QEvent::MouseButtonRelease, target, Qt::LeftButton, Qt::NoButton);
+    check(QStringLiteral("scroll.thumb-drag-keeps-file"),
+          grabbed && scrollbar->value() > 0 && pane->currentFilePath() == first,
+          QStringLiteral("value=%1").arg(scrollbar->value()));
+
+    check(QStringLiteral("scroll.reopen-reveals"), pane->openFile(first) && visible());
+    pane->setActiveTab(11);
+    QApplication::processEvents();
+    QWidget *overlay = pane->findChild<QWidget *>(QStringLiteral("editor-drop-overlay"));
+    const QPoint drop = strip->viewport()->rect().center();
+    const int dropIndex = tabs->tabAt(tabs->mapFrom(strip->viewport(), drop));
+    const quint64 serial = pane->tabSerial(11);
+    if (overlay != nullptr && dropIndex >= 0) {
+        const QPoint dropPosition = strip->viewport()->mapTo(pane, drop);
+        QMimeData mime;
+        mime.setData(QString::fromLatin1(vedit::app::kEditorTabMimeType), QByteArrayLiteral("drag"));
+        area.beginTabDrag(pane, serial);
+        QDragEnterEvent enter(dropPosition, Qt::MoveAction, &mime, Qt::LeftButton, Qt::NoModifier);
+        QApplication::sendEvent(overlay, &enter);
+        QDropEvent event(QPointF(dropPosition), Qt::MoveAction, &mime, Qt::LeftButton, Qt::NoModifier);
+        QApplication::sendEvent(overlay, &event);
+        area.endTabDrag();
+    }
+    check(QStringLiteral("scroll.drop-maps-visible-tab"),
+          dropIndex > 0 && dropIndex < 11 && pane->tabIndexForSerial(serial) == dropIndex,
+          QStringLiteral("target=%1 actual=%2").arg(dropIndex).arg(pane->tabIndexForSerial(serial)));
+    while (pane->tabCount() > 1) {
+        if (!pane->closeTab(pane->tabCount() - 1)) {
+            break;
+        }
+    }
+    QApplication::processEvents();
+    check(QStringLiteral("scroll.scrollbar-hides-again"),
+          pane->tabCount() == 1 && !scrollbar->isVisible() && visible());
+}
+
+void checkAuxiliaryTabs(const QString &directory, const QString &ordinaryFile)
+{
+    using namespace vedit::app;
+    ShellOptions options;
+    options.stateDir = directory + QStringLiteral("/aux-state");
+    options.restoreSession = false;
+    options.showDefaultPanels = false;
+    ApplicationShell shell(options);
+    DemoEditorProvider provider;
+    auto *area = shell.editorArea();
+    area->setProvider(&provider);
+    shell.resize(900, 570);
+    shell.show();
+    auto *left = area->ensurePane();
+    const QString id = QStringLiteral("aux:compare");
+    const QString title = QStringLiteral("Compare a and b");
+    check(QStringLiteral("aux.open-ordinary"), left->openFile(ordinaryFile));
+
+    bool dirty = false;
+    bool veto = false;
+    bool canSave = true;
+    int saves = 0;
+    int undos = 0;
+    AuxiliaryTabCallbacks callbacks;
+    callbacks.isModified = [&dirty]() { return dirty; };
+    callbacks.save = [&](QString *) {
+        if (!canSave) {
+            return false;
+        }
+        dirty = false;
+        ++saves;
+        return true;
+    };
+    callbacks.canClose = [&veto]() { return !veto; };
+    callbacks.actionEnabled = [](const QStringList &names) {
+        return names.contains(QStringLiteral("edit_undo"));
+    };
+    callbacks.triggerAction = [&](const QStringList &names, const char *) {
+        if (!names.contains(QStringLiteral("edit_undo"))) {
+            return false;
+        }
+        ++undos;
+        return true;
+    };
+    const QPointer<QPlainTextEdit> page(new QPlainTextEdit);
+    check(QStringLiteral("aux.hosted-in-tab"),
+          area->openAuxiliaryTab(id, title, page, std::move(callbacks)) == page &&
+              left->isAuxiliaryTab(left->activeTabIndex()) && left->tabCount() == 2 &&
+              left->editorWidget() == nullptr && left->currentFilePath().isEmpty());
+    const QPointer<QWidget> spare(new QWidget);
+    check(QStringLiteral("aux.same-id-activates"),
+          area->openAuxiliaryTab(id, title, spare) == page && spare.isNull() && left->tabCount() == 2);
+    dirty = true;
+    area->refreshAuxiliaryTab(id);
+    const int index = left->activeTabIndex();
+    check(QStringLiteral("aux.dirty-label"),
+          left->isActiveTabModified() && left->tabText(index).contains(QStringLiteral("●")) &&
+              left->tabDisplayName(index) == title && left->tabBar()->tabToolTip(index) == title);
+    int active = 0;
+    const auto savedDocuments = left->documentStates(&active);
+    check(QStringLiteral("aux.session-ordinary-only"),
+          savedDocuments.size() == 1 && savedDocuments.first().path == ordinaryFile && active == -1);
+
+    int saveAsCalls = 0;
+    shell.setSaveAsDialogProvider([&](const QString &) {
+        ++saveAsCalls;
+        return QString();
+    });
+    check(QStringLiteral("aux.save-current"),
+          shell.saveActiveDocument() && saves == 1 && saveAsCalls == 0 && !left->isActiveTabModified());
+    check(QStringLiteral("aux.save-as-refused-before-dialog"),
+          !shell.saveActiveDocumentAs() && saveAsCalls == 0);
+    QAction *undo = shell.commands()->action(QStringLiteral("edit.undo"));
+    if (undo != nullptr) {
+        undo->trigger();
+    }
+    check(QStringLiteral("aux.shell-undo"), undo != nullptr && undo->isEnabled() && undos == 1);
+
+    auto *right = area->splitActive(Qt::Horizontal);
+    check(QStringLiteral("aux.split-preserves-source"),
+          right != nullptr && right->tabCount() == 1 && !right->isAuxiliaryTab(0) &&
+              area->findAuxiliaryTab(id) == page);
+    if (right == nullptr) {
+        return;
+    }
+    const quint64 serial = left->tabSerial(index);
+    check(QStringLiteral("aux.move-keeps-identity"),
+          area->dropTab(left, serial, right, TabDropZone::Center) &&
+              right->tabIndexForSerial(serial) == 0 && area->findAuxiliaryTab(id) == page &&
+              left->tabCount() == 1 && right->tabCount() == 1);
+    check(QStringLiteral("aux.activate-moved-page"),
+          area->activateAuxiliaryTab(id) && area->activePane() == right && right->isAuxiliaryTab(0));
+
+    dirty = true;
+    area->refreshAuxiliaryTab(id);
+    QAction *saveAll = shell.commands()->action(QStringLiteral("file.save-all"));
+    if (saveAll != nullptr) {
+        saveAll->trigger();
+    }
+    check(QStringLiteral("aux.save-all"), saves == 2 && !dirty);
+    dirty = true;
+    veto = true;
+    check(QStringLiteral("aux.veto-guards-tab-pane-window"),
+          !right->closeTab(0) && !area->closePane(right) && !shell.confirmUnsavedDocuments());
+    veto = false;
+    QStringList prompted;
+    shell.setUnsavedPromptProvider([&](const QStringList &names, const QStringList &) {
+        prompted = names;
+        return ApplicationShell::CloseChoice::Save;
+    });
+    canSave = false;
+    check(QStringLiteral("aux.failed-save-blocks-window"),
+          !shell.confirmUnsavedDocuments() && dirty && area->findAuxiliaryTab(id) == page);
+    canSave = true;
+    check(QStringLiteral("aux.window-save-uses-title"),
+          shell.confirmUnsavedDocuments() && prompted == QStringList{title} && saves == 3 && !dirty);
+    dirty = true;
+    int closePrompts = 0;
+    right->setOnTabCloseRequested([&](EditorPane *, int) {
+        return ++closePrompts == 1 ? SaveDecision::Cancel : SaveDecision::Save;
+    });
+    check(QStringLiteral("aux.close-cancel-keeps-page"), !right->closeTab(0) && !page.isNull());
+    check(QStringLiteral("aux.close-save-releases-page"),
+          right->closeTab(0) && closePrompts == 2 && saves == 4 && page.isNull() &&
+              area->findAuxiliaryTab(id) == nullptr && right->tabCount() == 1);
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -139,6 +398,9 @@ int main(int argc, char **argv)
     const QString a = writeFile(temp.path(), QStringLiteral("a.txt"), QStringLiteral("alpha content\n"));
     const QString b = writeFile(temp.path(), QStringLiteral("b.txt"), QStringLiteral("bravo content\n"));
     const QString c = writeFile(temp.path(), QStringLiteral("c.txt"), QStringLiteral("charlie content\n"));
+
+    checkScrollingTabs(temp.path());
+    checkAuxiliaryTabs(temp.path(), a);
 
     vedit::app::DemoEditorProvider provider;
     vedit::app::EditorArea area;

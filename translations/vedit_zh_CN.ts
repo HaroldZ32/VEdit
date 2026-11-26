@@ -8494,6 +8494,66 @@ Right-click here or choose File → Open Folder.</source>
 <context>
     <name>FileComparison</name>
     <message>
+        <source>Cannot preserve the line endings of %1.</source>
+        <translation>无法保留 %1 的换行格式。</translation>
+    </message>
+    <message>
+        <source>%1 has a live comparison buffer. Close its open views before replacing it.</source>
+        <translation>%1 仍有打开的比对缓冲区。请关闭其所有视图后再替换此文件。</translation>
+    </message>
+    <message>
+        <source>Cannot open %1 for reading after Save As.</source>
+        <translation>另存为后将无法读取 %1。</translation>
+    </message>
+    <message>
+        <source>Saved %1, but could not reopen it: %2</source>
+        <translation>已保存 %1，但无法重新打开：%2</translation>
+    </message>
+    <message>
+        <source>Snapshot</source>
+        <translation>快照</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>撤销</translation>
+    </message>
+    <message>
+        <source>Sync scroll</source>
+        <translation>同步滚动</translation>
+    </message>
+    <message>
+        <source>Left comparison editor</source>
+        <translation>左侧比对编辑器</translation>
+    </message>
+    <message>
+        <source>Right comparison editor</source>
+        <translation>右侧比对编辑器</translation>
+    </message>
+    <message>
+        <source>Comparison requires a KTextEditor view.</source>
+        <translation>比对需要 KTextEditor 编辑器视图。</translation>
+    </message>
+    <message>
+        <source>  ·  Right only</source>
+        <translation>  ·  仅右侧有内容</translation>
+    </message>
+    <message>
+        <source>  ·  Left only</source>
+        <translation>  ·  仅左侧有内容</translation>
+    </message>
+    <message>
+        <source>This difference could not be applied.</source>
+        <translation>无法应用此差异。</translation>
+    </message>
+    <message>
+        <source>%1 is read-only.</source>
+        <translation>%1 为只读。</translation>
+    </message>
+    <message>
+        <source>%1 changed outside this comparison. Resolve the disk change before saving.</source>
+        <translation>%1 已在比对之外更改。请处理磁盘上的变更后再保存。</translation>
+    </message>
+    <message>
         <source>Cannot read %1.</source>
         <translation>无法读取 %1。</translation>
     </message>
@@ -8791,6 +8851,10 @@ Right-click here or choose File → Open Folder.</source>
 <context>
     <name>SvnComparison</name>
     <message>
+        <source>The active file has no SVN BASE revision.</source>
+        <translation>当前文件没有 SVN BASE 版本。</translation>
+    </message>
+    <message>
         <source>Reading SVN revisions…</source>
         <translation>正在读取 SVN 修订…</translation>
     </message>
@@ -9007,6 +9071,14 @@ Right-click here or choose File → Open Folder.</source>
 </context>
 <context>
     <name>vedit::workspace::vcs::VcsPanel</name>
+    <message>
+        <source>Current File: SVN History</source>
+        <translation>当前文件：SVN 历史</translation>
+    </message>
+    <message>
+        <source>Current File: Compare With SVN BASE</source>
+        <translation>当前文件：与 SVN BASE 比对</translation>
+    </message>
     <message>
         <source>Open HEAD Revision</source>
         <translation>打开最新修订 (HEAD)</translation>

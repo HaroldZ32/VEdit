@@ -9,7 +9,9 @@
 #include "vcs_integration.h"
 #include "vcs_panel.h"
 
+#include <KTextEditor/Attribute>
 #include <KTextEditor/Document>
+#include <KTextEditor/View>
 #include <QApplication>
 #include <QDialog>
 #include <QElapsedTimer>
@@ -23,9 +25,11 @@
 #include <QProcess>
 #include <QPushButton>
 #include <QScopeGuard>
+#include <QSignalSpy>
+#include <QScrollBar>
 #include <QStandardPaths>
 #include <QStatusBar>
-#include <QTableView>
+#include <QTest>
 #include <QTabWidget>
 #include <QTemporaryDir>
 #include <QThread>
@@ -76,28 +80,44 @@ QByteArray get(const QString &path)
     return file.open(QIODevice::ReadOnly) ? file.readAll() : QByteArray();
 }
 
-QDialog *dialog(app::ApplicationShell &shell)
+QWidget *comparisonPage(app::ApplicationShell &shell)
 {
-    return shell.findChild<QDialog *>(QStringLiteral("file-comparison"));
+    for (auto *page : shell.findChildren<QWidget *>(QStringLiteral("file-comparison"))) {
+        if (page->isVisibleTo(&shell)) {
+            return page;
+        }
+    }
+    return nullptr;
 }
 
-QPushButton *button(QDialog *comparison, const char *name)
+KTextEditor::View *sideView(QWidget *comparison, const char *name)
+{
+    return comparison ? comparison->findChild<KTextEditor::View *>(QString::fromLatin1(name)) : nullptr;
+}
+
+bool closeActiveTab(app::ApplicationShell &shell)
+{
+    auto *pane = shell.editorArea()->activePane();
+    return pane->closeTab(pane->activeTabIndex());
+}
+
+QPushButton *button(QWidget *comparison, const char *name)
 {
     return comparison->findChild<QPushButton *>(QString::fromLatin1(name));
 }
 
-QString status(QDialog *comparison)
+QString status(QWidget *comparison)
 {
     return comparison->findChild<QLabel *>(QStringLiteral("compare-status"))->text();
 }
 
-bool diffReady(QDialog *comparison)
+bool diffReady(QWidget *comparison)
 {
     return comparison && until([&] { return status(comparison) != QStringLiteral("Comparing…"); })
         && (status(comparison).startsWith(QStringLiteral("Difference")) || status(comparison) == QStringLiteral("No differences"));
 }
 
-bool shows(QDialog *comparison, const QString &text)
+bool shows(QWidget *comparison, const QString &text)
 {
     if (!comparison) {
         return false;
@@ -110,10 +130,17 @@ bool shows(QDialog *comparison, const QString &text)
     return false;
 }
 
-void close(app::ApplicationShell &shell, QDialog *comparison)
+void close(app::ApplicationShell &shell, QWidget *comparison)
 {
-    comparison->accept();
-    until([&] { return !dialog(shell); });
+    const QPointer<QWidget> page(comparison);
+    QTimer::singleShot(0, [] {
+        if (auto *prompt = qobject_cast<QMessageBox *>(QApplication::activeModalWidget())) {
+            if (auto *discard = prompt->findChild<QPushButton *>(QStringLiteral("unsaved-discard"))) {
+                discard->click();
+            }
+        }
+    });
+    check("tab.closed", closeActiveTab(shell) && until([&] { return page.isNull(); }));
 }
 
 bool compareThroughFileMenu(app::ApplicationShell &shell, const QStringList &files)
@@ -151,7 +178,7 @@ bool compareThroughFileMenu(app::ApplicationShell &shell, const QStringList &fil
     selectFiles.start(10);
     deadline.start(3000);
     action->trigger();
-    return !timedOut && chosen == files.size() && dialog(shell);
+    return !timedOut && chosen == files.size() && comparisonPage(shell);
 }
 
 bool sameFileState(const struct stat &before, const struct stat &after)
@@ -221,7 +248,7 @@ void invalidComparison(app::ApplicationShell &shell, const QString &directory)
                 app::showFileComparison(shell, invalidOnRight ? readable : unreadable,
                                        invalidOnRight ? unreadable : readable);
             }
-            auto *comparison = dialog(shell);
+            auto *comparison = comparisonPage(shell);
             const QByteArray testName = QByteArray("invalid.") + invalid.name + (invalidOnRight ? ".right" : ".left");
             if (!check((testName + ".diagnostic").constData(), comparison && status(comparison).contains(invalid.error))) {
                 if (comparison) {
@@ -243,12 +270,12 @@ void invalidComparison(app::ApplicationShell &shell, const QString &directory)
             QObject::connect(&closeProbe, &QTimer::timeout, comparison, [&] {
                 if (auto *prompt = qobject_cast<QMessageBox *>(QApplication::activeModalWidget())) {
                     prompted = true;
-                    prompt->button(QMessageBox::Discard)->click();
+                    prompt->reject();
                 }
             });
             closeProbe.start(10);
-            comparison->close();
-            check((testName + ".closes-without-discard").constData(), until([&] { return !dialog(shell); }) && !prompted);
+            check((testName + ".closes-without-discard").constData(), closeActiveTab(shell)
+                && until([&] { return !comparisonPage(shell); }) && !prompted);
             struct stat validAfter {}, after {}, aliasAfter {};
             const bool invalidUntouched = invalid.exists
                 ? fileState(invalid.path, after) && sameFileState(before, after) && get(invalid.path) == invalid.bytes
@@ -278,7 +305,7 @@ void localComparison(app::ApplicationShell &shell, const QString &directory)
     }
     const QString before = document->text();
     app::showFileComparison(shell, {left, {}, {}, false}, {right, {}, {}, false});
-    auto *comparison = dialog(shell);
+    auto *comparison = comparisonPage(shell);
     if (!check("local.diff-ready", diffReady(comparison))) {
         if (comparison) {
             qWarning("comparison: %s", qPrintable(status(comparison)));
@@ -286,16 +313,18 @@ void localComparison(app::ApplicationShell &shell, const QString &directory)
         }
         return;
     }
-    const auto *rows = comparison->findChild<QTableView *>()->model();
-    bool aligned = false;
-    for (int row = 0; row < rows->rowCount(); ++row) {
-        aligned |= rows->index(row, 0).data().toString().contains(QStringLiteral("anchor"))
-            && rows->index(row, 2).data().toString().contains(QStringLiteral("anchor"));
+    auto *leftView = sideView(comparison, "compare-left-editor");
+    auto *rightView = sideView(comparison, "compare-right-editor");
+    if (!check("local.in-page-native-shared-editors", !qobject_cast<QDialog *>(comparison)
+            && shell.editorArea()->activePane()->currentFilePath().isEmpty()
+            && leftView && rightView && leftView->document() == document)) {
+        close(shell, comparison);
+        return;
     }
-    check("local.aligned-rows", aligned && rows->rowCount() >= 7);
-    if (const auto output = qEnvironmentVariable("VEDIT_COMPARE_SCREENSHOT"); !output.isEmpty()) {
-        check("local.capture", comparison->grab().save(output));
-    }
+    check("local.native-diff-ranges", leftView->property("compare-diff-range-count").toInt() >= 2
+          && rightView->property("compare-diff-range-count").toInt() >= 2);
+    app::showFileComparison(shell, {left, {}, {}, false}, {right, {}, {}, false});
+    check("local.reuses-comparison-tab", comparisonPage(shell) == comparison);
     button(comparison, "compare-next")->click();
     button(comparison, "compare-apply-left")->click();
     check("local.apply-left-stays-in-buffer", diffReady(comparison) && document->isModified()
@@ -309,18 +338,22 @@ void localComparison(app::ApplicationShell &shell, const QString &directory)
     check("local.save-selected-only", get(left) == leftDisk && get(right).startsWith("unsaved ") && get(right).endsWith(rightDisk));
     close(shell, comparison);
 
-    app::showFileComparison(shell, {left, {}, {}, false}, {{}, QStringLiteral("Repository snapshot"), QByteArray("unsaved \xe4\xb8\xad\xe6\x96\x87\nhead\nleft\nanchor\nnew end\n"), false});
-    comparison = dialog(shell);
+    const app::CompareInput endingSnapshot{{}, QStringLiteral("Repository snapshot"),
+        QByteArray("unsaved \xe4\xb8\xad\xe6\x96\x87\nhead\nleft\nanchor\nnew end\n"), false};
+    app::showFileComparison(shell, {left, {}, {}, false}, endingSnapshot);
+    comparison = comparisonPage(shell);
     if (check("local.readonly-snapshot", diffReady(comparison) && !button(comparison, "compare-apply-right")->isEnabled())) {
         button(comparison, "compare-apply-left")->click();
         check("local.apply-eof-to-open-buffer", diffReady(comparison) && document->text().endsWith(QStringLiteral("new end\n")));
-        button(comparison, "compare-save-left")->click();
+        check("local.ordinary-save-shared-buffer", shell.openPaths({left}) && shell.saveActiveDocument());
         check("local.save-crlf-and-final-newline", get(left).contains("\r\nnew end\r\n") && !document->isModified());
+        app::showFileComparison(shell, {left, {}, {}, false}, endingSnapshot);
+        check("local.shared-save-reactivates-same-comparison", comparisonPage(shell) == comparison);
         close(shell, comparison);
     }
 
     app::showFileComparison(shell, {left, {}, {}, false}, {{}, QStringLiteral("Invalid UTF-8"), QByteArray::fromHex("c3"), false});
-    comparison = dialog(shell);
+    comparison = comparisonPage(shell);
     if (check("local.invalid-encoding", comparison && status(comparison).contains(QStringLiteral("unsupported encoding")))) {
         close(shell, comparison);
     }
@@ -330,7 +363,7 @@ void localComparison(app::ApplicationShell &shell, const QString &directory)
         return;
     }
     app::showFileComparison(shell, {empty, {}, {}, false}, {{}, QStringLiteral("Snapshot"), "one\n", false});
-    comparison = dialog(shell);
+    comparison = comparisonPage(shell);
     if (!check("local.empty-file-vs-insert", diffReady(comparison))) {
         return;
     }
@@ -339,10 +372,23 @@ void localComparison(app::ApplicationShell &shell, const QString &directory)
     check("local.external-change-fixture", put(empty, "outside\n"));
     button(comparison, "compare-save-left")->click();
     check("local.external-change-refuses-save", get(empty) == "outside\n" && status(comparison).contains(QStringLiteral("changed outside")));
+    QTimer::singleShot(0, [] {
+        if (auto *prompt = qobject_cast<QMessageBox *>(QApplication::activeModalWidget())) {
+            prompt->reject();
+        }
+    });
+    check("local.cancel-close-preserves-dirty-page", !closeActiveTab(shell) && comparisonPage(shell) == comparison
+        && sideView(comparison, "compare-left-editor")->document()->text() == QStringLiteral("one\n"));
+    if (QApplication::platformName() == QStringLiteral("offscreen")) {
+        button(comparison, "compare-undo")->click();
+        check("local.headless-undo-clears-close-block", diffReady(comparison)
+            && !sideView(comparison, "compare-left-editor")->document()->isModified());
+    }
     close(shell, comparison);
+    check("local.close-after-conflict-preserves-disk", get(empty) == "outside\n");
 
     app::showFileComparison(shell, {empty, {}, {}, false}, {{}, QStringLiteral("Empty snapshot"), {}, false});
-    comparison = dialog(shell);
+    comparison = comparisonPage(shell);
     if (!check("local.pure-delete-ready", diffReady(comparison))) {
         return;
     }
@@ -355,26 +401,354 @@ void localComparison(app::ApplicationShell &shell, const QString &directory)
 
     check("local.readonly-fixture", QFile::setPermissions(empty, QFileDevice::ReadOwner));
     app::showFileComparison(shell, {empty, {}, {}, false}, {{}, QStringLiteral("Snapshot"), "one\n", false});
-    comparison = dialog(shell);
+    comparison = comparisonPage(shell);
     if (check("local.readonly-disk-blocks-patch", diffReady(comparison) && !button(comparison, "compare-apply-left")->isEnabled())) {
         close(shell, comparison);
     }
 
     const QString beforeDiscard = document->text();
     app::showFileComparison(shell, {left, {}, {}, false}, {{}, QStringLiteral("Snapshot"), "different\n", false});
-    comparison = dialog(shell);
+    comparison = comparisonPage(shell);
     if (diffReady(comparison)) {
         button(comparison, "compare-apply-left")->click();
         const bool modified = diffReady(comparison) && document->isModified() && document->text() != beforeDiscard;
-        QTimer::singleShot(0, [] {
-            auto *prompt = qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
-            if (prompt) {
-                prompt->button(QMessageBox::Discard)->click();
-            }
-        });
-        QMetaObject::invokeMethod(comparison, "reject");
-        check("local.discard-restores-editor-buffer", modified && document->text() == beforeDiscard && !document->isModified());
-        until([&] { return !dialog(shell); });
+        const QString edited = document->text();
+        close(shell, comparison);
+        check("local.close-retains-live-editor-buffer", modified && document->text() == edited && document->isModified());
+        auto *ordinary = shell.editorArea()->activePane()->editorWidget();
+        check("local.ordinary-undo-retains-history", ordinary
+              && shell.editorArea()->triggerActiveEditorAction({QStringLiteral("edit_undo"), QStringLiteral("undo")},
+                  QStringLiteral("undo"))
+              && document->text() == beforeDiscard);
+        document->setModified(false);
+    }
+}
+
+QWidget *focusText(KTextEditor::View *view)
+{
+    view->setFocus(Qt::OtherFocusReason);
+    QApplication::processEvents();
+    return view->focusProxy() ? view->focusProxy() : view;
+}
+
+KTextEditor::Attribute::Ptr syntaxAttribute(KTextEditor::View *view, const QString &token)
+{
+    const auto column = view->document()->line(0).indexOf(token);
+    for (const auto &block : view->lineAttributes(0)) {
+        if (block.start <= column && column < block.start + block.length) {
+            return block.attribute;
+        }
+    }
+    return {};
+}
+
+bool syntaxUnderDiff(KTextEditor::View *view, const QString &moduleName)
+{
+    const auto keyword = syntaxAttribute(view, QStringLiteral("module"));
+    const auto module = syntaxAttribute(view, moduleName);
+    const auto comment = syntaxAttribute(view, QStringLiteral("//"));
+    return keyword && module && comment && module->name().endsWith(QStringLiteral("Module Definition"))
+        && comment->name().contains(QStringLiteral("Comment"))
+        && keyword->name() != comment->name() && module->foreground() != comment->foreground()
+        && view->property("compare-diff-range-count").toInt() > 0;
+}
+
+void nativeEditing(app::ApplicationShell &shell, const QString &directory)
+{
+    const QString left = directory + QStringLiteral("/native-left.sv");
+    const QString right = directory + QStringLiteral("/native-right.sv");
+    QByteArray leftText = "module left_design; // working left\n  logic old_signal;\n";
+    QByteArray rightText = "module right_design; // working right\n  logic new_signal;\n  logic extra_signal;\n";
+    for (int line = 0; line < 160; ++line) {
+        const QByteArray shared = "  wire common_" + QByteArray::number(line) + ";\n";
+        leftText += shared;
+        rightText += shared;
+    }
+    leftText += "endmodule\n";
+    rightText += "endmodule\n";
+    if (!check("native.fixtures", put(left, leftText) && put(right, rightText))) {
+        return;
+    }
+    app::showFileComparison(shell, {left, {}, {}, false}, {right, {}, {}, false});
+    auto *page = comparisonPage(shell);
+    auto *leftView = sideView(page, "compare-left-editor");
+    auto *rightView = sideView(page, "compare-right-editor");
+    if (!check("native.both-editors-ready", diffReady(page) && leftView && rightView)) {
+        return;
+    }
+    auto *leftDoc = leftView->document();
+    auto *rightDoc = rightView->document();
+    check("native.syntax-and-diff-coexist", leftDoc->highlightingMode() == QStringLiteral("SystemVerilog")
+        && rightDoc->highlightingMode() == QStringLiteral("SystemVerilog")
+        && syntaxUnderDiff(leftView, QStringLiteral("left_design"))
+        && syntaxUnderDiff(rightView, QStringLiteral("right_design")));
+    if (const auto output = qEnvironmentVariable("VEDIT_COMPARE_SCREENSHOT"); !output.isEmpty()) {
+        check("native.capture", shell.grab().save(output));
+    }
+    for (auto *bar : leftView->findChildren<QScrollBar *>()) {
+        if (bar->orientation() == Qt::Vertical && bar->maximum() >= 70) {
+            bar->setValue(70);
+            break;
+        }
+    }
+    check("native.scroll-aligns-unchanged-lines", leftView->firstDisplayedLine() == 70
+        && rightView->firstDisplayedLine() == 71);
+    shell.activateWindow();
+    check("native.keyboard-window-active", until([&] { return shell.isActiveWindow(); }));
+    leftView->setCursorPosition({1, 2});
+    QWidget *input = focusText(leftView);
+    check("native.keyboard-editor-focused", input->hasFocus());
+    QSignalSpy undoCommand(shell.commands()->action(QStringLiteral("edit.undo")), &QAction::triggered);
+    QSignalSpy saveCommand(shell.commands()->action(QStringLiteral("file.save")), &QAction::triggered);
+    QTest::keyClick(input, Qt::Key_X);
+    check("native.typing-stays-in-buffer", leftDoc->text().contains(QStringLiteral("xlogic old_signal;"))
+        && leftDoc->isModified() && get(left) == leftText);
+    check("native.edit-invalidates-hunk-actions", status(page) == QStringLiteral("Comparing…")
+        && !button(page, "compare-apply-right")->isEnabled());
+    check("native.recomputed-after-keyboard-edit", diffReady(page));
+    QTest::keyClick(input, Qt::Key_Z, Qt::ControlModifier);
+    check("native.ctrl-z-routes-shell-command", undoCommand.size() == 1);
+    check("native.ctrl-z-restores-baseline", until([&] { return leftDoc->text().toUtf8() == leftText; })
+        && !leftDoc->isModified());
+    QTest::keyClicks(input, QStringLiteral("wire saved_live; "));
+    QTest::keyClick(input, Qt::Key_S, Qt::ControlModifier);
+    check("native.ctrl-s-routes-shell-command", saveCommand.size() == 1);
+    check("native.ctrl-s-persists-typed-edit", until([&] { return get(left).contains("wire saved_live;"); })
+        && !leftDoc->isModified() && get(right) == rightText);
+
+    check("native.ordinary-tab-open-shares-comparison", shell.openPaths({right})
+        && editor::documentFor(shell.editorArea()->activePane()->editorWidget()) == rightDoc);
+    app::showFileComparison(shell, {left, {}, {}, false}, {right, {}, {}, false});
+    if (!check("native.opening-pair-reactivates-page", comparisonPage(shell) == page)) {
+        return;
+    }
+    close(shell, page);
+
+    const QByteArray snapshot = "module historic; // historic snapshot\n  wire from_revision;\nendmodule\n";
+    app::showFileComparison(shell, {left, {}, {}, false},
+        {{}, QStringLiteral("Revision r17"), snapshot, false, QStringLiteral("rtl/module.sv")});
+    page = comparisonPage(shell);
+    rightView = sideView(page, "compare-right-editor");
+    if (!check("native.historical-syntax", diffReady(page) && rightView
+        && rightView->document()->highlightingMode() == QStringLiteral("SystemVerilog")
+        && syntaxUnderDiff(rightView, QStringLiteral("historic"))
+        && !rightView->document()->isReadWrite())) {
+        if (page) { close(shell, page); }
+        return;
+    }
+    auto *snapshotDoc = rightView->document();
+    const QString before = snapshotDoc->text();
+    QTest::keyClicks(focusText(rightView), QStringLiteral("blocked"));
+    check("native.historical-typing-blocked", snapshotDoc->text() == before
+        && !snapshotDoc->isModified() && !button(page, "compare-apply-right")->isEnabled());
+    close(shell, page);
+}
+
+void inlineDifferencesAndNavigation(app::ApplicationShell &shell, const QString &directory)
+{
+    const QString path = directory + QStringLiteral("/inline-left.sv");
+    const QString leftText = QStringLiteral("logic out = old_name; // same\n// anchor A\n// mark \U0001F600 end\n"
+        "// anchor B\n// mark \U0001F600 end\n// anchor C\n// anchor D\n");
+    const QString rightText = QStringLiteral("logic out = new_name; // same\n// anchor A\n// mark \U0001F601 end\n"
+        "// anchor B\n// mark \U0001FA00 end\n// anchor C\n// right only\n// anchor D\n");
+    const app::CompareInput left{path, {}, {}, false};
+    const app::CompareInput right{{}, QStringLiteral("Revision"), rightText.toUtf8(), false, QStringLiteral("inline-right.sv")};
+    if (!check("inline.fixture", put(path, leftText.toUtf8()) && shell.openPaths({path}))) {
+        return;
+    }
+    app::showFileComparison(shell, left, right);
+    auto *page = comparisonPage(shell);
+    auto *leftView = sideView(page, "compare-left-editor");
+    auto *rightView = sideView(page, "compare-right-editor");
+    if (!check("inline.native-views-ready", diffReady(page) && leftView && rightView)) {
+        return;
+    }
+    const auto range = [](int line, int first, int end) { return QVariant::fromValue(QVariantList{line, first, end}); };
+    const auto spansLeft = leftView->property("compare-inline-ranges").toList();
+    const auto spansRight = rightView->property("compare-inline-ranges").toList();
+    check("inline.range-prefix-suffix", !spansLeft.isEmpty() && !spansRight.isEmpty()
+        && spansLeft.first() == range(0, 12, 15) && spansRight.first() == range(0, 12, 15));
+    const QVariantList expected{range(0, 12, 15), range(2, 8, 10), range(4, 8, 10)};
+    check("inline.unicode-safe", spansLeft == expected && spansRight == expected);
+    check("inline.background-only-with-original-native-text", leftView->property("compare-inline-background-only").toBool()
+        && rightView->property("compare-inline-background-only").toBool()
+        && leftView->document()->text() == leftText && rightView->document()->text() == rightText
+        && !leftView->document()->isModified() && !rightView->document()->isModified());
+    check("inline.one-sided-line-keeps-block-cue", leftView->property("compare-diff-range-count").toInt() == 3
+        && rightView->property("compare-diff-range-count").toInt() == 4);
+
+    shell.activateWindow();
+    auto *next = button(page, "compare-next");
+    auto *previous = button(page, "compare-previous");
+    QSignalSpy nextClicked(next, &QPushButton::clicked);
+    QTest::keyClick(focusText(leftView), Qt::Key_PageDown, Qt::AltModifier);
+    check("navigation.alt-page-down", nextClicked.size() == 1 && status(page) == QStringLiteral("Difference 2 of 4")
+        && leftView->cursorPosition().line() == 2 && rightView->cursorPosition().line() == 2);
+    QTest::keyClick(focusText(rightView), Qt::Key_PageUp, Qt::AltModifier);
+    check("navigation.alt-page-up", status(page) == QStringLiteral("Difference 1 of 4")
+        && leftView->cursorPosition().line() == 0 && rightView->cursorPosition().line() == 0);
+    check("navigation.shortcuts-discoverable", next->toolTip().contains(QStringLiteral("Alt"))
+        && previous->toolTip().contains(QStringLiteral("Alt")));
+    if (check("navigation.ordinary-tab-focused", shell.openPaths({path}))) {
+        auto *ordinary = editor::viewFor(shell.editorArea()->activePane()->editorWidget());
+        if (ordinary) {
+            QTest::keyClick(focusText(ordinary), Qt::Key_PageDown, Qt::AltModifier);
+        }
+        check("navigation.shortcuts-stay-in-compare", ordinary && nextClicked.size() == 1
+            && status(page) == QStringLiteral("Difference 1 of 4"));
+    }
+    app::showFileComparison(shell, left, right);
+    close(shell, page);
+}
+
+void saveAsComparison(app::ApplicationShell &shell, const QString &directory)
+{
+    const QString a = directory + QStringLiteral("/save-as-a.sv");
+    const QString b = directory + QStringLiteral("/save-as-b.sv");
+    const QString c = directory + QStringLiteral("/save-as-c.sv");
+    const QByteArray original = "module source_a;\r\nendmodule\r\n";
+    const app::CompareInput left{a, {}, {}, false};
+    const app::CompareInput right{c, {}, {}, false};
+    if (!check("save-as.fixture", put(a, original) && put(c, "module other;\nendmodule\n") && shell.openPaths({a}))) {
+        return;
+    }
+    auto *pane = shell.editorArea()->activePane();
+    auto *aDoc = editor::documentFor(pane->editorWidget());
+    app::showFileComparison(shell, left, right);
+    auto *page = comparisonPage(shell);
+    if (!check("save-as.compare-shares-a", diffReady(page) && aDoc && sideView(page, "compare-left-editor")->document() == aDoc)) {
+        return;
+    }
+    if (!check("save-as.return-to-a", shell.openPaths({a}))) {
+        return;
+    }
+    QString error;
+    check("save-as.refuses-other-compared-destination", !pane->saveAsFile(c, &error)
+        && get(c) == "module other;\nendmodule\n" && pane->currentFilePath() == a);
+    check("save-as.refuses-disappeared-compared-destination", QFile::remove(c) && !pane->saveAsFile(c, &error)
+        && !QFileInfo::exists(c) && put(c, "module other;\nendmodule\n") && pane->currentFilePath() == a);
+    const QString unreadable = directory + QStringLiteral("/save-as-write-only.sv");
+    check("save-as.does-not-write-unreadable-target", put(unreadable, "unchanged\n")
+        && QFile::setPermissions(unreadable, QFileDevice::WriteOwner)
+        && !pane->saveAsFile(unreadable, &error) && pane->currentFilePath() == a
+        && QFile::setPermissions(unreadable, QFileDevice::WriteOwner | QFileDevice::ReadOwner)
+        && get(unreadable) == "unchanged\n");
+    if (!check("save-as.detaches-b-model", pane->saveAsFile(b, &error) && pane->currentFilePath() == b
+        && editor::documentFor(pane->editorWidget()) != aDoc && get(b) == original && get(a) == original)) {
+        qWarning("Save As: %s", qPrintable(error));
+        return;
+    }
+    auto *bDoc = editor::documentFor(pane->editorWidget());
+    if (!check("save-as.b-typing-does-not-edit-a", bDoc && bDoc->insertText({0, 0}, QStringLiteral("// B only\n"))
+        && bDoc->isModified() && !aDoc->isModified() && !aDoc->text().contains(QStringLiteral("B only")))) {
+        return;
+    }
+    if (!check("save-as.reopens-a-as-original-model", shell.openPaths({a}) && editor::documentFor(pane->editorWidget()) == aDoc)) {
+        return;
+    }
+    app::showFileComparison(shell, left, right);
+    check("save-as.reuses-comparison-with-original-model", comparisonPage(shell) == page);
+    check("save-as.a-can-edit-independently", aDoc->insertText({0, 0}, QStringLiteral("// A only\n"))
+        && aDoc->isModified() && !bDoc->text().contains(QStringLiteral("A only")));
+    button(page, "compare-save-left")->click();
+    check("save-as.saving-a-preserves-b-dirty-state-and-disk", !aDoc->isModified() && bDoc->isModified()
+        && get(a) == "// A only\r\n" + original && get(b) == original);
+    close(shell, page);
+    check("save-as.saves-b-only-via-its-tab", shell.openPaths({b}) && editor::documentFor(pane->editorWidget()) == bDoc
+        && shell.saveActiveDocument() && get(b).startsWith("// B only\n") && get(a) == "// A only\r\n" + original);
+}
+
+void mixedLineEndings(app::ApplicationShell &shell, const QString &directory)
+{
+    const QString path = directory + QStringLiteral("/mixed.txt");
+    const QByteArray bom = QByteArray::fromHex("efbbbf");
+    const QByteArray original = "head\r\nkeep-lf\nold\r\nkeep-crlf\r\ntail";
+    const app::CompareInput left{path, {}, {}, false};
+    const app::CompareInput right{{}, QStringLiteral("Revision"), "head\nkeep-lf\nnew\nkeep-crlf\nnew-tail\n", false};
+    if (!check("mixed.fixture", put(path, bom + original) && shell.openPaths({path}))) {
+        return;
+    }
+    app::showFileComparison(shell, left, right);
+    auto *page = comparisonPage(shell);
+    if (!check("mixed.comparison-ready", diffReady(page))) {
+        if (page) { qWarning("Mixed compare: %s", qPrintable(status(page))); }
+        return;
+    }
+    auto *view = sideView(page, "compare-left-editor");
+    button(page, "compare-apply-left")->click();
+    if (!check("mixed.applies-hunk-without-writing", diffReady(page) && get(path) == bom + original)) {
+        return;
+    }
+    view->setCursorPosition({1, 7});
+    QTest::keyClicks(focusText(view), QStringLiteral("!"));
+    button(page, "compare-save-left")->click();
+    check("mixed.preserves-bom-lf-crlf-and-no-final-newline",
+          get(path) == bom + "head\r\nkeep-lf!\nnew\r\nkeep-crlf\r\ntail");
+    if (check("mixed.eof-hunk-ready", until([&] { return button(page, "compare-next")->isEnabled(); }))) {
+        button(page, "compare-next")->click();
+        button(page, "compare-apply-left")->click();
+        check("mixed.eof-hunk-updates-native-buffer", view->document()->text().endsWith(QStringLiteral("new-tail\n")));
+        button(page, "compare-save-left")->click();
+    }
+    const auto saved = get(path);
+    if (!check("mixed.eof-hunk-preserves-other-line-endings",
+          saved == bom + "head\r\nkeep-lf!\nnew\r\nkeep-crlf\r\nnew-tail\r\n")) {
+        qWarning("Mixed EOF status: %s, bytes: %s", qPrintable(status(page)), saved.toHex().constData());
+    }
+    close(shell, page);
+
+    const QString joinedPath = directory + QStringLiteral("/mixed-join-undo.txt");
+    check("mixed.join-undo-fixture", put(joinedPath, "A\r\nB\nC\n") && shell.openPaths({joinedPath}));
+    app::showFileComparison(shell, {joinedPath, {}, {}, false},
+                           {{}, QStringLiteral("Revision"), "A\nB\nunrelated\n", false});
+    page = comparisonPage(shell);
+    auto *joinedView = sideView(page, "compare-left-editor");
+    if (check("mixed.join-undo-ready", diffReady(page) && joinedView)) {
+        shell.activateWindow();
+        auto *input = focusText(joinedView);
+        joinedView->setCursorPosition({2, 1});
+        QTest::keyClicks(input, QStringLiteral("!"));
+        joinedView->setCursorPosition({1, 0});
+        QTest::keyClick(input, Qt::Key_Backspace);
+        check("mixed.joins-crlf-boundary", joinedView->document()->text() == QStringLiteral("AB\nC!\n"));
+        QTest::keyClick(input, Qt::Key_Z, Qt::ControlModifier);
+        check("mixed.undo-join-retains-other-dirty-edit", joinedView->document()->text() == QStringLiteral("A\nB\nC!\n"));
+        button(page, "compare-save-left")->click();
+        check("mixed.undo-join-restores-original-crlf", get(joinedPath) == "A\r\nB\nC!\n");
+        close(shell, page);
+    }
+}
+
+void guardSaveAll(app::ApplicationShell &shell, const QString &directory)
+{
+    for (bool compareFirst : {false, true}) {
+        const QString path = directory + (compareFirst ? QStringLiteral("/compare-first.txt") : QStringLiteral("/ordinary-first.txt"));
+        if (!check("save-all.fixture", put(path, "original\n") && (compareFirst || shell.openPaths({path})))) {
+            return;
+        }
+        const app::CompareInput left{path, {}, {}, false};
+        const app::CompareInput right{{}, QStringLiteral("Revision"), "historical\n", false};
+        app::showFileComparison(shell, left, right);
+        auto *page = comparisonPage(shell);
+        if (!check("save-all.shared-ready", diffReady(page) && shell.openPaths({path}))) {
+            return;
+        }
+        auto *doc = editor::documentFor(shell.editorArea()->activePane()->editorWidget());
+        if (!check("save-all.dirty-with-external-edit", doc && doc == sideView(page, "compare-left-editor")->document()
+            && doc->insertText({0, 0}, QStringLiteral("mine\n")) && put(path, "changed on disk\n"))) {
+            return;
+        }
+        shell.commands()->action(QStringLiteral("file.save-all"))->trigger();
+        check(compareFirst ? "save-all.compare-first-refuses-external-overwrite" : "save-all.ordinary-first-refuses-external-overwrite",
+              get(path) == "changed on disk\n" && doc->isModified() && doc->text().startsWith(QStringLiteral("mine\n")));
+        app::showFileComparison(shell, left, right);
+        close(shell, page);
+        check("save-all.closed-compare-retains-shared-dirty-buffer", shell.openPaths({path})
+            && editor::documentFor(shell.editorArea()->activePane()->editorWidget()) == doc && doc->isModified());
+        shell.commands()->action(QStringLiteral("file.save-all"))->trigger();
+        check("save-all.closed-compare-still-refuses-external-overwrite",
+            get(path) == "changed on disk\n" && doc->isModified());
+        doc->setModified(false);
     }
 }
 
@@ -423,6 +797,7 @@ void svnComparison(const QString &directory)
     options.restoreSession = false;
     options.showDefaultPanels = false;
     app::ApplicationShell shell(options);
+    shell.setEditorProvider(editor::makeEditCoreProvider());
     workspace::installVcs(shell, {});
     shell.panels()->showPanel(QStringLiteral("vcs"), &shell);
     shell.show();
@@ -445,14 +820,14 @@ void svnComparison(const QString &directory)
         rows->setCurrentItem(rows->topLevelItem(row));
     };
     const auto awaitComparison = [&]() {
-        until([&] { return dialog(shell); });
-        auto *item = dialog(shell);
+        until([&] { return comparisonPage(shell); });
+        auto *item = comparisonPage(shell);
         return diffReady(item) ? item : nullptr;
     };
     select(1);
     compare->click();
     history->findChild<QLineEdit *>(QStringLiteral("vcs-history-path"))->setText(original);
-    check("svn.stale-file-selection-discards-result", !until([&] { return dialog(shell); }));
+    check("svn.stale-file-selection-discards-result", !until([&] { return comparisonPage(shell); }));
     history->findChild<QLineEdit *>(QStringLiteral("vcs-history-path"))->setText(renamed);
     compare->click();
     auto *comparison = awaitComparison();
@@ -551,7 +926,7 @@ void svnComparison(const QString &directory)
         compare->click();
         check("svn.root-switch-fixture", shell.projectRoot() == wc);
         shell.setProjectRoot(directory);
-        check("svn.stale-root-discards-result", !until([&] { return dialog(shell); }));
+        check("svn.stale-root-discards-result", !until([&] { return comparisonPage(shell); }));
     }
 }
 bool activeDiffDestroyed = false;
@@ -564,15 +939,16 @@ void teardownMessageHandler(QtMsgType, const QMessageLogContext &, const QString
     std::fprintf(stderr, "%s\n", qPrintable(message));
 }
 
-void activeDiffTeardown(const QString &directory, bool quitApplication)
+void activeDiffTeardown(const QString &directory, bool quitApplication, bool testStaleResult)
 {
     const auto originalHandler = qInstallMessageHandler(teardownMessageHandler);
     const auto restoreHandler = qScopeGuard([&] { qInstallMessageHandler(originalHandler); });
     const QString realDiff = QStandardPaths::findExecutable(QStringLiteral("diff"));
     const QString wrapper = directory + QStringLiteral("/diff");
     const QString started = directory + QStringLiteral("/diff-started");
-    const QByteArray script = "#!/bin/bash\nprintf started > \"$VEDIT_TEST_DIFF_STARTED\"\n"
-                              "read -r -t 30 gate\nexec \"$VEDIT_TEST_REAL_DIFF\" \"$@\"\n";
+    const QByteArray script = "#!/bin/bash\nif [[ ! -e \"$VEDIT_TEST_DIFF_STARTED\" ]]; then\n"
+                              "  printf started > \"$VEDIT_TEST_DIFF_STARTED\"\n  read -r -t 30 gate\nfi\n"
+                              "exec \"$VEDIT_TEST_REAL_DIFF\" \"$@\"\n";
     if (!check("teardown.delayed-diff-wrapper", !realDiff.isEmpty() && put(wrapper, script)
         && QFile::setPermissions(wrapper, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner))) {
         return;
@@ -595,14 +971,42 @@ void activeDiffTeardown(const QString &directory, bool quitApplication)
         options.restoreSession = false;
         options.showDefaultPanels = false;
         app::ApplicationShell shell(options);
+        shell.setEditorProvider(editor::makeEditCoreProvider());
         shell.show();
-        app::showFileComparison(shell, {{}, QStringLiteral("left"), "before\n", false},
-                                {{}, QStringLiteral("right"), "after\n", false});
-        auto *comparison = dialog(shell);
+        app::CompareInput left{{}, QStringLiteral("left"), "before\n", false};
+        const app::CompareInput right{{}, QStringLiteral("right"), "after\n", false};
+        if (testStaleResult) {
+            left.localPath = directory + QStringLiteral("/working.txt");
+            if (!check("stale.writable-fixture", put(left.localPath, left.snapshot))) {
+                return;
+            }
+        }
+        app::showFileComparison(shell, left, right);
+        auto *comparison = comparisonPage(shell);
         auto *process = comparison ? comparison->findChild<QProcess *>() : nullptr;
         if (!check("teardown.child-is-running", process && until([&] {
             return process->state() == QProcess::Running && QFileInfo::exists(started);
         }))) {
+            return;
+        }
+        if (testStaleResult) {
+            auto *view = sideView(comparison, "compare-left-editor");
+            if (!check("stale.writable-native-view", view && view->document()->isReadWrite())) {
+                return;
+            }
+            bool rejected = false;
+            const auto result = QObject::connect(process, &QProcess::finished, comparison, [&](int code) {
+                if (code == 1) {
+                    rejected = status(comparison) == QStringLiteral("Comparing…")
+                        && !button(comparison, "compare-apply-left")->isEnabled();
+                }
+            });
+            check("stale.edit-before-old-result", view->document()->setText(QStringLiteral("after\n")));
+            process->write("continue\n");
+            process->closeWriteChannel();
+            check("stale.first-result-rejected-and-latest-used", diffReady(comparison) && rejected
+                && status(comparison) == QStringLiteral("No differences"));
+            QObject::disconnect(result);
             return;
         }
         pid = process->processId();
@@ -615,8 +1019,8 @@ void activeDiffTeardown(const QString &directory, bool quitApplication)
             check("teardown.application-event-loop-exited", QCoreApplication::exec() == 0);
             check("teardown.child-still-active-after-event-loop", process->state() == QProcess::Running);
         } else {
-            comparison->close();
-            check("teardown.dialog-destroyed", until([&] { return !dialog(shell); }));
+            const QPointer<QWidget> page(comparison);
+            check("teardown.tab-destroyed", closeActiveTab(shell) && until([&] { return page.isNull(); }));
         }
     }
     check("teardown.process-stopped-before-destruction", !activeDiffDestroyed);
@@ -631,6 +1035,7 @@ void activeDiffTeardown(const QString &directory, bool quitApplication)
 int main(int argc, char *argv[])
 {
     vedit_runtime_init();
+    std::setvbuf(stdout, nullptr, _IONBF, 0);
     QApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
     QApplication application(argc, argv);
     QTemporaryDir fixture;
@@ -638,9 +1043,10 @@ int main(int argc, char *argv[])
         return 1;
     }
     const QStringList arguments = application.arguments();
+    const bool testStaleResult = arguments.contains(QStringLiteral("--stale-diff"));
     if (arguments.contains(QStringLiteral("--close-active-diff"))
-        || arguments.contains(QStringLiteral("--exit-active-diff"))) {
-        activeDiffTeardown(fixture.path(), arguments.contains(QStringLiteral("--exit-active-diff")));
+        || arguments.contains(QStringLiteral("--exit-active-diff")) || testStaleResult) {
+        activeDiffTeardown(fixture.path(), arguments.contains(QStringLiteral("--exit-active-diff")), testStaleResult);
         std::printf("FILE-COMPARE-TEARDOWN failures=%d\n", failures);
         return failures == 0 ? 0 : 1;
     }
@@ -660,6 +1066,7 @@ int main(int argc, char *argv[])
     }
     app::ApplicationShell shell(options);
     shell.setEditorProvider(editor::makeEditCoreProvider());
+    shell.resize(1180, 720);
     shell.show();
     if (!translations.isEmpty()) {
         auto *action = shell.commands()->action(QStringLiteral("file.compare"));
@@ -669,6 +1076,11 @@ int main(int argc, char *argv[])
     invalidComparison(shell, fixture.path());
     if (translations.isEmpty()) {
         localComparison(shell, fixture.path());
+        nativeEditing(shell, fixture.path());
+        inlineDifferencesAndNavigation(shell, fixture.path());
+        saveAsComparison(shell, fixture.path());
+        mixedLineEndings(shell, fixture.path());
+        guardSaveAll(shell, fixture.path());
         svnComparison(fixture.path());
     }
     std::printf("FILE-COMPARE-SELFTEST failures=%d\n", failures);

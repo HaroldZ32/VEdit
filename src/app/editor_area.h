@@ -37,6 +37,10 @@ class QLabel;
 class QMouseEvent;
 class QMenu;
 class QTabBar;
+
+namespace vedit::app {
+class DocumentTabScrollArea;
+}
 class QStackedWidget;
 class QToolButton;
 class QVBoxLayout;
@@ -58,6 +62,16 @@ class EditorProvider;
 // Discard, so that path writes the file exactly once; a callback that does not
 // save may answer Save and the pane writes it before closing.
 enum class SaveDecision { Save, Discard, Cancel };
+
+struct AuxiliaryTabCallbacks {
+    std::function<bool()> isModified;
+    std::function<bool(QString *)> save;
+    std::function<bool()> canClose;
+    std::function<bool(const QStringList &)> actionEnabled;
+    std::function<bool(const QStringList &, const char *)> triggerAction;
+    // Optional single-tab override when another open page retains the buffer.
+    std::function<bool()> needsClosePrompt;
+};
 
 // batch-20261115 (T5): where a dragged tab is dropped. TabBar is the tab strip
 // itself (reorder in the same pane, move in another); Left/Right/Top/Bottom are
@@ -89,7 +103,7 @@ public:
     ~EditorPane() override;
 
     QString paneId() const;
-    // The ACTIVE tab's editor widget (a pane always has one tab).
+    // The active provider view, or nullptr while an auxiliary page is active.
     QWidget *editorWidget() const;
     // True when `widget` is one of this pane's editor widgets or a DESCENDANT of
     // one. The product editor (KTextEditor) hosts its real mouse target in a
@@ -146,6 +160,9 @@ public:
     // lane subscribes to EVERY open document's change signal, not only the
     // active tab's widget.
     QWidget *tabEditorWidget(int index) const;
+    bool isAuxiliaryTab(int index) const;
+    QString tabDisplayName(int index) const;
+    bool canCloseAuxiliaryTabs() const;
     // The rendered tab label (dirty marker included); empty for a bad index.
     QString tabText(int index) const;
     bool isTabModified(int index) const;
@@ -283,14 +300,21 @@ protected:
     void changeEvent(QEvent *event) override;
 
 private:
-    // One open document: the provider's editor widget plus where it came from.
+    friend class EditorArea;
+
     struct Document;
 
     void addTabForDocument(QWidget *editor, const QString &absolutePath = QString());
+    void addDocument(std::unique_ptr<Document> document);
     void removeTab(int index);
-    void replaceTabEditor(int index, QWidget *editor);
-    void wireEditor(QWidget *editor);
-    void unwireEditor(EditorProvider *provider, QWidget *editor);
+    void finishTabRemoval(int index);
+    std::unique_ptr<Document> detachDocument(int index);
+    int adoptDocument(std::unique_ptr<Document> document, int insertAt, bool reuseEmpty);
+    int auxiliaryTabIndex(const QString &id) const;
+    bool isUntouchedTab(int index) const;
+    bool canCloseTab(int index) const;
+    void wireEditor(const Document &document);
+    void unwireEditor(EditorProvider *provider, const Document &document);
     void syncCurrentEditor();
     void refreshTab(int index);
     void refreshAllTabs();
@@ -335,6 +359,7 @@ private:
     QStringList ownedShortcuts_;
     EditorProvider *provider_ = nullptr;
     QTabBar *tabs_ = nullptr;
+    DocumentTabScrollArea *tabScroll_ = nullptr;
     QStackedWidget *stack_ = nullptr;
     QLabel *activeBadge_ = nullptr;
     // T20/A-3: the real clickable breadcrumb (breadcrumb lane) when the build
@@ -397,6 +422,15 @@ public:
     int paneCount() const;
     EditorPane *activePane() const;
     void setActivePane(EditorPane *pane);
+
+    // Auxiliary pages own their content and are transient. The area takes
+    // ownership of page, activates an existing id if present, and returns the
+    // page that is actually displayed.
+    QWidget *openAuxiliaryTab(const QString &id, const QString &title, QWidget *page,
+                              AuxiliaryTabCallbacks callbacks = {});
+    QWidget *findAuxiliaryTab(const QString &id) const;
+    bool activateAuxiliaryTab(const QString &id);
+    void refreshAuxiliaryTab(const QString &id);
 
     // Splits the active pane. Qt::Horizontal puts the new pane to the right,
     // Qt::Vertical puts it below; the new pane becomes active (returned). The

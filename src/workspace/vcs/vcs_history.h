@@ -37,7 +37,7 @@ public:
 
     void setSource(std::unique_ptr<VcsSource> source, bool deferRefresh = false);
     void setRoot(const std::string &root);
-    std::string root() const { return root_; }
+    std::string root() const { return editorHistoryRoot_.empty() ? root_ : editorHistoryRoot_; }
 
     static constexpr int kDefaultPageSize = 50;
 
@@ -49,6 +49,10 @@ public:
     void previousPage();
     void selectCommit(const QString &hash); // loads the detail
     void openFileHistory(const QString &path, std::function<bool()> stillCurrent = {});
+    void openEditorFileHistory(const std::string &root, const QString &path, std::function<bool()> isActive);
+    void editorFileChanged();
+    bool hasEditorFileHistory() const { return !editorHistoryRoot_.empty(); }
+    bool editorFileHistoryCurrent() const;
     void setSavedRepositoriesFile(const QString &path);
     void showBlame(const QString &path);
     void compareSelected();
@@ -106,6 +110,7 @@ private:
     void onSelectionChanged();
     void compareSvnSelection(bool workingCopy);
     void promptSvnRevisions();
+    void clearEditorFileHistory();
 
     Backend backend_ = Backend::None;
     quint64 svnSelectionEpoch_ = 0;
@@ -118,6 +123,8 @@ private:
     QStringList svnRevisionFiles_;
     QSet<QString> svnDeletedRevisionFiles_;
     std::function<bool()> historySelectionGuard_;
+    std::string editorHistoryRoot_;
+    std::function<bool()> editorFileIsActive_;
     QString savedRepositoriesFile_;
     QComboBox *repository_ = nullptr;
     QPushButton *addRepository_ = nullptr;
