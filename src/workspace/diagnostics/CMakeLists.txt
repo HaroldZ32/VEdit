@@ -117,6 +117,11 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
   endif()
   target_compile_definitions(vedit_workspace_diagnostics PRIVATE
     VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR=1)
+  if(TARGET vedit_tree_sitter_verilog)
+    target_sources(vedit_workspace_diagnostics PRIVATE realtime_module_references.cpp)
+    target_link_libraries(vedit_workspace_diagnostics PRIVATE vedit_syntax_grammars)
+    target_compile_definitions(vedit_workspace_diagnostics PRIVATE VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER=1)
+  endif()
 endif()
 if(VEDIT_DIAGNOSTICS_FFI)
   target_link_libraries(vedit_workspace_diagnostics PUBLIC vd_ffi)
@@ -716,6 +721,20 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
     TIMEOUT 420
   )
+
+  add_executable(vedit-realtime-context-e2e selftests/realtime_context_e2e.cpp)
+  target_link_libraries(vedit-realtime-context-e2e PRIVATE
+    vedit_workspace_diagnostics vedit_workspace_module_tree vedit_workspace_project vedit_app_shell)
+  target_include_directories(vedit-realtime-context-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../module_tree" "${CMAKE_CURRENT_SOURCE_DIR}/../project"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-realtime-context-e2e PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-realtime-context-e2e COMMAND vedit-realtime-context-e2e)
+  set_tests_properties(vedit-realtime-context-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;VEDIT_NO_ENV_AUTOCAPTURE=1"
+    SKIP_RETURN_CODE 77 TIMEOUT 90)
 
   if(TARGET vedit_workspace_search)
     add_executable(vedit-filelist-authority-e2e selftests/filelist_authority_e2e.cpp)

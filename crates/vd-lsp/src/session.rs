@@ -726,6 +726,7 @@ async fn session_loop(
     diagnostics_budget: Duration,
     mut commands: mpsc::UnboundedReceiver<Command>,
 ) {
+    let has_slang_project_index = config.pending_slang_index.is_some();
     if let Some(index) = config.pending_slang_index.take() {
         if let Err(error) = config.prepare_project_index(&index) {
             inner.fail(format!("cannot prepare the project index: {error}"));
@@ -873,7 +874,13 @@ async fn session_loop(
                 inner.refresh_from(snapshot_generation, count);
             }
             Command::Change { path, text } => {
-                let outcome = apply_buffer_change(&mut client, &path, text).await;
+                let outcome = apply_buffer_change(
+                    &mut client,
+                    &path,
+                    text,
+                    has_slang_project_index && context_file.is_some(),
+                )
+                .await;
                 match outcome {
                     Ok(bytes) => {
                         child_exit_noted = false;
@@ -1030,7 +1037,15 @@ fn write_slang_project_index(
             patterns.push(path.into_owned());
         }
     }
-    crate::slang_project::write_layers(root, &config.workspace_root, &config.environment, patterns)
+    let override_flags = build_context_text(&[], &config.project_define_overrides, &[])
+        .map_err(std::io::Error::other)?;
+    crate::slang_project::write_layers(
+        root,
+        &config.workspace_root,
+        &config.environment,
+        patterns,
+        &override_flags,
+    )
 }
 
 /// Candidate directories for the generated context, in preference order:
@@ -1292,10 +1307,18 @@ async fn apply_build_context(
 /// Apply the editor buffer's text to one document: open it when the session does
 /// not have it, otherwise send a full-document `didChange`. Returns the byte
 /// length applied. Never touches the file on disk.
-async fn apply_buffer_change(client: &mut LspClient, path: &Path, text: String) -> Result<usize> {
+async fn apply_buffer_change(
+    client: &mut LspClient,
+    path: &Path,
+    text: String,
+    refresh_slang: bool,
+) -> Result<usize> {
     let uri =
         Url::from_file_path(path).map_err(|()| anyhow!("{} is not a file path", path.display()))?;
     let bytes = text.len();
+    if refresh_slang && !client.session_ended() && client.document_matches(&uri, &text)? {
+        return Ok(bytes);
+    }
     if client.is_open(&uri) {
         client
             .change_document(
@@ -1308,7 +1331,26 @@ async fn apply_buffer_change(client: &mut LspClient, path: &Path, text: String) 
             )
             .await?;
     } else {
-        client.open_document(uri, language_id(path), text).await?;
+        client
+            .open_document(uri.clone(), language_id(path), text)
+            .await?;
+    }
+    const BARRIER: &str = "slang.getModulesInFile";
+    if refresh_slang
+        && client
+            .server_capabilities()
+            .and_then(|caps| caps.execute_command_provider.as_ref())
+            .is_some_and(|provider| provider.commands.iter().any(|command| command == BARRIER))
+    {
+        // slang-server 0.3.1 uses its loose index for didChange diagnostics,
+        // which misses definitions in guarded includes. didSave rechecks its
+        // bounded build from the in-memory document. No file is written.
+        client.save_document(&uri).await?;
+        // Requests queue behind notifications in this server. Wait for the
+        // build diagnostics before answering the UI's next snapshot request.
+        client
+            .execute_command(BARRIER, vec![Value::String(path.display().to_string())])
+            .await?;
     }
     Ok(bytes)
 }

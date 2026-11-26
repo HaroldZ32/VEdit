@@ -263,6 +263,10 @@ impl LspClient {
         self.documents.contains(uri)
     }
 
+    pub(crate) fn document_matches(&self, uri: &Url, text: &str) -> Result<bool> {
+        self.documents.matches_text(uri, text)
+    }
+
     /// Apply incremental changes to a tracked document.
     pub async fn change_document(
         &mut self,

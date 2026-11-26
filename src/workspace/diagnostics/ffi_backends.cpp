@@ -281,6 +281,7 @@ public:
         FileList includeList(includeDirs_);
         FileList defineList(defines_);
         FileList projectIndex(projectIndex_);
+        FileList defineOverrides(projectDefineOverrides_);
         const QByteArray ls = effectiveServer.toUtf8();
         const QByteArray root = workspaceRoot.toUtf8();
         const QByteArray rules = rulesPath.toUtf8();
@@ -288,9 +289,10 @@ public:
         const VdStringList includeView = includeList.view();
         const VdStringList defineView = defineList.view();
         const VdStringList projectIndexView = projectIndex.view();
+        const VdStringList defineOverridesView = defineOverrides.view();
         // AC-2.5: record the argv the session is about to use (no process yet).
         commandLine_ = readCommandLine(effectiveServer, workspaceRoot, rulesPath);
-        session_ = vd_lsp_session_start_v3(service_.get(),
+        session_ = vd_lsp_session_start_v4(service_.get(),
                                            ls.constData(),
                                            root.constData(),
                                            rulesPath.isEmpty() ? nullptr : rules.constData(),
@@ -298,7 +300,8 @@ public:
                                            static_cast<int32_t>(backend_),
                                            includeDirs_.isEmpty() ? nullptr : &includeView,
                                            defines_.isEmpty() ? nullptr : &defineView,
-                                           projectIndex_.isEmpty() ? nullptr : &projectIndexView);
+                                           projectIndex_.isEmpty() ? nullptr : &projectIndexView,
+                                           projectDefineOverrides_.isEmpty() ? nullptr : &defineOverridesView);
         if (session_ == 0) {
             if (error != nullptr) {
                 *error = service_.lastError();
@@ -313,6 +316,11 @@ public:
     }
 
     void setProjectIndex(const QStringList &files) override { projectIndex_ = files; }
+
+    void setProjectDefineOverrides(const QStringList &defines) override
+    {
+        projectDefineOverrides_ = defines;
+    }
 
     void stop() override
     {
@@ -664,6 +672,7 @@ private:
     ServiceHandle service_;
     quint64 session_ = 0;
     QStringList projectIndex_;
+    QStringList projectDefineOverrides_;
     LspBackendKind backend_ = LspBackendKind::Verible;
     QString serverPath_;
     QStringList includeDirs_;
@@ -1101,13 +1110,15 @@ QStringList BackendSwitchState::effectiveDefines() const
 }
 
 bool BackendSwitchState::setProjectEnvironment(const QStringList &includeDirs,
-                                               const QStringList &defines)
+                                               const QStringList &defines,
+                                               const QStringList &defineOverrides)
 {
     projectIncludeDirs_ = includeDirs;
     projectDefines_ = defines;
     if (lsp_ == nullptr) {
         return false;
     }
+    lsp_->setProjectDefineOverrides(defineOverrides);
     // `selectBackend` is the ONE writer of the LSP session's -I/-D. Re-selecting
     // the SAME backend and server with the new lists is what guarantees the
     // next `start()` cannot inherit the previous project's argv: it stops any

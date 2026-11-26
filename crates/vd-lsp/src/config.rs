@@ -59,6 +59,7 @@ pub struct LspConfig {
     pub environment: BTreeMap<String, String>,
     pub(crate) project_index: Option<Arc<crate::session::ContextFile>>,
     pub(crate) pending_slang_index: Option<Vec<PathBuf>>,
+    pub(crate) project_define_overrides: Vec<String>,
 }
 
 impl LspConfig {
@@ -79,6 +80,7 @@ impl LspConfig {
             environment: BTreeMap::new(),
             project_index: None,
             pending_slang_index: None,
+            project_define_overrides: Vec::new(),
         }
     }
 
@@ -109,6 +111,12 @@ impl LspConfig {
     /// Add one project define (`NAME` or `NAME=VALUE`).
     pub fn with_define(mut self, define: impl Into<String>) -> Self {
         self.defines.push(define.into());
+        self
+    }
+
+    /// Prefer explicit project macros in a filelist-scoped slang session.
+    pub fn with_project_define_overrides(mut self, defines: Vec<String>) -> Self {
+        self.project_define_overrides = defines;
         self
     }
 
