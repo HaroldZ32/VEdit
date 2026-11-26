@@ -1,0 +1,29 @@
++ trap 'rc=$?; printf "BASELINE_NATIVE_EXIT=%s\n" "$rc"; exit "$rc"' EXIT
++ bash target/editor-compare-qa/run-qt.sh env QT_QPA_PLATFORM=offscreen ctest --test-dir target/qt6-build --output-on-failure -R '^vedit-(file-compare(-selftest|-close-active-diff|-exit-active-diff)|editor-area-selftest|svn-workbench-selftest|svn-workspaces-selftest|app-ffi-abi-selftest)$'
++ docker run --rm --network none -v $WORKTREE:/vedit-build:ro -v $WORKTREE/target/qt6-build:/vedit-build/target/qt6-build -v $WORKTREE/target/editor-compare-qa/ctest-state-5qwJe2sP:/vedit-build/target/qt6-build/Testing -v $MAIN_CHECKOUT/.git:$MAIN_CHECKOUT/.git:ro -v $WORKTREE/target/editor-compare-qa/native-tools/root:/native-tools:ro -v $WORKTREE/target/editor-compare-qa:/qa -w /vedit-build -e HOME=/tmp -e LANG=C.UTF-8 -e GIT_OPTIONAL_LOCKS=0 -e VEDIT_NO_ENV_AUTOCAPTURE=1 -e VEDIT_SVN_BIN=/native-tools/usr/bin/svn -e VEDIT_SVNADMIN=/native-tools/usr/bin/svnadmin sha256:809c8072ac65be85a15bfc010400f1a0b2cffa10966cfebd4e7dcd0b418360c1 bash -c $'\n        set -euo pipefail\n        printf "%s\\n" /native-tools/usr/lib/x86_64-linux-gnu >/etc/ld.so.conf.d/vedit-native-tools.conf\n        ldconfig -X\n        export PATH=/native-tools/usr/bin:$PATH\n        export XDG_RUNTIME_DIR=/tmp/vedit-runtime\n        install -d -m 0700 "$XDG_RUNTIME_DIR"\n        set -x\n        "$@"\n        printf "QT_RUNNER_EXIT=0\\n"\n    ' qa env QT_QPA_PLATFORM=offscreen ctest --test-dir target/qt6-build --output-on-failure -R '^vedit-(file-compare(-selftest|-close-active-diff|-exit-active-diff)|editor-area-selftest|svn-workbench-selftest|svn-workspaces-selftest|app-ffi-abi-selftest)$'
++ env QT_QPA_PLATFORM=offscreen ctest --test-dir target/qt6-build --output-on-failure -R '^vedit-(file-compare(-selftest|-close-active-diff|-exit-active-diff)|editor-area-selftest|svn-workbench-selftest|svn-workspaces-selftest|app-ffi-abi-selftest)$'
+Test project /vedit-build/target/qt6-build
+    Start 12: vedit-app-ffi-abi-selftest
+1/7 Test #12: vedit-app-ffi-abi-selftest .............   Passed    0.51 sec
+    Start 19: vedit-file-compare-selftest
+2/7 Test #19: vedit-file-compare-selftest ............   Passed   13.71 sec
+    Start 20: vedit-file-compare-close-active-diff
+3/7 Test #20: vedit-file-compare-close-active-diff ...   Passed    0.08 sec
+    Start 21: vedit-file-compare-exit-active-diff
+4/7 Test #21: vedit-file-compare-exit-active-diff ....   Passed    0.08 sec
+    Start 22: vedit-svn-workbench-selftest
+5/7 Test #22: vedit-svn-workbench-selftest ...........   Passed    1.49 sec
+    Start 23: vedit-editor-area-selftest
+6/7 Test #23: vedit-editor-area-selftest .............   Passed    0.16 sec
+    Start 94: vedit-svn-workspaces-selftest
+7/7 Test #94: vedit-svn-workspaces-selftest ..........   Passed    2.10 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  18.12 sec
++ printf 'QT_RUNNER_EXIT=0\n'
+QT_RUNNER_EXIT=0
++ rc=0
++ printf 'BASELINE_NATIVE_EXIT=%s\n' 0
+BASELINE_NATIVE_EXIT=0
++ exit 0

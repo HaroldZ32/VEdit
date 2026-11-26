@@ -1,0 +1,30 @@
+[Before repair]
++ sha256sum src/editor/kernel/ktexteditor_provider.cpp src/editor/kernel/undo_view_lifetime_test.cpp
+a20211c80d8c8bc7a323b965fb1a67b2393d2353271c9a253aca97091ac01d14  src/editor/kernel/ktexteditor_provider.cpp
+a9c738cabe61e91c3a88cff67f5ce97ea8e17584c937c252cade119712b4bdac  src/editor/kernel/undo_view_lifetime_test.cpp
++ cmake --build target/qt6-build --parallel 6 --target vedit-undo-view-lifetime-tests
++ sha256sum $WORKTREE/target/editor-compare-qa/clean-qt6-9TUxQTSP/build/src/app/editor-lane/vedit-undo-view-lifetime-tests
+0135d3d42951d0baaef4293aa71189a825ea3054b82f85fb5e713ebcffdcc7cd  $WORKTREE/target/editor-compare-qa/clean-qt6-9TUxQTSP/build/src/app/editor-lane/vedit-undo-view-lifetime-tests
++ env QT_QPA_PLATFORM=offscreen ctest --test-dir target/qt6-build -V -R '^vedit-undo-view-lifetime-tests$'
+46: CHECK save-as.fifo-fixture PASS
+46: CHECK save-as.fifo-returned-before-watchdog FAIL (kf.sonnet.core: Sonnet: No speller backends available!
+46: CHECK save-as.fifo-and-source-intact PASS
+46: CHECK mixed.large-hunk-replaced PASS
+46: CHECK mixed.large-hunk-undo-retains-dirty-edit PASS
+46: CHECK mixed.large-hunk-undo-restores-disk-bytes FAIL (bytes=3675 expected=3955 crlf=0 expected-crlf=280 error=)
+T13_RED_EXIT=8
+
+[After repair]
++ sha256sum src/editor/kernel/ktexteditor_provider.cpp src/editor/kernel/undo_view_lifetime_test.cpp
++ cmake --build target/qt6-build --parallel 4 --target vedit-undo-view-lifetime-tests
++ sha256sum --check --strict $WORKTREE/target/editor-compare-qa/t13-refrozen.sha256
++ sha256sum $WORKTREE/target/editor-compare-qa/clean-qt6-9TUxQTSP/build/src/app/editor-lane/vedit-undo-view-lifetime-tests
+ead212ce88b7ef53d9bee8b0ba128d510fdf0ffa29794e9541202b2186ced281  $WORKTREE/target/editor-compare-qa/clean-qt6-9TUxQTSP/build/src/app/editor-lane/vedit-undo-view-lifetime-tests
++ env QT_QPA_PLATFORM=offscreen ctest --test-dir target/qt6-build -V -R '^vedit-undo-view-lifetime-tests$'
+46: CHECK save-as.fifo-fixture PASS
+46: CHECK save-as.fifo-returned-before-watchdog PASS
+46: CHECK save-as.fifo-and-source-intact PASS
+46: CHECK mixed.large-hunk-replaced PASS
+46: CHECK mixed.large-hunk-undo-retains-dirty-edit PASS
+46: CHECK mixed.large-hunk-undo-restores-disk-bytes PASS
+T13_GREEN_EXIT=0

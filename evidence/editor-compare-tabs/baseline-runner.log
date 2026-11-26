@@ -1,0 +1,39 @@
++ trap 'rc=$?; printf "RUNNERS_EXIT=%s\n" "$rc"; exit "$rc"' EXIT
++ docker image inspect --format '{{.Id}} {{.Created}} {{join .RepoTags ","}}' vedit-build:local vedit-qt6-build:local
+sha256:0798e93a6d3026424dfcda486014462298474a3e773e448e31856028f921a0e0 2026-10-31T11:00:12.156129684+08:00 vedit-build:local
+sha256:809c8072ac65be85a15bfc010400f1a0b2cffa10966cfebd4e7dcd0b418360c1 2026-11-20T07:56:40Z vedit-qt6-build:local
++ docker run --rm vedit-qt6-build:local bash -c 'set -e; for tool in c++ cmake ninja Xvfb xvfb-run xdotool ffmpeg import xwd svn svnadmin; do command -v "$tool" || printf "missing %s\n" "$tool"; done; query="qt6-base-dev libkf6texteditor-dev libkf6syntaxhighlighting-dev libtree-sitter-dev libc6"; dpkg-query -W $query; pkg-config --modversion tree-sitter; for tool in cmake ninja c++; do "$tool" --version; done'
+/usr/bin/c++
+/usr/bin/cmake
+/usr/bin/ninja
+/usr/bin/Xvfb
+/usr/bin/xvfb-run
+missing xdotool
+missing ffmpeg
+missing import
+missing xwd
+missing svn
+missing svnadmin
+libc6:amd64	2.43-2ubuntu2.4
+libkf6syntaxhighlighting-dev:amd64	6.24.0-0ubuntu1
+libkf6texteditor-dev	6.24.0-0ubuntu1
+libtree-sitter-dev:amd64	0.25.9-7
+qt6-base-dev:amd64	6.10.2+dfsg-7
+0.25.9
+cmake version 4.2.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+1.13.2
+c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+Copyright (C) 2025 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
++ docker run --rm vedit-build:local bash -c 'set -e; rustc --version; cargo --version; getconf GNU_LIBC_VERSION'
+rustc 1.99.0 (b940084d7 2026-09-28)
+cargo 1.99.0 (5f94df478 2026-08-27)
+glibc 2.17
++ rc=0
++ printf 'RUNNERS_EXIT=%s\n' 0
+RUNNERS_EXIT=0
++ exit 0
