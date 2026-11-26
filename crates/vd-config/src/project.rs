@@ -645,9 +645,10 @@ pub fn expand_with_variables(
 ///
 /// The entries arrive **as the user typed them** (the panel persists that
 /// spelling), so this is where a relative include directory is resolved against
-/// the project root. They are inserted BEFORE the tools-page values, so the
-/// project's own declaration wins the order while the de-duplication below
-/// still keeps one copy per real directory / define.
+/// the project root. Authored include directories precede tools-page paths.
+/// For macros, the latest authored value for a name overrides all lower layers.
+/// For other names, the first definition wins in configuration, filelist,
+/// then tools-page order.
 ///
 /// An entry that cannot become a `-I`/`-D` argument is a **hard error naming
 /// the offending value**: silently dropping it would let the editor, the lint
@@ -669,20 +670,33 @@ pub fn expand_with_project_entries(
     }
     include_dirs.extend_from_slice(extra_include_dirs);
 
-    let mut defines: Vec<String> = Vec::with_capacity(project_defines.len() + extra_defines.len());
+    let mut overrides = BTreeMap::new();
+    let mut defines = Vec::with_capacity(project_defines.len() + extra_defines.len());
     for entry in project_defines {
-        let trimmed = entry.trim();
         reject_unsafe_entry(entry, "define")?;
-        if parse_define(trimmed).is_none() {
+        let Some(define) = parse_define(entry) else {
             anyhow::bail!(
                 "the project define `{entry}` is not NAME or NAME=VALUE; remove or fix it"
             );
-        }
-        defines.push(trimmed.to_string());
+        };
+        overrides.insert(define.name.clone(), define);
+        defines.push(entry.clone());
     }
-    defines.extend(extra_defines.iter().cloned());
+    defines.extend_from_slice(extra_defines);
 
-    expand_with_variables(root, imported_filelists, &include_dirs, &defines, variables)
+    let mut expansion =
+        expand_with_variables(root, imported_filelists, &include_dirs, &defines, variables)?;
+    let mut seen = BTreeSet::new();
+    expansion.defines.retain_mut(|define| {
+        if !seen.insert(define.name.clone()) {
+            return false;
+        }
+        if let Some(authored) = overrides.remove(&define.name) {
+            *define = authored;
+        }
+        true
+    });
+    Ok(expansion)
 }
 
 /// Resolve ONE typed include directory: trimmed, relative to the project root,

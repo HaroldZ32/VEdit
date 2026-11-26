@@ -794,6 +794,7 @@ unsafe fn start_session_impl(
     include_dirs: *const VdStringList,
     defines: *const VdStringList,
     project_index: *const VdStringList,
+    project_define_overrides: *const VdStringList,
 ) -> u64 {
     let Some(state) = service_state(service) else {
         return 0;
@@ -866,6 +867,16 @@ unsafe fn start_session_impl(
     };
     let mut config =
         LspConfig::new(Path::new(ls_path), Path::new(workspace_root)).with_backend(backend);
+    if !project_define_overrides.is_null() {
+        // SAFETY: the caller supplies a readable list of NUL-terminated strings.
+        match unsafe { read_string_list(project_define_overrides) } {
+            Ok(values) => config = config.with_project_define_overrides(values),
+            Err(message) => {
+                state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+                return 0;
+            }
+        }
+    }
     // batch-20261115 AC-1.3: the imported environment selection reaches the
     // language-server child through the same store the tool children use, so the
     // two can never disagree about what was imported.
@@ -984,6 +995,7 @@ pub unsafe extern "C" fn vd_lsp_session_start(
             ptr::null(),
             ptr::null(),
             ptr::null(),
+            ptr::null(),
         )
     }
 }
@@ -1023,6 +1035,7 @@ pub unsafe extern "C" fn vd_lsp_session_start_v2(
             include_dirs,
             defines,
             ptr::null(),
+            ptr::null(),
         )
     }
 }
@@ -1059,6 +1072,46 @@ pub unsafe extern "C" fn vd_lsp_session_start_v3(
             include_dirs,
             defines,
             project_index,
+            ptr::null(),
+        )
+    }
+}
+
+/// Start a realtime session with explicit Project macro overrides for slang.
+/// `project_define_overrides` applies to the private configuration of a
+/// filelist-scoped slang session. A null list retains native flag precedence.
+///
+/// # Safety
+///
+/// The contract of [`vd_lsp_session_start_v3`] applies to its parameters. A
+/// non-null `project_define_overrides` must satisfy the contract of `defines`.
+#[no_mangle]
+#[allow(clippy::too_many_arguments)]
+pub unsafe extern "C" fn vd_lsp_session_start_v4(
+    service: *mut VdService,
+    ls_path: *const c_char,
+    workspace_root: *const c_char,
+    rules_path: *const c_char,
+    files: *const VdStringList,
+    backend: i32,
+    include_dirs: *const VdStringList,
+    defines: *const VdStringList,
+    project_index: *const VdStringList,
+    project_define_overrides: *const VdStringList,
+) -> u64 {
+    // SAFETY: the documented pointer contracts match start_session_impl's.
+    unsafe {
+        start_session_impl(
+            service,
+            ls_path,
+            workspace_root,
+            rules_path,
+            files,
+            backend,
+            include_dirs,
+            defines,
+            project_index,
+            project_define_overrides,
         )
     }
 }

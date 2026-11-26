@@ -43,6 +43,7 @@ QString moduleTreeSlangBinary(const QObject *shell)
 #include "panel_registry.h"
 
 #include "top_scope.h"
+#include "../diagnostics/realtime_file_scope.h"
 
 #include <QDir>
 #include <QHash>
@@ -175,6 +176,7 @@ public:
         client_->setStateDirectory(stateDirectory_);
         client_->setOnReady([this](const module_tree::ModuleCatalog &catalog) {
             catalog_ = catalog;
+            catalogSourceCutoffMs_ = catalogRunStartedMs_;
             status_ = catalog.summaryLine();
             if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
                 std::fprintf(stderr,
@@ -405,6 +407,7 @@ public:
         const bool allowLarge = userRequestQueued_;
         userRequestQueued_ = false;
         client_->setAllowLargeCatalog(allowLarge);
+        catalogRunStartedMs_ = QDateTime::currentMSecsSinceEpoch();
         ++catalogRuns_;
         setProperty("catalogRuns", catalogRuns_);
         panelCancellable(true);
@@ -606,16 +609,40 @@ private:
             closure.insert(it.key(), it.value());
         }
         QStringList includedDefinitions;
+        QVariantMap owners;
         for (const auto &module : catalog_.modules) {
             if (!module.compilationUnit.isEmpty()) {
                 includedDefinitions.append(module.file);
+            }
+            const QString owner = module.compilationUnit.isEmpty() ? module.file : module.compilationUnit;
+            if (catalog_.find(module.name) == &module && !owner.isEmpty()) {
+                owners.insert(module.name, owner);
+            }
+        }
+        using diagnostics::realtime_scope::CatalogDependencySites;
+        CatalogDependencySites sites;
+        for (const auto &module : catalog_.modules) {
+            const QString parent = module.compilationUnit.isEmpty() ? module.file : module.compilationUnit;
+            for (const auto &instance : module.children) {
+                const QString child = owners.value(instance.module).toString();
+                if (parent.isEmpty() || child.isEmpty() || parent == child) {
+                    continue;
+                }
+                const bool local = instance.file == parent;
+                sites[parent].append({child, instance.module,
+                                      local ? instance.line : -1, local ? instance.column : -1});
             }
         }
         includedDefinitions.removeDuplicates();
         includedDefinitions.sort();
         const bool closureChanged = closure != shell_->property("vedit.moduleTree.closure").toMap()
+            || owners != shell_->property("vedit.moduleTree.owners").toMap()
+            || sites != shell_->property("vedit.moduleTree.closureSites").value<CatalogDependencySites>()
             || includedDefinitions != shell_->property("vedit.moduleTree.includedDefinitions").toStringList();
         shell_->setProperty("vedit.moduleTree.closure", closure);
+        shell_->setProperty("vedit.moduleTree.owners", owners);
+        shell_->setProperty("vedit.moduleTree.closureSites", QVariant::fromValue(sites));
+        shell_->setProperty("vedit.moduleTree.sourceCutoffMs", catalog_.valid ? catalogSourceCutoffMs_ : 0);
         shell_->setProperty("vedit.moduleTree.includedDefinitions", includedDefinitions);
         if (closureChanged) {
             const auto revision = shell_->property("vedit.moduleTree.scopeRevision").toULongLong();
@@ -912,6 +939,8 @@ private:
     QString top_;
     QStringList topCandidates_;
     int catalogRuns_ = 0;
+    qint64 catalogRunStartedMs_ = 0;
+    qint64 catalogSourceCutoffMs_ = 0;
     /// AC-7.3: the last invalid-top fallback, shown instead of the raw failure.
     QString topNote_;
     /// One fallback per user choice; never a loop.

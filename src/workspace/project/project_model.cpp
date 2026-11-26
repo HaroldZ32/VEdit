@@ -4,6 +4,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QSet>
 #include <QStringLiteral>
 
 #include <algorithm>
@@ -37,6 +38,25 @@ QString normalizedDefineEntry(const QString &entry)
     }
     return trimmed.left(equals).trimmed() + QLatin1Char('=')
            + trimmed.mid(equals + 1).trimmed();
+}
+
+QString defineName(const QString &entry)
+{
+    return entry.section(QLatin1Char('='), 0, 0).trimmed();
+}
+
+void deduplicateProjectDefines(QStringList &defines)
+{
+    // Older versions appended edits. The last entry for a name is the latest edit.
+    QSet<QString> seen;
+    for (qsizetype index = defines.size(); index > 0; --index) {
+        const QString name = defineName(defines.at(index - 1));
+        if (seen.contains(name)) {
+            defines.removeAt(index - 1);
+        } else {
+            seen.insert(name);
+        }
+    }
 }
 
 // The Rust `parse_define` rule (crates/vd-config/src/project.rs): an ASCII
@@ -128,6 +148,7 @@ bool ProjectModel::restoreFromDisk(QString *error, bool restoreCachedFiles,
     }
     stopExpansion();
     state_ = std::move(state);
+    deduplicateProjectDefines(state_.projectDefines);
     // RM-3: a version-2 project-model.json has one live variable table and no
     // per-root map. Seed the entry for its own root so switching away and back
     // cannot lose what the user typed.
@@ -175,6 +196,7 @@ bool ProjectModel::selectRoot(const QString &root)
     next.filelists = authored.filelists;
     next.projectIncludeDirs = authored.includeDirs;
     next.projectDefines = authored.defines;
+    deduplicateProjectDefines(next.projectDefines);
     next.filesStale = !authored.filelists.isEmpty();
     next.variablesByRoot = std::move(state_.variablesByRoot);
     next.topByRoot = std::move(state_.topByRoot);
@@ -607,9 +629,7 @@ bool ProjectModel::validateProjectEntry(const QString &entry, bool includeDir, Q
         }
         return true;
     }
-    const int equals = trimmed.indexOf(QLatin1Char('='));
-    const QString name = (equals < 0 ? trimmed : trimmed.left(equals)).trimmed();
-    if (!isDefineIdentifier(name)) {
+    if (!isDefineIdentifier(defineName(trimmed))) {
         if (error != nullptr) {
             *error = QCoreApplication::translate(
                          "VEdit", "\"%1\" is not NAME or NAME=VALUE (the name must be an identifier)")
@@ -664,7 +684,15 @@ bool ProjectModel::addDefine(const QString &entry, QString *error)
     if (!validateProjectEntry(entry, false, error)) {
         return false;
     }
-    state_.projectDefines.append(normalizedDefineEntry(entry));
+    const QString normalized = normalizedDefineEntry(entry);
+    const QString name = defineName(normalized);
+    const auto existing = std::find_if(state_.projectDefines.begin(), state_.projectDefines.end(),
+                                       [&name](const QString &value) { return defineName(value) == name; });
+    if (existing == state_.projectDefines.end()) {
+        state_.projectDefines.append(normalized);
+    } else {
+        *existing = normalized;
+    }
     saveState();
     startExpansion(true);
     emit stateChanged();
@@ -707,12 +735,14 @@ QStringList ProjectModel::displayIncludeDirs() const
 QStringList ProjectModel::displayDefines() const
 {
     QStringList display = state_.projectDefines;
-    QStringList covered;
+    QSet<QString> covered;
     for (const QString &entry : state_.projectDefines) {
-        covered.append(normalizedDefineEntry(entry));
+        covered.insert(defineName(entry));
     }
     for (const QString &effective : state_.defines) {
-        if (!covered.contains(normalizedDefineEntry(effective))) {
+        const QString name = defineName(effective);
+        if (!covered.contains(name)) {
+            covered.insert(name);
             display.append(effective);
         }
     }

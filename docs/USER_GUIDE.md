@@ -109,11 +109,13 @@ VEdit 是面向 Verilog / SystemVerilog 的桌面编辑器。可以直接打开�
 - 摘要行与按钮：`Refresh`、`Import Filelist…`、`Remove Selected Filelist`、`Edit Variables…`；
 - `Filelists`：已导入的 filelist，双击打开；
 - `Files`：展开出的源文件，双击打开；
-- `Include dirs (-I)` 与 `Defines (-D)`：展开得到的包含目录与宏；
+- `Include dirs (-I)` 与 `Defines (-D)`：本工程添加的包含目录与宏，以及展开后生效的条目；
 - `Variables`：工程变量表；
 - `Diagnostics`：filelist 解析诊断（缺失的 `+incdir+`、未知指令、嵌套问题等）。这些都显示在面板里，不弹模态框。
 
 没有工程时，面板显示一行提示；这不是错误。
+
+在 `Defines (-D)` 下点 `Add Define…`，输入 `NAME` 或 `NAME=VALUE`。用相同名称提交不同值会更新原有条目，改动按工程保存。导入 filelist 后，工程展开同名宏时依次取 `Project` 面板、`vedit.toml` 的 `[project] defines`、filelist、`Preferences → Tools` 中的第一个定义。选中本工程添加的宏并点 `Remove`，就会恢复下一来源的值。比如 filelist 定义了 `WIDTH=2`，在面板添加 `WIDTH=4` 后工程展开值变成 `4`，移除后恢复 `2`。改动会触发 slang 重新分析当前文件，原生 slang 配置的同名宏见第 10 节。
 
 ### 2.5 filelist 里的变量与转义
 
@@ -139,8 +141,6 @@ VEdit 是面向 Verilog / SystemVerilog 的桌面编辑器。可以直接打开�
 - 不认识的 `+…` / `-…` 指令报一条诊断后跳过，不会让工程打不开。
 
 `Variables` 对话框（标题 `Filelist variables`）可以**增删改**工程变量表：`Add variable` 新增一行，名字与值都可编辑；每行右侧的 `Delete` 删除该行。打开时会列出已有变量和当前仍缺失的变量——即使工程还一个变量都没有，`Edit Variables…` 也能打开它（新增就是用途之一）。名字按 `[A-Za-z_][A-Za-z0-9_]*` 校验：**空名字、含空格或 `=` / `$` 等字符、以数字开头、或重名**都会在该行下面给出原因，`OK` 不会关闭对话框。删除一个仍被 filelist 引用的变量只会去掉它的值：工程会把它重新列为缺失，并在下次展开时再问（不会静默消失）。保存是**整表替换**，并按**工程根分别记忆**：A→B→A 切换回来时恢复 A 自己的表，切到 B 看不到 A 的变量（存在 `project-model.json`，重启仍在）。
-
-`Project` 面板里的 `Include dirs (-I)` 与 `Defines (-D)` 列表是从展开结果来的只读视图，**没有按工程增删的入口**（见第 10 节）。
 
 ### 2.6 恢复上次会话
 
@@ -425,7 +425,7 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 切到 **slang**（随包 `slang-server`）后，同一个文件会给出真正的语法诊断（例如 `expected ';'`），位置就在删除点附近；这是本版推荐的读法。
 
-导入 filelist 后，slang 的实时分析和定义跳转采用展开后的文件集、包含目录和宏，并保留工作区与用户的 slang 编译设置。`Preferences → Tools` 的 Include dirs / Defines 用于手动运行的工程级 lint。为 Verible 提供 `--file_list_path` 无法解决上面的宏预处理限制。
+导入 filelist 后，slang 的实时分析和定义跳转采用工程展开的文件集、包含目录和宏，其中包括 `Project` 面板中的宏覆盖（见 2.4）。工作区与用户的原生 slang 编译设置仍生效。为 Verible 提供 `--file_list_path` 无法解决上面的宏预处理限制。
 
 ## 7. 代码导航与多光标
 
@@ -639,8 +639,8 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 - **Lint engine**：独立选择 CLI lint 引擎，默认为 `slang`，显式 `verible` 选择继续生效。全工程 lint 由用户手动启动。
 - **工具路径**：`verible-verilog-ls`、`slang`、`slang-server`、`verible-verilog-format`、verible 规则文件。留空表示用随包或自动发现的版本。
 - **Host shell**：选择启动新终端和后续 Git/SVN 任务使用的宿主机 shell。详见附录 D。
-- **Include dirs (-I)**、**Defines (-D)**：一行一个，交给工程级 lint 使用。
-- 页底说明：这些值存在设置文件里；保存后的改动**立即生效**（运行中的程序约 300 ms 内读入设置文件）：实时 LSP 会话用新选择的后端重启并重新分析当前文件，lint 引擎在下一次 `Lint Project` 时生效，`-I` / `-D` 交给工程级 lint。
+- **Include dirs (-I)**、**Defines (-D)**：一行一个。导入 filelist 后，这些设置补充工程展开的包含目录与宏，供 slang 实时分析及工程级 lint 使用。同名宏优先采用工程中的值（见 2.4）。
+- 页底说明：这些值存在设置文件里；保存后的改动**立即生效**（运行中的程序约 300 ms 内读入设置文件）。实时 LSP 会话用新选择的后端重启并重新分析当前文件，lint 引擎在下一次 `Lint Project` 时生效。
 
 ### 8.5 FIM（可选的补全服务）
 
@@ -807,7 +807,7 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 5. **模块树与接口的规模上限**：层级深度上限 64 层、最多 20000 行；超限或环形例化显示一行标记。本版工程模式需要**显式导入 filelist**：没有 filelist 时模块树/顶层选择禁用，显示空态原因；没有工程或 `slang` 没报出模块时，也只显示一行原因。工程超过 5000 个文件时模块树不会自动跑全量目录，需要输入顶层或显式 `Refresh`；全量目录默认 120 秒业务超时，可 `Cancel`。
 6. **`Alt` 手势可能被窗口管理器截获**：KDE / GNOME 默认用 `Alt+拖拽`（以及 `Alt+点击`）移动窗口，事件到不了应用。因此块选择与加光标的**主手势**是 `Shift+Alt+拖拽` 与 `Ctrl+Alt+点击`（窗口管理器不占用它们）；`Alt+...` 只作为次选手势保留。见 7.2。
 7. **中文宽度 1.60 倍**：中英文混排的注释列对齐是近似的（见 9.3）。
-8. **工程面板不能增删 `-I` / `-D`**：`Project` 面板里的 `Include dirs (-I)` 与 `Defines (-D)` 是从 filelist 展开得到的**只读**结果，没有按工程增删的入口。要调整交给工程级 lint 的 `-I` / `-D`，用 `Edit → Preferences… → Tools` 的全局设置（见 8.4）；要改变展开结果，改 filelist 后按 `Refresh`。
+8. **工程面板与原生 slang 配置**。`Project` 面板的 `Remove` 只移除本工程在面板中添加的包含目录或宏。要修改 filelist 中的原始定义，请编辑 filelist 后点 `Refresh`。导入 filelist 后，slang 实时分析优先使用面板中的宏定义，覆盖原生 slang 配置中的同名 `-D`。移除面板条目后，原生配置和 filelist 恢复原有优先级。原生 `-U` 仍会取消对应宏的定义。
 9. **发布包的 `Auto` 界面语言通常为英文**。包内只有 `C.UTF-8`，需要中文请显式选择（见 9.1）。
 10. **打包产物的语法定义范围**。发布包只加载随包白名单里的语法定义。
 11. **桌面验证范围**。合并到本版的交互改动在 X11/Xvfb 下验证。原生 Wayland、各桌面环境的 DPI、字体和输入法组合仍需单独验证。

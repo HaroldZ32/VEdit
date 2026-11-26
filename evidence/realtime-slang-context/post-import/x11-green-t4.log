@@ -1,0 +1,22 @@
+Intermediate integrated app SHA-256 ca71698e60d59d015a9a087eeefdb8676f6c362ca9db4262c171fe8ad72abf68
+Selected application stdout, followed by Outline observations from X11 captures.
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=10'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=4'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+
+After import: filelist width 2, index-oob at [1:0].
+
+After Add 10: the index-oob row cleared.
+
+After Add 4: exactly one macro row and index-oob at [3:0].
+
+After Remove 4: filelist width 2 restored and index-oob at [1:0].
+
+Every rendered step retained the genuinely missing module diagnostic.
+
+Separate GUI control after user-initiated Project Lint with no macro:
+LINT-PASS-FINISHED automatic=0 errors=1 files=2 dialogs=0 notice=1
+DIAG-ROW file='<project>/rtl/top.sv' line=9 column=20 severity=1 code='UndeclaredIdentifier' option='' source='cli:slang' origin=1
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=10'
+After Add 10, rendered Outline dropped the old undefined-branch row and retained the genuinely missing module row. The manual Project Lint result remained separate.

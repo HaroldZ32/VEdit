@@ -326,6 +326,7 @@ void DiagnosticsController::invalidateRealtimeSession()
     }
     lspStarted_ = false;
     navigation_ = 0;
+    outlineRequest_ = 0;
     session_ = SessionSnapshot{};
 }
 
@@ -398,6 +399,8 @@ void DiagnosticsController::reparse()
         ++lspStops_;
     }
     lspStarted_ = false;
+    navigation_ = 0;
+    outlineRequest_ = 0;
     lspDiagnosticsRequested_ = false;
     lints_.clear();
     lspDiagnostics_.clear();
@@ -720,7 +723,7 @@ bool DiagnosticsController::serverSilent() const
     // The other half of AC-2: no documentSymbol either, and no set was ever
     // published for the file. Both surfaces empty is "not analysed", not "a
     // clean file with no symbols".
-    return navigation_ == 0 && lspStarted_ && session_.state == BackendState::Ready
+    return navigation_ == 0 && outlineRequest_ == 0 && lspStarted_ && session_.state == BackendState::Ready
         && outline_.isEmpty() && !publishedDiagnosticsFiles_.contains(analysisFile_);
 }
 
@@ -902,7 +905,7 @@ void DiagnosticsController::refresh()
                     }
                     const quint64 id = lsp_->requestDiagnostics(file);
                     if (id != 0) {
-                        lspDiagnostics_.append(DiagnosticTicket{id, file});
+                        lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
                         lastDiagnosticsRequestFiles_.append(file);
                     }
                 }
@@ -910,9 +913,9 @@ void DiagnosticsController::refresh()
                     static_cast<quint64>(lastDiagnosticsRequestFiles_.size());
             }
 
-            if (!analysisFile_.isEmpty() && !symbolsRequested_) {
-                navigation_ = lsp_->requestSymbols(analysisFile_);
-                symbolsRequested_ = navigation_ != 0;
+            if (!analysisFile_.isEmpty() && !symbolsRequested_ && outlineRequest_ == 0) {
+                outlineRequest_ = lsp_->requestSymbols(analysisFile_);
+                symbolsRequested_ = outlineRequest_ != 0;
             }
         }
     }
@@ -920,8 +923,16 @@ void DiagnosticsController::refresh()
         report_.lspMessage = QCoreApplication::translate("VEdit", "the LSP session did not start");
     }
 
-    if (navigation_ != 0) {
-        pollNavigation();
+    // The timer that requested a user action owns its reply. Automatic outline
+    // polling must never consume definition, references, or formatting results.
+    if (lsp_ && outlineRequest_ != 0) {
+        const LspPolled polled = lsp_->poll(outlineRequest_);
+        if (!polled.pending) {
+            outlineRequest_ = 0;
+            if (symbolsRequested_ && polled.ready && polled.kind == ResponseKind::Symbols) {
+                outline_ = polled.symbols;
+            }
+        }
     }
     collectLints();
     collectLspDiagnostics();
@@ -990,6 +1001,9 @@ void DiagnosticsController::collectLspDiagnostics()
         LspPolled polled = lsp_->poll(ticket.id);
         if (polled.pending) {
             pending.append(ticket);
+            continue;
+        }
+        if (ticket.analysis != analysisCount_) {
             continue;
         }
         if (polled.failed) {
@@ -1092,7 +1106,7 @@ void DiagnosticsController::pollServerSilence()
             }
             const quint64 id = lsp_->requestDiagnostics(file);
             if (id != 0) {
-                lspDiagnostics_.append(DiagnosticTicket{id, file});
+                lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
             }
         }
     }
@@ -1174,7 +1188,8 @@ void DiagnosticsController::finaliseState()
     const bool bufferPublishing =
         bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
         && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= kBufferSettleMs;
-    if (lspPending || bufferPublishing || !lints_.isEmpty() || !lspDiagnostics_.isEmpty()) {
+    if (lspPending || bufferPublishing || (!lspFailed && outlineRequest_ != 0)
+        || !lints_.isEmpty() || !lspDiagnostics_.isEmpty()) {
         return;
     }
 

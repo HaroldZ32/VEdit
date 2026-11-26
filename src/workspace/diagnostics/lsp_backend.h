@@ -65,6 +65,9 @@ public:
     /// list keeps the server's ordinary discovery for a loose document.
     virtual void setProjectIndex(const QStringList &) {}
 
+    /// Explicit Project dock macros for the next imported slang session.
+    virtual void setProjectDefineOverrides(const QStringList &) {}
+
     /// Request a cooperative shutdown (idempotent, non-blocking).
     virtual void stop() = 0;
 

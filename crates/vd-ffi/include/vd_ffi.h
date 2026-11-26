@@ -3752,6 +3752,27 @@ uint64_t vd_lsp_session_start_v3(struct VdService *service,
                                  const struct VdStringList *project_index);
 
 /*
+ Start a realtime session with explicit Project macro overrides for slang.
+ `project_define_overrides` applies to the private configuration of a
+ filelist-scoped slang session. A null list retains native flag precedence.
+
+ # Safety
+
+ The contract of [`vd_lsp_session_start_v3`] applies to its parameters. A
+ non-null `project_define_overrides` must satisfy the contract of `defines`.
+ */
+uint64_t vd_lsp_session_start_v4(struct VdService *service,
+                                 const char *ls_path,
+                                 const char *workspace_root,
+                                 const char *rules_path,
+                                 const struct VdStringList *files,
+                                 int32_t backend,
+                                 const struct VdStringList *include_dirs,
+                                 const struct VdStringList *defines,
+                                 const struct VdStringList *project_index,
+                                 const struct VdStringList *project_define_overrides);
+
+/*
  Read the observable state of one session (A3d).
 
  Returns `VD_STATUS_READY` with `out` filled, or `POLL_MISUSE` when the id is

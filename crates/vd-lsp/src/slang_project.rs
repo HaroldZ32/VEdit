@@ -15,6 +15,7 @@ pub(crate) fn write_layers(
     workspace: &Path,
     environment: &BTreeMap<String, String>,
     patterns: Vec<String>,
+    override_flags: &str,
 ) -> io::Result<()> {
     let workspace_settings = workspace.join(".slang");
     let home = environment
@@ -35,17 +36,34 @@ pub(crate) fn write_layers(
 
     // The upstream loader selects nonempty shared flags in preference to the
     // user's flags, then appends the local flags. Keep ignored files untouched.
-    if shared
-        .get("flags")
-        .and_then(Value::as_str)
-        .is_some_and(|flags| !flags.is_empty())
-    {
+    let has_flags = |layer: &Map<String, Value>| {
+        layer
+            .get("flags")
+            .and_then(Value::as_str)
+            .is_some_and(|flags| !flags.is_empty())
+    };
+    let shared_has_flags = has_flags(&shared);
+    if shared_has_flags {
         user.remove("flags");
     }
+    let use_user_flags = !shared_has_flags && has_flags(&user);
     for layer in [&mut shared, &mut user, &mut local] {
         if let Some(Value::String(flags)) = layer.get_mut("flags") {
             *flags = compiler.rebase(flags)?;
         }
+    }
+    if !override_flags.is_empty() {
+        // Slang takes the first -D for a name, including before nested -f/-F.
+        let layer = if use_user_flags {
+            &mut user
+        } else {
+            &mut shared
+        };
+        let mut flags = override_flags.to_owned();
+        if let Some(Value::String(native)) = layer.get("flags") {
+            flags.push_str(native);
+        }
+        layer.insert("flags".to_string(), Value::String(flags));
     }
     // An empty project index still explicitly disables the workspace crawl.
     shared.insert("index".to_string(), serde_json::json!([{"dirs": []}]));

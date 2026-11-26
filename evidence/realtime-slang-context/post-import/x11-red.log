@@ -1,0 +1,18 @@
+Baseline b614a4af (xcb/Xvfb with real pinned slang-server, exit 0 on GUI close)
+Selected product stdout, fixture root shortened to <project>.
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+DIAG-ROW file='<project>/rtl/top.sv' line=7 column=25 severity=1 code='index-oob' option='' source='slang' origin=0
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=2 env='-DPROJECT_WIDTH=2 -DPROJECT_WIDTH=10'
+DIAG-ROW file='<project>/rtl/top.sv' line=7 column=25 severity=1 code='index-oob' option='' source='slang' origin=0
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=3 env='-DPROJECT_WIDTH=2 -DPROJECT_WIDTH=10 -DPROJECT_WIDTH=4'
+DIAG-ROW file='<project>/rtl/top.sv' line=7 column=25 severity=1 code='index-oob' option='' source='slang' origin=0
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=2 env='-DPROJECT_WIDTH=2 -DPROJECT_WIDTH=10'
+DIAG-ROW file='<project>/rtl/top.sv' line=7 column=25 severity=1 code='index-oob' option='' source='slang' origin=0
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+DIAG-ROW file='<project>/rtl/top.sv' line=7 column=25 severity=1 code='index-oob' option='' source='slang' origin=0
+
+Outline row observed in all five corresponding screen captures:
+
+top.sv:7:25 — cannot refer to element 8 of 'logic[1:0]' [index-oob]
+
+top.sv:4:3 — unknown module 'genuinely_missing' [slang]

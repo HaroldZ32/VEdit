@@ -502,6 +502,7 @@ private:
     struct DiagnosticTicket {
         quint64 id = 0;
         QString file;
+        quint64 analysis = 0;
     };
 
     void startLsp();
@@ -594,6 +595,7 @@ private:
     QString lastError_;
     quint64 generation_ = 0;
     quint64 navigation_ = 0;
+    quint64 outlineRequest_ = 0;
     bool lspStarted_ = false;
     bool lspDiagnosticsRequested_ = false;
 
