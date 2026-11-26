@@ -1,0 +1,116 @@
+[Native tools]
++ git rev-parse HEAD
+304e1a29be4dbe2372daf81206a011a8a6b00675
++ env QT_QPA_PLATFORM=offscreen VEDIT_VERIBLE_LS=/native-tools/usr/bin/verible-verilog-ls VEDIT_VERIBLE_BIN_DIR=/native-tools/usr/bin VEDIT_SLANG_SERVER=/native-tools/usr/bin/slang-server bash -c 'set -euxo pipefail; ctest --test-dir target/qt6-build -N; ctest --test-dir target/qt6-build --output-on-failure --parallel 4 -E "^vedit-diagnostics-product-seam$"'
++ ctest --test-dir target/qt6-build -N
+Total Tests: 100
++ ctest --test-dir target/qt6-build --output-on-failure --parallel 4 -E '^vedit-diagnostics-product-seam$'
+ 1/99 Test  #3: vedit-syntax-provider-tests ......................   Passed    0.00 sec
+ 2/99 Test  #5: vedit-syntax-directory-equivalence ...............   Passed    0.02 sec
+ 3/99 Test  #4: vedit-syntax-kde-data ............................   Passed    0.04 sec
+ 4/99 Test  #2: vedit-m0-smoke ...................................   Passed    0.06 sec
+ 5/99 Test  #7: vedit-syntax-product-tests .......................   Passed    0.06 sec
+ 6/99 Test  #9: vedit-terminal-env-inheritance ...................   Passed    0.02 sec
+ 7/99 Test #10: vedit-terminal-env-imported ......................   Passed    0.03 sec
+ 8/99 Test  #6: vedit-syn-grammars-tests .........................   Passed    0.21 sec
+ 9/99 Test #12: vedit-app-ffi-abi-selftest .......................   Passed    0.72 sec
+10/99 Test  #8: vedit-terminal-selftest ..........................   Passed    2.15 sec
+11/99 Test #11: vedit-syntax-overlay-selftest ....................   Passed    2.36 sec
+12/99 Test  #1: vedit-app-syntax-startup .........................   Passed    2.64 sec
+13/99 Test #15: vedit-app-crash-reporter-selftest ................   Passed    0.14 sec
+14/99 Test #17: vedit-file-dialog-filters-selftest ...............   Passed    0.10 sec
+15/99 Test #18: vedit-app-i18n-selftest ..........................   Passed    0.02 sec
+16/99 Test #16: vedit-app-crash-report-shipped ...................   Passed    0.15 sec
+17/99 Test #20: vedit-file-compare-close-active-diff .............   Passed    0.13 sec
+18/99 Test #21: vedit-file-compare-exit-active-diff ..............   Passed    0.13 sec
+19/99 Test #14: vedit-signal-trace-selftest ......................   Passed    0.92 sec
+20/99 Test #22: vedit-file-compare-stale-diff ....................   Passed    0.27 sec
+21/99 Test #24: vedit-editor-area-selftest .......................   Passed    0.17 sec
+22/99 Test #25: vedit-app-ui-theme-selftest ......................   Passed    0.04 sec
+23/99 Test #13: vedit-app-shell-selftest .........................   Passed    2.67 sec
+24/99 Test #26: vedit-app-ux-selftest ............................   Passed    0.31 sec
+25/99 Test #27: vedit-app-disabled-look-selftest .................   Passed    0.28 sec
+26/99 Test #28: vedit-app-reset-layout-guard-selftest ............   Passed    0.13 sec
+27/99 Test #29: vedit-editor-pane-activation-tests ...............   Passed    0.39 sec
+28/99 Test #31: vedit-app-ux-screenshots .........................   Passed    0.30 sec
+29/99 Test #30: vedit-shortcut-key-path-tests ....................   Passed    0.98 sec
+30/99 Test #23: vedit-svn-workbench-selftest .....................   Passed    2.25 sec
+31/99 Test #34: vedit-editor-tab-drag-tests ......................   Passed    0.21 sec
+32/99 Test #32: vedit-editor-open-bench ..........................   Passed    1.17 sec
+33/99 Test #33: vedit-app-batch-layout-selftest ..................   Passed    0.96 sec
+34/99 Test #36: vedit-fold-gutter-click ..........................   Passed    0.22 sec
+35/99 Test #35: vedit-native-fold-tests ..........................   Passed    0.42 sec
+36/99 Test #37: vedit-find-bar-drag ..............................   Passed    0.13 sec
+37/99 Test #40: vedit-highlight-mode-selftest ....................   Passed    0.07 sec
+38/99 Test #38: vedit-block-selection-drag .......................   Passed    0.11 sec
+39/99 Test #39: vedit-edit-core-selftest .........................   Passed    0.13 sec
+40/99 Test #41: vedit-editor-find-replace-selftest ...............   Passed    0.10 sec
+41/99 Test #42: vedit-editor-multi-cursor-selftest ...............   Passed    0.21 sec
+42/99 Test #43: vedit-signature-help-selftest ....................   Passed    0.33 sec
+43/99 Test #46: vedit-undo-view-lifetime-tests ...................   Passed    0.31 sec
+44/99 Test #47: after-unsubscribe-the-binding-has-no-listener ....   Passed    0.05 sec
+45/99 Test #48: destroyed-view-leaves-no-registry-entry ..........   Passed    0.05 sec
+46/99 Test #49: relay-outlived-by-a-captured-lambda-is-a-no-op ...   Passed    0.05 sec
+47/99 Test #50: vedit-breadcrumb-tests ...........................   Passed    0.05 sec
+48/99 Test #51: vedit-breadcrumb-click-tests .....................   Passed    0.06 sec
+49/99 Test #52: vedit-jump-tests .................................   Passed    0.00 sec
+50/99 Test #53: vedit-fim-selftest ...............................   Passed    0.11 sec
+51/99 Test #54: vedit-workspace-palette-selftest .................   Passed    0.14 sec
+52/99 Test #55: vedit-workspace-palette-integration-selftest .....   Passed    0.29 sec
+53/99 Test #44: vedit-fim-wiring-selftest ........................   Passed    5.59 sec
+54/99 Test #45: vedit-editor-language-tests ......................   Passed    7.47 sec
+55/99 Test #58: vedit-filelist-open-e2e ..........................   Passed    0.30 sec
+56/99 Test #59: vedit-project-variables-e2e ......................   Passed    0.16 sec
+57/99 Test #60: vedit-workspace-project-selftest .................   Passed    0.63 sec
+58/99 Test #61: vedit-module-tree-selftest .......................   Passed    0.57 sec
+59/99 Test #57: vedit-search-replace-tests .......................   Passed    6.47 sec
+60/99 Test #19: vedit-file-compare-selftest ......................   Passed   16.46 sec
+61/99 Test #62: vedit-module-tree-catalog-test ...................   Passed    3.82 sec
+62/99 Test #65: vedit-lint-orchestration-probe ...................   Passed    0.02 sec
+63/99 Test #56: vedit-workspace-search-selftest ..................   Passed   12.50 sec
+64/99 Test #67: vedit-edit-jank-bench-100 ........................   Passed    0.02 sec
+65/99 Test #68: vedit-edit-jank-bench-1000 .......................   Passed    0.04 sec
+66/99 Test #69: vedit-verdict-retention-selftest .................   Passed    0.00 sec
+67/99 Test #70: vedit-toolchain-missing-selftest .................   Passed    0.01 sec
+68/99 Test #71: vedit-diagnostics-ffi-selftest ...................   Passed    0.00 sec
+69/99 Test #64: vedit-project-lint-dock-test .....................   Passed    2.95 sec
+70/99 Test #73: vedit-lint-experience-selftest ...................   Passed    0.48 sec
+71/99 Test #74: vedit-rename-e2e .................................   Passed    0.03 sec
+72/99 Test #63: vedit-module-tree-lane-b-test ....................   Passed    4.97 sec
+73/99 Test #66: vedit-workspace-diagnostics-selftest .............   Passed    4.48 sec
+74/99 Test #77: vedit-slang-build-context-e2e ....................   Passed    0.01 sec
+75/99 Test #72: vedit-active-watcher-cap-selftest ................   Passed    6.18 sec
+76/99 Test #76: vedit-realtime-depth-switch-e2e ..................   Passed    7.22 sec
+77/99 Test #79: vedit-split-pane-mouse-e2e .......................   Passed    4.13 sec
+78/99 Test #81: vedit-rm9-status-dots-e2e ........................   Passed    1.57 sec
+79/99 Test #82: vedit-rm17b-top-scope-e2e ........................   Passed    3.68 sec
+80/99 Test #83: vedit-b3-repair-api-selftest .....................   Passed    0.01 sec
+81/99 Test #84: vedit-toolchain-ux-selftest ......................   Passed    0.04 sec
+82/99 Test #85: vedit-verible-preprocess-hint-selftest ...........   Passed    0.01 sec
+83/99 Test #80: vedit-rm2-project-switch-e2e .....................   Passed    5.62 sec
+84/99 Test #86: vedit-module-closure-e2e .........................   Passed   11.44 sec
+85/99 Test #78: vedit-b3-wiring-e2e ..............................   Passed   24.42 sec
+86/99 Test #87: vedit-realtime-context-e2e .......................   Passed   13.59 sec
+87/99 Test #89: vedit-filelist-authority-verible-e2e .............   Passed    1.95 sec
+88/99 Test #88: vedit-filelist-authority-e2e .....................   Passed    4.71 sec
+89/99 Test #91: vedit-filelist-authority-include-e2e .............   Passed    2.31 sec
+90/99 Test #92: vedit-filelist-authority-wrapper-e2e .............   Passed    2.29 sec
+91/99 Test #90: vedit-filelist-authority-config-e2e ..............   Passed    4.70 sec
+92/99 Test #94: vedit-svn-workspaces-selftest ....................   Passed    2.11 sec
+93/99 Test #96: vedit-host-shell-selftest ........................   Passed    0.17 sec
+94/99 Test #97: vedit-ui-scale-restart ...........................   Passed    0.33 sec
+95/99 Test #98: vedit-env-import-ui ..............................   Passed    0.21 sec
+96/99 Test #95: vedit-workspace-settings-selftest ................   Passed    2.92 sec
+97/99 Test #99: vedit-rename-ui-probe ............................   Passed    0.68 sec
+98/99 Test #93: vedit-workspace-vcs-selftest .....................   Passed   15.62 sec
+99/99 Test #75: vedit-project-lint-e2e ...........................   Passed  144.56 sec
+100% tests passed, 0 tests failed out of 99
+Total Test time (real) = 167.25 sec
+FINAL_FULL_NATIVE_EXIT=0
+
+[Diagnostics fixture]
++ env -u VEDIT_VERIBLE_LS -u VEDIT_VERIBLE_BIN_DIR -u VEDIT_SLANG_SERVER PATH=/usr/bin:/bin QT_QPA_PLATFORM=offscreen ctest --test-dir target/qt6-build --output-on-failure -R '^vedit-diagnostics-product-seam$'
+1/1 Test #72: vedit-diagnostics-product-seam ...   Passed   30.17 sec
+100% tests passed, 0 tests failed out of 1
+Total Test time (real) =  30.18 sec
+FINAL_DIAGNOSTICS_FIXTURE_EXIT=0

@@ -8,10 +8,8 @@
 #   vedit-app                the shell executable (layout/menu/theme/docks)
 #   vedit-app-shell-selftest ctest entry running `vedit-app --selfcheck`
 #
-# The shell links Qt6 Widgets + KSyntaxHighlighting only. It deliberately does
-# NOT link KTextEditor: the editor is a seam (src/app/editor_provider.h) owned by
-# src/editor (edit-core). That keeps the shell buildable and testable before the
-# editor lane lands, and keeps the editor lane free to pick its own widgets.
+# The editor provider owns document creation and sharing. The comparison page
+# uses KTextEditor directly to synchronize views and paint view-local diff ranges.
 
 set(CMAKE_AUTOMOC ON)
 # UX batch 2 (item 11): the built-in user manual is a Qt resource
@@ -33,6 +31,7 @@ set(VEDIT_APP_SHELL_SOURCES
   editor_area.cpp
   editor_provider.cpp
   file_compare.cpp
+  file_compare_page.cpp
   help_viewer.cpp
   i18n.cpp
   panel_registry.cpp
@@ -83,6 +82,7 @@ target_link_libraries(vedit_app_shell PUBLIC
   Qt6::Widgets
   Qt6::Svg
   KF6::SyntaxHighlighting
+  PRIVATE KF6::TextEditor
 )
 # Same C++ static-check policy as the M0 smoke target (docs/BUILD.md §12.4/12.5):
 # warnings in our own code are errors.
@@ -371,7 +371,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 if(TARGET vedit_editor_core AND TARGET vedit_workspace_vcs)
   add_executable(vedit-file-compare-selftest file_compare_selftest.cpp)
-  target_link_libraries(vedit-file-compare-selftest PRIVATE vedit_app_shell vedit_editor_core vedit_workspace_vcs)
+  target_link_libraries(vedit-file-compare-selftest PRIVATE vedit_app_shell vedit_editor_core vedit_workspace_vcs Qt6::Test)
   target_include_directories(vedit-file-compare-selftest PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(vedit-file-compare-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
@@ -379,7 +379,9 @@ if(TARGET vedit_editor_core AND TARGET vedit_workspace_vcs)
   add_test(NAME vedit-file-compare-selftest COMMAND vedit-file-compare-selftest)
   add_test(NAME vedit-file-compare-close-active-diff COMMAND vedit-file-compare-selftest --close-active-diff)
   add_test(NAME vedit-file-compare-exit-active-diff COMMAND vedit-file-compare-selftest --exit-active-diff)
-  set_tests_properties(vedit-file-compare-selftest vedit-file-compare-close-active-diff vedit-file-compare-exit-active-diff
+  add_test(NAME vedit-file-compare-stale-diff COMMAND vedit-file-compare-selftest --stale-diff)
+  set_tests_properties(vedit-file-compare-selftest vedit-file-compare-close-active-diff
+                       vedit-file-compare-exit-active-diff vedit-file-compare-stale-diff
                        PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
   add_executable(vedit-svn-workbench-selftest svn_workbench_selftest.cpp)
   target_link_libraries(vedit-svn-workbench-selftest PRIVATE vedit_app_shell vedit_editor_core vedit_workspace_vcs)

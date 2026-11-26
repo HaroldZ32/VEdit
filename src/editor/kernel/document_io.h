@@ -25,7 +25,7 @@ namespace vedit::editor {
 // modified=false; the earlier "KIO job spins under offscreen" concern did not
 // reproduce for local files. The atomic save path is unaffected.
 bool loadFileIntoDocument(KTextEditor::Document *document, const QString &absolutePath,
-                          QString *error = nullptr);
+                          QString *error = nullptr, QByteArray *diskBytes = nullptr);
 
 class EditorDocument
 {

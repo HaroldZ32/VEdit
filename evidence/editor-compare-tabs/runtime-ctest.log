@@ -1,0 +1,35 @@
++ sha256sum --check --strict $WORKTREE/target/editor-compare-qa/final-runtime-tdh2ILv5/product-source-after.sha256
++ export QT_QPA_PLATFORM=offscreen
++ export VEDIT_VERIBLE_LS=/native-tools/usr/bin/verible-verilog-ls
++ export VEDIT_VERIBLE_BIN_DIR=/native-tools/usr/bin
++ export VEDIT_SLANG_SERVER=/native-tools/usr/bin/slang-server
++ ctest --test-dir target/qt6-build -N
+Total Tests: 100
++ ctest --test-dir target/qt6-build --output-on-failure --parallel 3 -R '^vedit-(app-(ffi-abi-selftest|shell-selftest|i18n-selftest|ux-selftest|reset-layout-guard-selftest|batch-layout-selftest)|file-dialog-filters-selftest|file-compare(-selftest|-close-active-diff|-exit-active-diff|-stale-diff)|editor-(area-selftest|tab-drag-tests|pane-activation-tests|language-tests)|shortcut-key-path-tests|native-fold-tests|fold-gutter-click|svn-(workbench|workspaces)-selftest|split-pane-mouse-e2e|undo-view-lifetime-tests|workspace-vcs-selftest|realtime-depth-switch-e2e)$'
+ 1/24 Test #17: vedit-file-dialog-filters-selftest ......   Passed    0.08 sec
+ 2/24 Test #18: vedit-app-i18n-selftest .................   Passed    0.02 sec
+ 3/24 Test #12: vedit-app-ffi-abi-selftest ..............   Passed    1.14 sec
+ 4/24 Test #20: vedit-file-compare-close-active-diff ....   Passed    0.12 sec
+ 5/24 Test #21: vedit-file-compare-exit-active-diff .....   Passed    0.12 sec
+ 6/24 Test #22: vedit-file-compare-stale-diff ...........   Passed    0.25 sec
+ 7/24 Test #13: vedit-app-shell-selftest ................   Passed    2.66 sec
+ 8/24 Test #24: vedit-editor-area-selftest ..............   Passed    0.19 sec
+ 9/24 Test #26: vedit-app-ux-selftest ...................   Passed    0.32 sec
+10/24 Test #28: vedit-app-reset-layout-guard-selftest ...   Passed    0.14 sec
+11/24 Test #29: vedit-editor-pane-activation-tests ......   Passed    0.39 sec
+12/24 Test #23: vedit-svn-workbench-selftest ............   Passed    2.31 sec
+13/24 Test #30: vedit-shortcut-key-path-tests ...........   Passed    0.96 sec
+14/24 Test #34: vedit-editor-tab-drag-tests .............   Passed    0.22 sec
+15/24 Test #33: vedit-app-batch-layout-selftest .........   Passed    0.94 sec
+16/24 Test #36: vedit-fold-gutter-click .................   Passed    0.21 sec
+17/24 Test #35: vedit-native-fold-tests .................   Passed    0.42 sec
+18/24 Test #46: vedit-undo-view-lifetime-tests ..........   Passed    0.32 sec
+19/24 Test #77: vedit-realtime-depth-switch-e2e .........   Passed    6.89 sec
+20/24 Test #45: vedit-editor-language-tests .............   Passed    7.46 sec
+21/24 Test #19: vedit-file-compare-selftest .............   Passed   16.53 sec
+22/24 Test #80: vedit-split-pane-mouse-e2e ..............   Passed    4.15 sec
+23/24 Test #95: vedit-svn-workspaces-selftest ...........   Passed    2.12 sec
+24/24 Test #94: vedit-workspace-vcs-selftest ............   Passed   15.53 sec
+100% tests passed, 0 tests failed out of 24
+Total Test time (real) =  28.08 sec
+FINAL_RELATED_CTEST_EXIT=0

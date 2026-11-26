@@ -15,7 +15,7 @@
 namespace vedit::editor {
 
 bool loadFileIntoDocument(KTextEditor::Document *document, const QString &absolutePath,
-                          QString *error)
+                          QString *error, QByteArray *diskBytes)
 {
     if (document == nullptr) {
         if (error != nullptr) {
@@ -74,6 +74,9 @@ bool loadFileIntoDocument(KTextEditor::Document *document, const QString &absolu
                          .arg(absolutePath);
         }
         return false;
+    }
+    if (diskBytes) {
+        *diskBytes = data;
     }
     // T81: selecting the syntax definition is part of opening a document.
     // KTextEditor's own auto-detection is keyed on the document URL, and VEdit
