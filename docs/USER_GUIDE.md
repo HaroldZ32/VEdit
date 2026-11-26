@@ -828,32 +828,32 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 从 [GitHub Releases](https://github.com/HaroldZ32/VEdit/releases) 下载所需的 Linux x86_64 格式及同版本的 `SHA256SUMS`。把文件放在同一目录。以下示例校验 AppImage，下载其他格式时把 `asset` 改成对应文件名。输出应为该文件的 `OK`。下载全部三种格式时，直接运行 `sha256sum --check --strict SHA256SUMS`。
 
 ```sh
-asset=VEdit-0.4.1-x86_64.AppImage
+asset=VEdit-0.5.0-x86_64.AppImage
 awk -v asset="$asset" '$2 == asset' SHA256SUMS | sha256sum --check
 ```
 
 **AppImage**。直接运行需要 FUSE（`libfuse2`）。没有 FUSE 时使用下方的解包运行命令。
 
 ```sh
-chmod +x VEdit-0.4.1-x86_64.AppImage
-./VEdit-0.4.1-x86_64.AppImage path/to/top.sv
-./VEdit-0.4.1-x86_64.AppImage --appimage-extract-and-run path/to/top.sv
+chmod +x VEdit-0.5.0-x86_64.AppImage
+./VEdit-0.5.0-x86_64.AppImage path/to/top.sv
+./VEdit-0.5.0-x86_64.AppImage --appimage-extract-and-run path/to/top.sv
 ```
 
 **`.tar.gz` 目录包**。解开后从目录外运行 `AppRun`，保留整个目录供后续使用。
 
 ```sh
-tar -xzf vedit-0.4.1-linux-x86_64.tar.gz
-./vedit-0.4.1-linux-x86_64/AppRun path/to/top.sv
+tar -xzf vedit-0.5.0-linux-x86_64.tar.gz
+./vedit-0.5.0-linux-x86_64/AppRun path/to/top.sv
 ```
 
 **`.run` 自解压包**。直接运行会临时解包并启动，程序退出后清理临时目录。也可以用 `--extract` 将包解到指定的新目录，保留文件供后续启动。新目录的父目录须已存在。
 
 ```sh
-chmod +x VEdit-0.4.1-x86_64.run
-./VEdit-0.4.1-x86_64.run path/to/top.sv
-./VEdit-0.4.1-x86_64.run --extract ./vedit-install
-./vedit-install/vedit-0.4.1-linux-x86_64/AppRun path/to/top.sv
+chmod +x VEdit-0.5.0-x86_64.run
+./VEdit-0.5.0-x86_64.run path/to/top.sv
+./VEdit-0.5.0-x86_64.run --extract ./vedit-install
+./vedit-install/vedit-0.5.0-linux-x86_64/AppRun path/to/top.sv
 ```
 
 三个包使用同一 Qt6 应用、运行库、字体和 HDL、VHDL、Scala 工具（见[构建指南](BUILD.md) §7.3）。`.tar.gz` 和 `.run` 使用宿主机上的标准解压工具，无需 FUSE。三种格式的启动脚本都需要宿主机的 `/bin/sh`，终端使用设置中选定的系统 shell。要使用版本控制，请在宿主安装所需的 `git` 或 `svn`，详见附录 D。

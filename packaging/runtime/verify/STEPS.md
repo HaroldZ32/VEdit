@@ -17,30 +17,31 @@ sha256sum --check --strict SHA256SUMS
 
 ## 启动三种格式与运行自检
 
-以下用 `0.4.1` 作示例。`TMPDIR`（未设置时为 `/tmp`）需要允许临时解包后执行。用新的状态目录隔离验证会话。
+以下用 `0.5.0` 作示例。`TMPDIR`（未设置时为 `/tmp`）需要允许临时解包后执行。用新的状态目录隔离验证会话。
 
 ```bash
-chmod +x VEdit-0.4.1-x86_64.AppImage VEdit-0.4.1-x86_64.run
-export QT_QPA_PLATFORM=offscreen VEDIT_NO_ENV_AUTOCAPTURE=1 VEDIT_STARTUP_TRACE=1
+chmod +x VEdit-0.5.0-x86_64.AppImage VEdit-0.5.0-x86_64.run
+export QT_QPA_PLATFORM=offscreen VEDIT_NO_ENV_AUTOCAPTURE=1
+unset VEDIT_STARTUP_TRACE
 state_dir=$(mktemp -d)
 
-./VEdit-0.4.1-x86_64.AppImage --appimage-extract-and-run --version
-./VEdit-0.4.1-x86_64.AppImage --appimage-extract-and-run --state-dir "$state_dir" --selfcheck
-tar -xzf vedit-0.4.1-linux-x86_64.tar.gz
-./vedit-0.4.1-linux-x86_64/AppRun --version
-./vedit-0.4.1-linux-x86_64/AppRun --state-dir "$state_dir" --no-session-restore --hold 500
-./VEdit-0.4.1-x86_64.run --version
-PATH= ./VEdit-0.4.1-x86_64.run --state-dir "$state_dir" --no-session-restore --hold 500
+./VEdit-0.5.0-x86_64.AppImage --appimage-extract-and-run --version
+./VEdit-0.5.0-x86_64.AppImage --appimage-extract-and-run --state-dir "$state_dir" --selfcheck
+tar -xzf vedit-0.5.0-linux-x86_64.tar.gz
+./vedit-0.5.0-linux-x86_64/AppRun --version
+VEDIT_STARTUP_TRACE=1 ./vedit-0.5.0-linux-x86_64/AppRun --state-dir "$state_dir" --no-session-restore --hold 500
+./VEdit-0.5.0-x86_64.run --version
+PATH= VEDIT_STARTUP_TRACE=1 ./VEdit-0.5.0-x86_64.run --state-dir "$state_dir" --no-session-restore --hold 500
 ```
 
-三个 `--version` 应输出 `vedit-app 0.4.1`。记录 AppImage 自检的结果、两次 `launch-ready` 以及各命令的退出码。最后一条命令应在 `VCS-TOOLCHAIN` 中报告 Git 和 SVN 缺失。安装 FUSE 的环境可以另外验证 AppImage 直接运行。如果有图形桌面，清除 `QT_QPA_PLATFORM` 再试打开、编辑与保存 HDL 文件，记录显示服务器类型。
+三个 `--version` 应输出 `vedit-app 0.5.0`。记录 AppImage 自检的结果、两次 `launch-ready` 以及各命令的退出码。最后一条命令应在 `VCS-TOOLCHAIN` 中报告 Git 和 SVN 缺失。安装 FUSE 的环境可以另外验证 AppImage 直接运行。如果有图形桌面，清除 `QT_QPA_PLATFORM` 再试打开、编辑与保存 HDL 文件，记录显示服务器类型。
 
 ## 单独生成 AppImage 报告
 
 把本版本的 `verify-appimage-centos7.sh` 也复制到下载目录。运行以下命令，显式选择要检查的 AppImage：
 
 ```bash
-bash verify-appimage-centos7.sh ./VEdit-0.4.1-x86_64.AppImage
+bash verify-appimage-centos7.sh ./VEdit-0.5.0-x86_64.AppImage
 ```
 
 脚本从 `SHA256SUMS` 读取对应的 AppImage 校验行，检查系统内核、包内 loader、自检、原生折叠和真实 HDL 工具。保存生成的 `verify-report-*.txt`。逐条查看 `RESULT` 及其原因，任何 `FAIL` 都需要解释，`SKIP` 表示该项未覆盖。

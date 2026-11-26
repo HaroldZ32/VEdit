@@ -8,17 +8,17 @@ VEdit 是面向 Verilog 和 SystemVerilog 工程的 Linux 桌面编辑器。导�
 
 ## 安装与运行
 
-从 [Releases](https://github.com/HaroldZ32/VEdit/releases) 选择 Linux x86_64 的 AppImage、`.tar.gz` 或 `.run`，并下载同版本的 `SHA256SUMS`。以 0.4.1 的 AppImage 为例：
+从 [Releases](https://github.com/HaroldZ32/VEdit/releases) 选择 Linux x86_64 的 AppImage、`.tar.gz` 或 `.run`，并下载同版本的 `SHA256SUMS`。以 0.5.0 的 AppImage 为例：
 
 ```sh
-awk '$2 == "VEdit-0.4.1-x86_64.AppImage"' SHA256SUMS | sha256sum --check
-chmod +x VEdit-0.4.1-x86_64.AppImage
-./VEdit-0.4.1-x86_64.AppImage
+awk '$2 == "VEdit-0.5.0-x86_64.AppImage"' SHA256SUMS | sha256sum --check
+chmod +x VEdit-0.5.0-x86_64.AppImage
+./VEdit-0.5.0-x86_64.AppImage
 ```
 
 没有 FUSE 时，可以给 AppImage 加上 `--appimage-extract-and-run`，也可以使用无需 FUSE 的 `.tar.gz` 和 `.run`。[三种格式的启动命令](docs/USER_GUIDE.md#附录-a-产物形态与安装)
 
-三种格式均随附 Qt 和 HDL 分析工具，普通用户即可运行。集成终端使用宿主机的 shell，版本控制功能需要在宿主机安装 Git 或 Subversion。[0.4.1 发布说明](docs/releases/0.4.1.md)
+三种格式均随附 Qt 和 HDL 分析工具，普通用户即可运行。集成终端使用宿主机的 shell，版本控制功能需要在宿主机安装 Git 或 Subversion。[0.5.0 发布说明](docs/releases/0.5.0.md)
 
 ## 打开第一个工程
 
