@@ -15,6 +15,7 @@ target_link_libraries(vedit-m0-smoke PRIVATE
 )
 
 target_compile_definitions(vedit-m0-smoke PRIVATE
+  VEDIT_M0_VERSION="${PROJECT_VERSION}"
   VEDIT_M0_QT_VERSION="${Qt6_VERSION}"
   VEDIT_M0_KF6_VERSION="${KF6TextEditor_VERSION}"
   VEDIT_M0_KSYNTAXHIGHLIGHTING_VERSION="${KF6SyntaxHighlighting_VERSION}"
