@@ -7,6 +7,7 @@
 #include "editor_context_menu.h"
 #include "filelist_path_completion.h"
 #include "find_replace.h"
+#include "highlight_mode.h"
 #include "lsp_actions.h"
 #include "multi_cursor.h"
 #include "signature_help.h"
@@ -19,12 +20,15 @@
 
 #include <KTextEditor/Document>
 #include <KTextEditor/Editor>
+#include <KTextEditor/MovingCursor>
 #include <KTextEditor/View>
 
 #include <KSyntaxHighlighting/Repository>
 #include <KSyntaxHighlighting/Theme>
 
+#include <QDir>
 #include <QFileInfo>
+#include <QHash>
 #include <QIcon>
 #include <QPainter>
 #include <QPlainTextEdit>
@@ -34,13 +38,20 @@
 #include <QVariant>
 
 #include <algorithm>
+#include <deque>
+#include <iterator>
+#include <optional>
 #include <QCoreApplication>
 
 namespace vedit::editor {
 namespace {
 
 constexpr auto kOpenFilePathProperty = "vedit.openFilePath";
+constexpr auto kComparisonPathProperty = "vedit.comparisonPath";
+constexpr char kCrLf = 'D';
 constexpr auto kDocumentKeeperProperty = "vedit.documentKeeper";
+constexpr auto kEndingHistoryBytes = vedit::app::ComparisonEditorInput::maxBytes;
+constexpr auto kRememberedJoins = vedit::app::ComparisonEditorInput::maxLines;
 
 // Batch 20261110d (split view): the lifetime of ONE document.
 //
@@ -61,7 +72,133 @@ public:
     explicit DocumentKeeper(KTextEditor::Document *document)
         : document_(document)
     {
+        connect(document, &KTextEditor::Document::editingStarted, this, [this] {
+            if (trackingEndings_ && (!baselineDigest_.isEmpty() || !removalStates_.isEmpty())) {
+                lockedRevision_ = document_->revision();
+                document_->lockRevision(lockedRevision_);
+            }
+        });
+        connect(document, &KTextEditor::Document::editingFinished, this, &DocumentKeeper::unlockRevision);
+        connect(document, &KTextEditor::Document::aboutToInvalidateMovingInterfaceContent, this, [this] {
+            resetEndingHistory();
+            unlockRevision();
+        });
+        connect(document, &KTextEditor::Document::lineWrapped, this,
+                [this](KTextEditor::Document *, KTextEditor::Cursor position) {
+            const auto line = position.line();
+            if (trackingEndings_ && line >= 0 && line <= endings_.size()) {
+                char ending = line < endings_.size() ? endings_.at(line)
+                    : (endings_.isEmpty() ? preferredEnding_ : endings_.back());
+                const auto match = std::find_if(removedEndings_.rbegin(), removedEndings_.rend(),
+                    [position](const RemovedEnding &removed) { return removed.position->toCursor() == position; });
+                if (match != removedEndings_.rend()) {
+                    ending = match->endings.back();
+                    match->endings.chop(1);
+                    --removedEndingCount_;
+                    if (match->endings.isEmpty()) {
+                        removedEndings_.erase(std::prev(match.base()));
+                    }
+                }
+                if (endingHistoryIncomplete_) {
+                    endingsReliable_ = false;
+                }
+                endings_.insert(line, ending);
+                endingsChanged_ = true;
+            }
+        });
+        connect(document, &KTextEditor::Document::lineUnwrapped, this,
+                [this](KTextEditor::Document *edited, int line) {
+            if (trackingEndings_ && line > 0 && line <= endings_.size()) {
+                if (lockedRevision_ >= 0) {
+                    // The merge just moved the start of the second line to the join.
+                    KTextEditor::Cursor joined(line, 0);
+                    edited->transformCursor(joined, KTextEditor::MovingCursor::StayOnInsert, edited->revision() - 1);
+                    rememberJoinedEnding(joined, endings_.at(line - 1));
+                }
+                endings_.remove(line - 1, 1);
+                endingsChanged_ = true;
+            }
+        });
+        connect(document, &KTextEditor::Document::textChanged, this, [this] {
+            if (endingsChanged_ && (!baselineDigest_.isEmpty() || !removalStates_.isEmpty())) {
+                const auto digest = vedit::app::comparisonDiskDigest(document_->text().toUtf8());
+                const auto state = removalStates_.constFind(digest);
+                if (state != removalStates_.cend()) {
+                    endings_ = state.value();
+                    endingsReliable_ = true;
+                } else if (digest == baselineDigest_) {
+                    endings_ = baselineEndings_;
+                    endingsReliable_ = true;
+                }
+            }
+            endingsChanged_ = false;
+        });
+        connect(document, &KTextEditor::Document::reloaded, this, [this](KTextEditor::Document *reloaded) {
+            QFile file(reloaded->url().toLocalFile());
+            if (file.open(QIODevice::ReadOnly)) {
+                const QByteArray bytes = file.read(vedit::app::ComparisonEditorInput::maxBytes + 1);
+                if (file.error() == QFileDevice::NoError && file.atEnd()) {
+                    recordDisk(bytes);
+                    return;
+                }
+            }
+            trackingEndings_ = false;
+        });
     }
+
+    void recordDisk(const QByteArray &bytes)
+    {
+        document_->setProperty(vedit::app::comparisonDiskDigestProperty, vedit::app::comparisonDiskDigest(bytes));
+        endings_.clear();
+        const auto maxBytes = vedit::app::ComparisonEditorInput::maxBytes;
+        if (bytes.size() <= maxBytes) {
+            for (qsizetype i = 0; i < bytes.size(); ++i) {
+                if (bytes.at(i) == '\r') {
+                    const bool paired = i + 1 < bytes.size() && bytes.at(i + 1) == '\n';
+                    endings_.append(paired ? kCrLf : '\r');
+                    i += paired;
+                } else if (bytes.at(i) == '\n') {
+                    endings_.append('\n');
+                }
+            }
+        }
+        preferredEnding_ = endings_.isEmpty() ? '\n' : endings_.front();
+        trackingEndings_ = bytes.size() <= maxBytes && endings_.size() == document_->lines() - 1;
+        byteOrderMark_ = bytes.startsWith("\xef\xbb\xbf");
+        const bool mixed = trackingEndings_ && endings_.count(preferredEnding_) != endings_.size();
+        baselineEndings_ = mixed ? endings_ : QByteArray();
+        baselineDigest_ = mixed ? vedit::app::comparisonDiskDigest(document_->text().toUtf8()) : QByteArray();
+        endingsChanged_ = false;
+        endingsReliable_ = true;
+    }
+
+    std::optional<QByteArray> encodeComparisonText() const
+    {
+        if (!trackingEndings_ || !endingsReliable_ || endings_.size() != document_->lines() - 1) {
+            return std::nullopt;
+        }
+        const QByteArray text = document_->text().toUtf8();
+        QByteArray output = byteOrderMark_ ? QByteArray("\xef\xbb\xbf") : QByteArray();
+        output.reserve(text.size() + endings_.count(kCrLf) + output.size());
+        qsizetype start = 0;
+        for (char ending : endings_) {
+            const auto pos = text.indexOf('\n', start);
+            if (pos < 0) {
+                return std::nullopt;
+            }
+            output.append(QByteArrayView(text).sliced(start, pos - start));
+            if (ending == kCrLf) {
+                output.append("\r\n");
+            } else {
+                output.append(ending);
+            }
+            start = pos + 1;
+        }
+        output.append(QByteArrayView(text).sliced(start));
+        return output;
+    }
+
+    bool tracksLineEndings() const { return trackingEndings_; }
 
     void watchView(KTextEditor::View *view)
     {
@@ -71,7 +208,62 @@ public:
         QObject::connect(view, &QObject::destroyed, this, [this]() { viewDestroyed(); });
     }
 
+    void rememberRemovalState()
+    {
+        if (!trackingEndings_ || !endingsReliable_ || endings_.count(preferredEnding_) == endings_.size()) {
+            return;
+        }
+        // Undo reinserts full lines through different native positions than the
+        // deletion's joins. Match the restored text and recover its original separators.
+        const auto digest = vedit::app::comparisonDiskDigest(document_->text().toUtf8());
+        if (!removalStates_.contains(digest)) {
+            const qsizetype cost = endings_.size() + digest.size() + 2 * qsizetype(sizeof(QByteArray));
+            if (cost > kEndingHistoryBytes - removalStateBytes_) {
+                endingHistoryIncomplete_ = true;
+                return;
+            }
+            removalStateBytes_ += cost;
+        }
+        removalStates_.insert(digest, endings_);
+    }
+
 private:
+    struct RemovedEnding {
+        std::unique_ptr<KTextEditor::MovingCursor> position;
+        QByteArray endings;
+    };
+
+    void rememberJoinedEnding(KTextEditor::Cursor joined, char ending)
+    {
+        if (removedEndingCount_ >= kRememberedJoins) {
+            endingHistoryIncomplete_ = true;
+            return;
+        }
+        if (removedEndings_.empty() || removedEndings_.back().position->toCursor() != joined) {
+            removedEndings_.push_back({std::unique_ptr<KTextEditor::MovingCursor>(
+                document_->newMovingCursor(joined, KTextEditor::MovingCursor::StayOnInsert)), {}});
+        }
+        removedEndings_.back().endings.append(ending);
+        ++removedEndingCount_;
+    }
+
+    void resetEndingHistory()
+    {
+        removedEndings_.clear();
+        removalStates_.clear();
+        removedEndingCount_ = 0;
+        removalStateBytes_ = 0;
+        endingHistoryIncomplete_ = false;
+    }
+
+    void unlockRevision()
+    {
+        if (lockedRevision_ >= 0 && document_) {
+            document_->unlockRevision(lockedRevision_);
+            lockedRevision_ = -1;
+        }
+    }
+
     void viewDestroyed()
     {
         --liveViews_;
@@ -82,14 +274,41 @@ private:
         // destroyed() is emitted, so this really is the last view and deleting
         // the document cannot pull a live view out from under its pane.
         KTextEditor::Document *doomed = document_.data();
+        resetEndingHistory();
+        unlockRevision();
         document_ = nullptr;
         delete doomed;
         deleteLater();
     }
 
     QPointer<KTextEditor::Document> document_;
+    std::deque<RemovedEnding> removedEndings_;
+    QHash<QByteArray, QByteArray> removalStates_;
+    qsizetype removedEndingCount_ = 0;
+    qsizetype removalStateBytes_ = 0;
+    qint64 lockedRevision_ = -1;
+    QByteArray endings_;
+    QByteArray baselineEndings_;
+    QByteArray baselineDigest_;
+    char preferredEnding_ = '\n';
+    bool endingsChanged_ = false;
+    bool endingsReliable_ = true;
+    bool endingHistoryIncomplete_ = false;
+    bool trackingEndings_ = false;
+    bool byteOrderMark_ = false;
     int liveViews_ = 0;
 };
+
+DocumentKeeper *keeperFor(KTextEditor::Document *document)
+{
+    return document ? dynamic_cast<DocumentKeeper *>(document->property(kDocumentKeeperProperty).value<QObject *>())
+                    : nullptr;
+}
+
+QString comparedPathFor(KTextEditor::Document *document)
+{
+    return document ? document->property(kComparisonPathProperty).toString() : QString();
+}
 
 // UI-Mosaic F2: the theme name KTextEditor can actually render, or an empty
 // string when even the repository default is unusable (KTextEditor missing).
@@ -142,6 +361,45 @@ QWidget *unavailableEditor(QWidget *parent)
     return fallback;
 }
 
+bool prepareComparisonSave(KTextEditor::Document *document, const QString &path,
+                           const QString &canonical, QByteArray &bytes, QString *error)
+{
+    using vedit::app::ComparisonEditorInput;
+    const auto fail = [error, &path](const char *message) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", message).arg(path);
+        }
+        return false;
+    };
+    const QFileInfo info(canonical);
+    constexpr auto writeBits = QFileDevice::WriteOwner | QFileDevice::WriteGroup | QFileDevice::WriteOther;
+    if (QFileInfo(path).canonicalFilePath() != canonical || info.canonicalFilePath() != canonical || !info.isFile()) {
+        return fail("%1 changed outside this comparison. Resolve the disk change before saving.");
+    }
+    if (!document->isReadWrite() || !(info.permissions() & writeBits) || !info.isWritable()) {
+        return fail("%1 is read-only.");
+    }
+    QFile file(canonical);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return fail("Cannot read %1.");
+    }
+    const QByteArray disk = file.read(ComparisonEditorInput::maxBytes + 1);
+    if (file.error() != QFileDevice::NoError || !file.atEnd()
+        || vedit::app::comparisonDiskDigest(disk) != document->property(vedit::app::comparisonDiskDigestProperty).toByteArray()) {
+        return fail("%1 changed outside this comparison. Resolve the disk change before saving.");
+    }
+    const auto *keeper = keeperFor(document);
+    const auto encoded = keeper ? keeper->encodeComparisonText() : std::nullopt;
+    if (!encoded) {
+        return fail("Cannot preserve the line endings of %1.");
+    }
+    bytes = *encoded;
+    if (bytes.size() > ComparisonEditorInput::maxBytes || document->lines() > ComparisonEditorInput::maxLines) {
+        return fail("%1 exceeds the text comparison limit (8 MiB or 100,000 lines).");
+    }
+    return true;
+}
+
 } // namespace
 
 KTextEditor::View *viewFor(QWidget *editorWidget)
@@ -172,31 +430,41 @@ QString EditCoreProvider::displayName() const
 
 QWidget *EditCoreProvider::createEditor(QWidget *parent)
 {
-    KTextEditor::Editor *editor = KTextEditor::Editor::instance();
-    if (editor == nullptr) {
+    auto *view = createDocumentView(parent);
+    if (!view) {
         return unavailableEditor(parent);
     }
-    KTextEditor::Document *document = editor->createDocument(nullptr);
-    if (document == nullptr) {
-        return unavailableEditor(parent);
-    }
-    // Batch 20261110d: since split view a document can have more than one View,
-    // so it must NOT die with the view that happened to create it. The keeper
-    // owns it and deletes it after the LAST view is destroyed.
-    auto *keeper = new DocumentKeeper(document);
-    document->setParent(keeper);
-    document->setProperty(kDocumentKeeperProperty, QVariant::fromValue<QObject *>(keeper));
-    KTextEditor::View *view = document->createView(parent);
-    if (view == nullptr) {
-        delete keeper;
-        return unavailableEditor(parent);
-    }
-    keeper->watchView(view);
     configureView(view);
     return view;
 }
 
+KTextEditor::View *EditCoreProvider::createDocumentView(QWidget *parent)
+{
+    auto *editor = KTextEditor::Editor::instance();
+    auto *document = editor ? editor->createDocument(nullptr) : nullptr;
+    if (!document) {
+        return nullptr;
+    }
+    auto *keeper = new DocumentKeeper(document);
+    document->setParent(keeper);
+    document->setProperty(kDocumentKeeperProperty, QVariant::fromValue<QObject *>(keeper));
+    auto *view = document->createView(parent);
+    if (!view) {
+        delete keeper;
+        return nullptr;
+    }
+    keeper->watchView(view);
+    return view;
+}
+
 QWidget *EditCoreProvider::createEditorForExistingDocument(QWidget *sourceEditor, QWidget *parent)
+{
+    auto *view = createSharedView(sourceEditor, parent);
+    configureView(view);
+    return view;
+}
+
+KTextEditor::View *EditCoreProvider::createSharedView(QWidget *sourceEditor, QWidget *parent)
 {
     KTextEditor::View *sourceView = viewFrom(sourceEditor);
     if (sourceView == nullptr) {
@@ -209,8 +477,7 @@ QWidget *EditCoreProvider::createEditorForExistingDocument(QWidget *sourceEditor
     // RTTI, not qobject_cast: the keeper is an implementation detail of this
     // translation unit and deliberately has no Q_OBJECT macro (it exposes no
     // signals/slots of its own), so the Qt cast would not compile.
-    auto *keeper = dynamic_cast<DocumentKeeper *>(
-        document->property(kDocumentKeeperProperty).value<QObject *>());
+    auto *keeper = keeperFor(document);
     if (keeper == nullptr) {
         // Not a document this provider owns: sharing its buffer is not ours to
         // manage, so the caller keeps the empty-pane split behaviour.
@@ -227,7 +494,82 @@ QWidget *EditCoreProvider::createEditorForExistingDocument(QWidget *sourceEditor
     if (path.isValid()) {
         view->setProperty(kOpenFilePathProperty, path);
     }
-    configureView(view);
+    return view;
+}
+
+QWidget *EditCoreProvider::createComparisonEditor(QWidget *sourceEditor, QWidget *parent,
+    const vedit::app::ComparisonEditorInput &input, QString *error)
+{
+    KTextEditor::View *view = nullptr;
+    if (!input.readOnly) {
+        if (auto *source = documentFor(sourceEditor)) {
+            const auto comparedPath = comparedPathFor(source);
+            if (comparedPath.isEmpty() || comparedPath == input.localPath) {
+                view = createSharedView(sourceEditor, parent);
+            }
+        }
+        if (!view) {
+            const auto document = comparisonDocuments_.value(input.localPath);
+            if (document && comparedPathFor(document) == input.localPath) {
+                view = createSharedView(document->views().constFirst(), parent);
+            }
+        }
+    }
+    if (!view) {
+        view = createDocumentView(parent);
+        if (!view) {
+            return nullptr;
+        }
+        auto *document = view->document();
+        QByteArray disk;
+        if (!loadFileIntoDocument(document, input.backingPath, error, &disk)) {
+            delete view;
+            return nullptr;
+        }
+        keeperFor(document)->recordDisk(disk);
+        applyHighlightingMode(document, input.logicalPath);
+        document->setReadWrite(!input.readOnly);
+        document->setModifiedOnDiskWarning(false);
+    }
+    if (!input.readOnly && !keeperFor(view->document())->tracksLineEndings()) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", "Cannot preserve the line endings of %1.")
+                         .arg(input.localPath);
+        }
+        delete view;
+        return nullptr;
+    }
+    applyThemeToView(view, syntaxTheme_);
+    view->setConfigValue(QStringLiteral("line-numbers"), true);
+    FindReplaceBar::install(view);
+    if (!input.readOnly) {
+        view->setProperty(kOpenFilePathProperty, input.localPath);
+        view->document()->setProperty(kComparisonPathProperty, input.localPath);
+        for (auto entry = comparisonDocuments_.begin(); entry != comparisonDocuments_.end();) {
+            entry = entry.value() ? std::next(entry) : comparisonDocuments_.erase(entry);
+        }
+        comparisonDocuments_.insert(input.localPath, view->document());
+    }
+    return view;
+}
+
+QWidget *EditCoreProvider::createEditorForOpenComparison(const QString &path, QWidget *parent)
+{
+    const QString canonical = QFileInfo(path).canonicalFilePath();
+    const auto document = comparisonDocuments_.value(canonical);
+    if (!document || comparedPathFor(document) != canonical || canonical.isEmpty()) {
+        return nullptr;
+    }
+    auto *view = createSharedView(document->views().constFirst(), parent);
+    if (view) {
+        view->setProperty(kOpenFilePathProperty, path);
+        configureView(view);
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+        if (auto *binding = FoldBreadcrumbBinding::instanceFor(view)) {
+            binding->onDocumentOpened();
+        }
+#endif
+    }
     return view;
 }
 
@@ -344,8 +686,12 @@ bool EditCoreProvider::openFile(QWidget *editor, const QString &absolutePath, QS
     // T128: no fold injection, so there is no registry to release before the
     // text replacement; KDE-native folding is user-driven only.
 #endif
-    if (!loadFileIntoDocument(view->document(), info.absoluteFilePath(), error)) {
+    QByteArray disk;
+    if (!loadFileIntoDocument(view->document(), info.absoluteFilePath(), error, &disk)) {
         return false;
+    }
+    if (auto *keeper = keeperFor(view->document())) {
+        keeper->recordDisk(disk);
     }
     view->document()->setModified(false);
     view->setProperty(kOpenFilePathProperty, info.absoluteFilePath());
@@ -534,6 +880,11 @@ bool EditCoreProvider::replaceComparisonText(QWidget *editor, qsizetype start, q
     }
     const KTextEditor::Range range(document->offsetToCursor(static_cast<int>(start)),
                                    document->offsetToCursor(static_cast<int>(start + length)));
+    if (!range.onSingleLine()) {
+        if (auto *keeper = keeperFor(document)) {
+            keeper->rememberRemovalState();
+        }
+    }
     KTextEditor::Document::EditingTransaction transaction(document);
     return document->replaceText(range, text);
 }
@@ -594,14 +945,94 @@ bool EditCoreProvider::saveFile(QWidget *editor, QString *error)
         }
         return false;
     }
-    const AtomicSaveResult saved = atomicSaveText(path, document->text().toUtf8());
+    QByteArray bytes = document->text().toUtf8();
+    const QString comparedPath = comparedPathFor(document);
+    if (!comparedPath.isEmpty() && !prepareComparisonSave(document, path, comparedPath, bytes, error)) {
+        return false;
+    }
+    const AtomicSaveResult saved = atomicSaveText(comparedPath.isEmpty() ? path : comparedPath, bytes);
     if (!saved.ok) {
         if (error != nullptr) {
             *error = saved.error;
         }
         return false;
     }
+    if (auto *keeper = keeperFor(document)) {
+        keeper->recordDisk(bytes);
+    }
     document->setModified(false);
+    return true;
+}
+
+bool EditCoreProvider::saveFileAs(QWidget *editor, const QString &path, QWidget **replacement, QString *error)
+{
+    *replacement = nullptr;
+    auto *source = documentFor(editor);
+    const QFileInfo target(path);
+    if ((target.exists() || target.isSymLink()) && !target.isFile()) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", "%1 is not a regular file.").arg(path);
+        }
+        return false;
+    }
+    QString canonical = target.canonicalFilePath();
+    if (canonical.isEmpty()) {
+        const QString parent = target.absoluteDir().canonicalPath();
+        canonical = parent.isEmpty() ? target.absoluteFilePath() : QDir(parent).filePath(target.fileName());
+    }
+    const auto destination = comparisonDocuments_.value(canonical);
+    if (destination && destination != source && comparedPathFor(destination) == canonical) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", "%1 has a live comparison buffer. Close its open views before replacing it.")
+                         .arg(path);
+        }
+        return false;
+    }
+    const QString current = source ? comparedPathFor(source) : QString();
+    if (current.isEmpty() || current == canonical) {
+        return EditorProvider::saveFileAs(editor, path, replacement, error);
+    }
+
+    constexpr auto readBits = QFileDevice::ReadOwner | QFileDevice::ReadGroup | QFileDevice::ReadOther;
+    if (target.exists() && (!(target.permissions() & readBits) || !target.isReadable())) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", "Cannot open %1 for reading after Save As.").arg(path);
+        }
+        return false;
+    }
+    const auto bytes = keeperFor(source)->encodeComparisonText();
+    if (!bytes) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", "Cannot preserve the line endings of %1.")
+                         .arg(current);
+        }
+        return false;
+    }
+    std::unique_ptr<KTextEditor::View> fresh(createDocumentView(nullptr));
+    if (!fresh) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", "Comparison requires a KTextEditor view.");
+        }
+        return false;
+    }
+    const auto saved = atomicSaveText(path, *bytes);
+    if (!saved.ok) {
+        if (error) {
+            *error = saved.error;
+        }
+        return false;
+    }
+    configureView(fresh.get());
+    QString reopenError;
+    if (!openFile(fresh.get(), path, &reopenError)) {
+        if (error) {
+            *error = QCoreApplication::translate("FileComparison", "Saved %1, but could not reopen it: %2")
+                         .arg(path, reopenError);
+        }
+        return false;
+    }
+    setViewState(fresh.get(), viewState(editor));
+    *replacement = fresh.release();
     return true;
 }
 

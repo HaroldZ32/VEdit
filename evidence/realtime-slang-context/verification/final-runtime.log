@@ -1,0 +1,70 @@
+Exact tested source bd22d7f8892f8e042f1b638ebe138e421f621404
+Real Slang and ABI direct run, exit 0. Selected runtime output.
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+SUMMARY checks=11 failures=0 skips=0
+AFTER-IMPORT pass=1 authored=[] resolved=[] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+ADDED pass=1 authored=[PROJECT_WIDTH=2] resolved=[PROJECT_WIDTH=2] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_width_two']
+REPLACED pass=1 authored=[PROJECT_WIDTH=3] resolved=[PROJECT_WIDTH=3] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_changed_width']
+REMOVED pass=1 authored=[] resolved=[] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+DIRECT-CHILD tree=1 pass=1 inputs=[<project>/lib/alternate.sv,<project>/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_bad_port' does not exist in 'alternate'|unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+DIRECT-CHILD-CORRECTED fresh=1 disk-unchanged=1 rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+SAVED-REOPEN pass=1 saved=1 inputs=[<project>/lib/alternate.sv,<project>/rtl/original.sv,<project>/rtl/top.sv] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+MACRO-CHILD pass=1 before=1 inputs=[<project>/lib/alternate.sv,<project>/rtl/macro_parent.sv] rows=[port 'macro_bad_port' does not exist in 'alternate'|input port 'correct' has no connection|unknown module 'genuinely_missing']
+PROJECT-MANUAL-ONLY pass=1
+MACRO-OVERRIDE NATIVE-FALLBACK pass=1 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[4:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE ADDED-SAME-AS-FILELIST pass=1 authored=[DOCK_OVERRIDE_WIDTH=2] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[1:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE REPLACED pass=1 authored=[DOCK_OVERRIDE_WIDTH=3] resolved=[DOCK_OVERRIDE_WIDTH=3,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=3] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[2:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE UPDATED-NAME-ONLY pass=1 authored=[DOCK_OVERRIDE_WIDTH] resolved=[DOCK_OVERRIDE_WIDTH,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[0:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE REMOVED-TO-NATIVE pass=1 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[4:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE NATIVE-FILES-UNCHANGED pass=1
+
+Complete CTest, selected output. The raw run exited 8.
+ 1/99 Test #62: vedit-module-tree-lane-b-test ....................   Passed    4.95 sec
+ 2/99 Test #61: vedit-module-tree-catalog-test ...................   Passed    3.84 sec
+ 3/99 Test #86: vedit-module-closure-e2e .........................   Passed   11.54 sec
+ 4/99 Test #87: vedit-realtime-context-e2e .......................   Passed   15.69 sec
+ 5/99 Test #76: vedit-realtime-depth-switch-e2e ..................   Passed    8.09 sec
+ 6/99 Test #65: vedit-workspace-diagnostics-selftest .............   Passed    4.49 sec
+ 7/99 Test #88: vedit-filelist-authority-e2e .....................   Passed    4.73 sec
+ 8/99 Test #90: vedit-filelist-authority-config-e2e ..............   Passed    4.70 sec
+ 9/99 Test #92: vedit-filelist-authority-wrapper-e2e .............   Passed    2.29 sec
+10/99 Test #60: vedit-module-tree-selftest .......................   Passed    0.55 sec
+11/99 Test #91: vedit-filelist-authority-include-e2e .............   Passed    2.24 sec
+12/99 Test #89: vedit-filelist-authority-verible-e2e .............   Passed    2.01 sec
+13/99 Test #59: vedit-workspace-project-selftest .................   Passed    0.80 sec
+25/99 Test #12: vedit-app-ffi-abi-selftest .......................   Passed    0.06 sec
+35/99 Test #22: vedit-svn-workbench-selftest .....................***Skipped   0.04 sec
+44/99 Test #31: vedit-editor-open-bench ..........................   Passed    1.11 sec
+45/99 Test #32: vedit-app-batch-layout-selftest ..................   Passed    0.89 sec
+72/99 Test #63: vedit-project-lint-dock-test .....................   Passed    2.92 sec
+79/99 Test #71: vedit-diagnostics-product-seam ...................***Failed    6.30 sec
+82/99 Test #75: vedit-project-lint-e2e ...........................   Passed  144.52 sec
+83/99 Test #77: vedit-slang-build-context-e2e ....................   Passed    0.00 sec
+85/99 Test #74: vedit-rename-e2e .................................***Failed   31.44 sec
+93/99 Test #94: vedit-svn-workspaces-selftest ....................***Skipped   0.02 sec
+98% tests passed, 2 tests failed out of 99
+The following tests did not run:
+The following tests FAILED:
+CHECK switch.realtime-set-is-one-level PASS  <switch-project>/top.sv,<switch-project>/sub.sv
+CHECK switch.diagnostics-request-set-bounded PASS  requested=2 session=3
+CHECK switch.p95-under-50ms PASS  p95=13ms
+CHECK switch.no-new-session PASS  before=1 after=1
+CHECK switch.no-session-stop PASS  before=0 after=0
+CHECK ac1.slang-server SKIP (no slang-server (set VEDIT_SLANG_SERVER))
+
+Rust test invocation exited 0.
+groups=42 passed=569 failed=0 ignored=4
+Pinned cargo fmt --all -- --check and focused cargo clippy --all-targets -- -D warnings exited 0.
+
+Both broad failures reproduced on separately built baseline b614a4af1d57c6e4ce292a25e539722320189a4b with matched pinned tools (exit 8):
+71: CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+71: expected ';' [slang]
+71: expected a declaration name [slang]
+74: NAV-FAILED action=rename backend=slang reason='LSP request textDocument/rename failed: No such file or directory (jsonrpc error -32603)'
+74: CHECK FAIL rename.crossfile-buffer  module top;
+0% tests passed, 2 tests failed out of 2
+
+Final revision targeted Verible fallback control (exit 0):
+71: CHECK seam.annotation-tooltip-has-syntax PASS  syntax error at "b" [verible]
+74: CHECK PASS rename.crossfile-buffer  module top2;
+100% tests passed, 0 tests failed out of 2

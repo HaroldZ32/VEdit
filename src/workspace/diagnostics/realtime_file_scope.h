@@ -38,12 +38,22 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QHash>
 #include <QSet>
 #include <QString>
 #include <QStringList>
 #include <QVariantMap>
 
 namespace vedit::workspace::diagnostics::realtime_scope {
+
+struct CatalogDependencySite {
+    QString owner;
+    QString module;
+    int line = -1;
+    int column = -1;
+    bool operator==(const CatalogDependencySite &) const = default;
+};
+using CatalogDependencySites = QHash<QString, QList<CatalogDependencySite>>;
 
 /// The one key used for every membership test: `QDir::cleanPath` only. NOT
 /// `canonicalPath`, which answers empty for a path that does not exist yet and
@@ -234,6 +244,18 @@ inline bool activeDocumentJoinsProjectSession(const GoldenFileSet &golden,
     return true;
 }
 
+inline QStringList closureFilesFor(const QVariantMap &closure, const QString &path)
+{
+    if (closure.isEmpty()) {
+        return {};
+    }
+    const auto direct = closure.constFind(normalizeFileKey(path));
+    if (direct != closure.cend()) {
+        return direct->toStringList();
+    }
+    return closure.value(canonicalDirectoryVariant(path)).toStringList();
+}
+
 /// AC-3.1 + G1-a: the realtime analysis file set of ONE document.
 ///
 /// `closure` is the published `vedit.moduleTree.closure` map (file -> the
@@ -244,7 +266,8 @@ inline QStringList realtimeFileSetFor(const GoldenFileSet &golden,
                                       const QVariantMap &closure,
                                       const QString &path,
                                       int closureCap,
-                                      bool *truncated = nullptr)
+                                      bool *truncated = nullptr,
+                                      const QHash<QString, QStringList> &edited = {})
 {
     QStringList files{path};
     if (truncated != nullptr) {
@@ -256,35 +279,23 @@ inline QStringList realtimeFileSetFor(const GoldenFileSet &golden,
     if (!golden.isEmpty() && !isGoldenFile(golden, path)) {
         return files;
     }
-    if (!closure.isEmpty()) {
-        // AC-5: a direct key miss falls back to the canonical directory spelling
-        // before giving up on the closure.
-        QString key = normalizeFileKey(path);
-        if (!closure.contains(key)) {
-            const QString canonical = canonicalDirectoryVariant(path);
-            if (!canonical.isEmpty() && closure.contains(canonical)) {
-                key = canonical;
-            }
+    const auto override = edited.constFind(path);
+    const QStringList children = override == edited.cend() ? closureFilesFor(closure, path) : *override;
+    for (const QString &child : children) {
+        if (child.isEmpty() || files.contains(child)) {
+            continue;
         }
-        const QStringList children = closure.value(key).toStringList();
-        for (const QString &child : children) {
-            if (child.isEmpty() || files.contains(child)) {
-                continue;
-            }
-            // G1-b: a closure entry may only name a file of the project set. The
-            // module tree already guarantees it; this is the consumer's own
-            // defence, so a stale/foreign entry cannot smuggle a definition in.
-            if (!golden.isEmpty() && !isGoldenFile(golden, child)) {
-                continue;
-            }
-            if (files.size() >= closureCap) {
-                if (truncated != nullptr) {
-                    *truncated = true;
-                }
-                break;
-            }
-            files.append(child);
+        // The filelist remains authoritative over dependencies of edited text.
+        if (!golden.isEmpty() && !isGoldenFile(golden, child)) {
+            continue;
         }
+        if (files.size() >= closureCap) {
+            if (truncated != nullptr) {
+                *truncated = true;
+            }
+            break;
+        }
+        files.append(child);
     }
     return files;
 }
@@ -301,7 +312,8 @@ inline QStringList openDocumentSessionSet(const GoldenFileSet &golden,
                                           int closureCap,
                                           int sessionCap,
                                           int *outsideFileCount = nullptr,
-                                          bool *truncated = nullptr)
+                                          bool *truncated = nullptr,
+                                          const QHash<QString, QStringList> &edited = {})
 {
     QStringList unionFiles;
     if (truncated != nullptr) {
@@ -325,7 +337,7 @@ inline QStringList openDocumentSessionSet(const GoldenFileSet &golden,
             }
             continue;
         }
-        for (const QString &file : realtimeFileSetFor(golden, closure, tab, closureCap)) {
+        for (const QString &file : realtimeFileSetFor(golden, closure, tab, closureCap, nullptr, edited)) {
             if (unionFiles.contains(file)) {
                 continue;
             }
@@ -343,3 +355,5 @@ inline QStringList openDocumentSessionSet(const GoldenFileSet &golden,
 }
 
 } // namespace vedit::workspace::diagnostics::realtime_scope
+
+Q_DECLARE_METATYPE(vedit::workspace::diagnostics::realtime_scope::CatalogDependencySites)

@@ -13,6 +13,9 @@
 #include "lsp_backend.h"
 #include "project_lint_notice.h"
 #include "realtime_file_scope.h"
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+#include "realtime_module_references.h"
+#endif
 #include "symbol_scan.h"
 #include "slang_backend.h"
 #include "waiver_actions.h"
@@ -631,6 +634,7 @@ private:
         goldenRevision_ = revision;
         catalogRevision_ = catalogRevision;
         hasFilelist_ = project;
+        editedClosures_.clear();
         shadowedFiles_ = shadowed;
         const QStringList members = shell_->property("vedit.diagnostics.projectFiles").toStringList();
         goldenFiles_ = diagnostics::realtime_scope::goldenFileSetFrom(members);
@@ -645,6 +649,73 @@ private:
         return true;
     }
 
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+    void updateEditedClosure(const QFileInfo &source, const QString &disk, const QString &text)
+    {
+        namespace scope = diagnostics::realtime_scope;
+        const QString path = source.filePath();
+        const bool modified = disk != text;
+        const qint64 catalogCutoff = shell_->property("vedit.moduleTree.sourceCutoffMs").toLongLong();
+        const QDateTime diskTime = source.lastModified();
+        const bool catalogSawDisk = catalogCutoff > 0 && diskTime.isValid()
+            && diskTime.toMSecsSinceEpoch() < catalogCutoff;
+        if ((!modified && catalogSawDisk) || !hasFilelist_ || !scope::isGoldenFile(goldenFiles_, path)) {
+            editedClosures_.remove(path);
+            return;
+        }
+        const QVariantMap owners = shell_->property("vedit.moduleTree.owners").toMap();
+        if (owners.isEmpty()) {
+            return;
+        }
+        const auto references = diagnostics::literalModuleReferences(text);
+        QSet<QString> activeOwners;
+        for (auto it = references.cbegin(); it != references.cend(); ++it) {
+            const QString owner = owners.value(it.key()).toString();
+            if (!owner.isEmpty()) {
+                activeOwners.insert(owner);
+            }
+        }
+        const QStringList catalogChildren = scope::closureFilesFor(moduleClosure(), path);
+        QSet<QString> removable;
+        // Removing a literal occurrence does not remove a macro or include
+        // occurrence of the same child. Match each catalog site against the
+        // actual identifiers in the disk text this catalog saw.
+        if (modified && catalogSawDisk) {
+            const auto diskReferences = diagnostics::literalModuleReferences(disk);
+            const auto allSites = shell_->property("vedit.moduleTree.closureSites")
+                .value<scope::CatalogDependencySites>();
+            auto fileSites = allSites.constFind(scope::normalizeFileKey(path));
+            if (fileSites == allSites.cend()) {
+                fileSites = allSites.constFind(scope::canonicalDirectoryVariant(path));
+            }
+            if (fileSites != allSites.cend()) {
+                QSet<QString> opaque;
+                for (const auto &site : *fileSites) {
+                    const auto literal = diskReferences.constFind(site.module);
+                    if (site.column > 0 && literal != diskReferences.cend()
+                        && literal->contains({site.line, site.column})) {
+                        removable.insert(site.owner);
+                    } else {
+                        opaque.insert(site.owner);
+                    }
+                }
+                removable.subtract(opaque);
+            }
+        }
+        // When the source was saved after the catalog, add the live children
+        // and keep old catalog edges whose provenance can no longer be proved.
+        const QSet<QString> known(catalogChildren.cbegin(), catalogChildren.cend());
+        QStringList children = (activeOwners - known).values();
+        children.sort();
+        for (const QString &child : catalogChildren) {
+            if (activeOwners.contains(child) || !removable.contains(child)) {
+                children.append(child);
+            }
+        }
+        editedClosures_.insert(path, children);
+    }
+#endif
+
     /// AC-3.1 + G1-a: the realtime analysis file set of ONE file. Inside the
     /// golden set it is the file itself plus its one-level closure (capped);
     /// OUTSIDE it, only the file itself - the user keeps single-file diagnostics
@@ -654,7 +725,7 @@ private:
     QStringList realtimeFileSetFor(const QString &path, bool *truncated = nullptr) const
     {
         return diagnostics::realtime_scope::realtimeFileSetFor(
-            goldenFiles_, moduleClosure(), path, kRealtimeClosureMaxFiles, truncated);
+            goldenFiles_, moduleClosure(), path, kRealtimeClosureMaxFiles, truncated, editedClosures_);
     }
 
     /// A61.3 + G1-a: the session covers the union of the GOLDEN open documents'
@@ -681,9 +752,12 @@ private:
                 }
             }
         }
+        editedClosures_.removeIf([&openDocuments](QHash<QString, QStringList>::iterator entry) {
+            return !openDocuments.contains(entry.key());
+        });
         return diagnostics::realtime_scope::openDocumentSessionSet(
             goldenFiles_, moduleClosure(), openDocuments, kRealtimeClosureMaxFiles,
-            kRealtimeSessionMaxFiles, &outsideFileCount_, truncated);
+            kRealtimeSessionMaxFiles, &outsideFileCount_, truncated, editedClosures_);
     }
 
     /// The AC-3/AC-5 probe surface: what the realtime analysis covers right now.
@@ -823,7 +897,8 @@ private:
         // BLOCKER fix: decide from METADATA before copying anything. The on-disk
         // size is O(1); the document size is summed without a copy. Above the cap
         // neither the document nor the file is read, and the skip is named once.
-        const qint64 fileBytes = QFileInfo(path).size();
+        const QFileInfo source(path);
+        const qint64 fileBytes = source.size();
         const qint64 documentBytes = bufferCharacterCount(widget);
         const qint64 watchedBytes = qMax(fileBytes, documentBytes);
         if (watchedBytes > kCapBytes) {
@@ -860,6 +935,10 @@ private:
         controller_->setDocumentAnalysisAvailability(path, true, QString());
         ++analyzeCalls_;
         publishWatchStats();
+        refreshProjectScope();
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        updateEditedClosure(source, disk, text);
+#endif
         // AC-3.1/AC-5.1: publish the analysis closure and hand the stable session
         // set to the controller BEFORE the analysis, so the switch that triggered
         // this call finds the session it needs already covered.
@@ -891,6 +970,7 @@ private:
     bool hasFilelist_ = false;
     QStringList projectIndex_;
     QStringList shadowedFiles_;
+    QHash<QString, QStringList> editedClosures_;
     /// Open documents excluded from the session by the golden rule (published).
     int outsideFileCount_ = 0;
     /// One notice per truncation episode, not one per 400 ms tick.
@@ -1003,8 +1083,8 @@ int projectExpandPollIntervalMs()
 /// controller. The poll is timer-driven, so `installPanels()` never blocks.
 class ProjectFileSetPoller final : public QObject {
 public:
-    using ReadyCallback =
-        std::function<void(const QStringList &, const QStringList &, const QStringList &)>;
+    using ReadyCallback = std::function<void(const QStringList &, const QStringList &,
+                                             const QStringList &, const QStringList &)>;
 
     ProjectFileSetPoller(QObject *parent,
                          vedit::app::ApplicationShell *shell,
@@ -1201,7 +1281,7 @@ private:
                 // must be able to tell "this project has no file set" from "the
                 // property was never set at all".
                 if (ready_) {
-                    ready_(QStringList{}, QStringList{}, QStringList{});
+                    ready_(QStringList{}, QStringList{}, QStringList{}, QStringList{});
                 } else {
                     controller_->setFileSet(QStringList{});
                 }
@@ -1223,6 +1303,7 @@ private:
         const QStringList includeDirs =
             shell_->property("vedit.project.includeDirs").toStringList();
         const QStringList defines = shell_->property("vedit.project.defines").toStringList();
+        const QStringList defineOverrides = shell_->property("vedit.project.defineOverrides").toStringList();
         publishedRevision_ = revision;
         publishedValid_ = true;
         files_ = files;
@@ -1230,7 +1311,7 @@ private:
         defines_ = defines;
         publishState(QStringLiteral("ready"));
         if (ready_) {
-            ready_(files_, includeDirs_, defines_);
+            ready_(files_, includeDirs_, defines_, defineOverrides);
         } else {
             controller_->setFileSet(files);
         }
@@ -1257,7 +1338,7 @@ private:
             startedAtMs_ = 0;
             lastJob_ = 0;
             if (ready_) {
-                ready_(files_, includeDirs_, defines_);
+                ready_(files_, includeDirs_, defines_, QStringList{});
             } else if (controller_ != nullptr) {
                 controller_->setFileSet(files_);
             }
@@ -1426,7 +1507,7 @@ private:
             // The sink owns the controller (it re-pins the request and starts the
             // ONE session for this file set). Calling setFileSet() here as well
             // reparsed twice per Open Folder - two LSP sessions for one root.
-            ready_(files_, includeDirs_, defines_);
+            ready_(files_, includeDirs_, defines_, inputs_.projectDefines);
         } else {
             controller_->setFileSet(files);
         }
@@ -3785,10 +3866,10 @@ public:
     /// restart, because `setProjectEnvironment()` stops the running server and the
     /// restart below is what brings it back with the new `-I`/`-D`.
     void adoptProjectFiles(const QStringList &files, const QStringList &includeDirs,
-                           const QStringList &defines)
+                           const QStringList &defines, const QStringList &defineOverrides)
     {
         setProjectFiles(files, includeDirs, defines);
-        const bool envPinned = state_.setProjectEnvironment(includeDirs, defines);
+        const bool envPinned = state_.setProjectEnvironment(includeDirs, defines, defineOverrides);
         // Recompute both scopes from the new revision before starting a server.
         // The watcher starts it over open documents and their direct children;
         // the expanded project list supplies its separate symbol index.
@@ -4587,10 +4668,10 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
         return new ProjectFileSetPoller(
             &shell, &shell, controller, root, inputs,
             [wiring](const QStringList &files, const QStringList &includeDirs,
-                     const QStringList &defines) {
+                     const QStringList &defines, const QStringList &defineOverrides) {
                 // The same sink the root-switch poller uses: one setFileSet per
                 // file set, not the sink's call plus the poller's second one.
-                wiring->adoptProjectFiles(files, includeDirs, defines);
+                wiring->adoptProjectFiles(files, includeDirs, defines, defineOverrides);
             });
     };
     auto *poller = makeProjectPoller(projectRoot);

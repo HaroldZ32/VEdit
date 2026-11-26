@@ -130,10 +130,11 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("vedit-m0-smoke"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.4.0"));
+    QCoreApplication::setApplicationVersion(QStringLiteral(VEDIT_M0_VERSION));
 
     QCommandLineParser parser;
     parser.addHelpOption();
+    parser.addVersionOption();
     parser.addOption({QStringLiteral("selfcheck"), QStringLiteral("Run the non-interactive checks (default).")});
     parser.addOption({QStringLiteral("testdata"), QStringLiteral("Directory holding the project-owned test syntax definition."),
                       QStringLiteral("dir"), QStringLiteral(VEDIT_M0_TESTDATA_DIR)});

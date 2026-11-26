@@ -39,6 +39,7 @@ struct PublishedFileSet {
     QStringList files;
     QStringList includeDirs;
     QStringList defines;
+    QStringList defineOverrides;
 };
 
 // The directory this lane persists into: the shell's own state directory, so a
@@ -115,6 +116,10 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
         next.files = model->files();
         next.includeDirs = model->includeDirs();
         next.defines = model->defines();
+        if (next.hasFilelist) {
+            next.defineOverrides = next.pending && next.root == published->root
+                ? published->defineOverrides : model->projectDefines();
+        }
         next.error = model->lastError();
         // The revision is the CHANGE TOKEN consumers follow: it moves when the
         // expanded ANSWER (the set, or the -I/-D that produced it) changed, when
@@ -125,9 +130,11 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
         // import) left the revision untouched, so the diagnostics poller's
         // early return kept the dock on a stale "expanding…"/"No project file
         // set yet" forever.
+        // A dock override can match the filelist value yet outrank native Slang flags.
         const bool answerChanged = next.files != published->files
             || next.includeDirs != published->includeDirs
-            || next.defines != published->defines;
+            || next.defines != published->defines
+            || next.defineOverrides != published->defineOverrides;
         const bool membershipChanged = next.hasFilelist != published->hasFilelist;
         const bool failureChanged = next.error != published->error;
         const quint64 revision = published->revision
@@ -140,6 +147,7 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
         shell.setProperty("vedit.project.files", published->files);
         shell.setProperty("vedit.project.includeDirs", published->includeDirs);
         shell.setProperty("vedit.project.defines", published->defines);
+        shell.setProperty("vedit.project.defineOverrides", published->defineOverrides);
         shell.setProperty("vedit.project.hasFilelist", published->hasFilelist);
         shell.setProperty("vedit.project.filesPending", published->pending);
         shell.setProperty("vedit.project.filesError", published->error);

@@ -26,7 +26,7 @@ VEdit 是面向 Verilog / SystemVerilog 的桌面编辑器。可以直接打开�
 ### 1.1 主窗口布局
 
 - **菜单栏**提供 `File`、`Edit`、`View`、`Project` 和 `Help`。用 `File` 打开或保存文件，用 `View` 切换主题和停靠面板。
-- **编辑区**：每个标签页是一份打开的文件；可以水平或垂直分成多个分屏，当前分屏右上角有 `active` 标记。
+- **编辑区**：同一标签栏中可以切换文件和比对结果。编辑区可以水平或垂直分屏，当前分屏右上角有 `active` 标记。
 - **左侧停靠区**包含 `Files`（文件树）、`Project`（工程）和 `Source Control`（版本控制）。
 - **右侧停靠区**包含 `Module Tree`（模块树）、`Interface`（接口）和 `Outline`（大纲与诊断）。
 - **底部停靠区**包含 `Search`（搜索）和 `Terminal`（内置终端）。可拖动面板之间的分隔线调整宽度或高度。
@@ -109,11 +109,13 @@ VEdit 是面向 Verilog / SystemVerilog 的桌面编辑器。可以直接打开�
 - 摘要行与按钮：`Refresh`、`Import Filelist…`、`Remove Selected Filelist`、`Edit Variables…`；
 - `Filelists`：已导入的 filelist，双击打开；
 - `Files`：展开出的源文件，双击打开；
-- `Include dirs (-I)` 与 `Defines (-D)`：展开得到的包含目录与宏；
+- `Include dirs (-I)` 与 `Defines (-D)`：本工程添加的包含目录与宏，以及展开后生效的条目；
 - `Variables`：工程变量表；
 - `Diagnostics`：filelist 解析诊断（缺失的 `+incdir+`、未知指令、嵌套问题等）。这些都显示在面板里，不弹模态框。
 
 没有工程时，面板显示一行提示；这不是错误。
+
+在 `Defines (-D)` 下点 `Add Define…`，输入 `NAME` 或 `NAME=VALUE`。用相同名称提交不同值会更新原有条目，改动按工程保存。导入 filelist 后，工程展开同名宏时依次取 `Project` 面板、`vedit.toml` 的 `[project] defines`、filelist、`Preferences → Tools` 中的第一个定义。选中本工程添加的宏并点 `Remove`，就会恢复下一来源的值。比如 filelist 定义了 `WIDTH=2`，在面板添加 `WIDTH=4` 后工程展开值变成 `4`，移除后恢复 `2`。改动会触发 slang 重新分析当前文件，原生 slang 配置的同名宏见第 10 节。
 
 ### 2.5 filelist 里的变量与转义
 
@@ -139,8 +141,6 @@ VEdit 是面向 Verilog / SystemVerilog 的桌面编辑器。可以直接打开�
 - 不认识的 `+…` / `-…` 指令报一条诊断后跳过，不会让工程打不开。
 
 `Variables` 对话框（标题 `Filelist variables`）可以**增删改**工程变量表：`Add variable` 新增一行，名字与值都可编辑；每行右侧的 `Delete` 删除该行。打开时会列出已有变量和当前仍缺失的变量——即使工程还一个变量都没有，`Edit Variables…` 也能打开它（新增就是用途之一）。名字按 `[A-Za-z_][A-Za-z0-9_]*` 校验：**空名字、含空格或 `=` / `$` 等字符、以数字开头、或重名**都会在该行下面给出原因，`OK` 不会关闭对话框。删除一个仍被 filelist 引用的变量只会去掉它的值：工程会把它重新列为缺失，并在下次展开时再问（不会静默消失）。保存是**整表替换**，并按**工程根分别记忆**：A→B→A 切换回来时恢复 A 自己的表，切到 B 看不到 A 的变量（存在 `project-model.json`，重启仍在）。
-
-`Project` 面板里的 `Include dirs (-I)` 与 `Defines (-D)` 列表是从展开结果来的只读视图，**没有按工程增删的入口**（见第 10 节）。
 
 ### 2.6 恢复上次会话
 
@@ -198,8 +198,9 @@ auto_discover = true
 
 ### 3.1 标签页与分屏
 
-- `File → New` 新建一个空白文档；`File → Open…` 打开文件；两者都会在当前分屏里增加一个标签。
-- 关闭一个文件：点标签右侧的 `×`。有未保存修改时会问「保存 / 丢弃 / 取消」，取消则标签保持打开。
+- `File → New` 新建一个空白文档，`File → Open…` 打开文件。文件和比对结果都出现在当前分屏的标签栏。
+- 标签宽度固定。标签排不下时，可拖动下方的横向滚动条，或把鼠标停在标签栏上使用滚轮。滚动时仍停留在原标签。打开文件或切换标签时，标签栏会滚到活动项。把鼠标停在长文件名上可查看完整名称和路径。
+- 点标签右侧的 `×` 关闭。出现未保存修改提示时，可以保存、丢弃或取消关闭。比对标签中共享缓冲区的关闭行为见 D.1.1。
 - 分屏：`View → Split Pane Horizontally`（`Ctrl+Alt+H`）左右分，`View → Split Pane Vertically`（`Ctrl+Shift+V`）上下分；`F6` 在分屏间切换焦点；`View → Close Pane`（`Ctrl+W`）关闭当前分屏（其中每个未保存文档都会逐个询问）。
 - `View → Reset Layout`（`Ctrl+Alt+R`）回到单分屏；`File → New Empty Layout`（`Ctrl+Alt+N`）重建一个空布局。这两个命令（以及 `View → Mixed Split`）在**有未保存文档时会先询问**：可以保存、丢弃或取消（有多份未保存文档时是「全部保存 / 全部丢弃 / 取消」）；选**取消**则分屏、文档与布局都保持原样。
 - 点哪个分屏就激活哪个分屏：鼠标按在非活动分屏的任意位置，或焦点进入它，之后的命令、跳转与重命名都跟随它。
@@ -425,7 +426,7 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 切到 **slang**（随包 `slang-server`）后，同一个文件会给出真正的语法诊断（例如 `expected ';'`），位置就在删除点附近；这是本版推荐的读法。
 
-导入 filelist 后，slang 的实时分析和定义跳转采用展开后的文件集、包含目录和宏，并保留工作区与用户的 slang 编译设置。`Preferences → Tools` 的 Include dirs / Defines 用于手动运行的工程级 lint。为 Verible 提供 `--file_list_path` 无法解决上面的宏预处理限制。
+导入 filelist 后，slang 的实时分析和定义跳转采用工程展开的文件集、包含目录和宏，其中包括 `Project` 面板中的宏覆盖（见 2.4）。工作区与用户的原生 slang 编译设置仍生效。为 Verible 提供 `--file_list_path` 无法解决上面的宏预处理限制。
 
 ## 7. 代码导航与多光标
 
@@ -639,8 +640,8 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 - **Lint engine**：独立选择 CLI lint 引擎，默认为 `slang`，显式 `verible` 选择继续生效。全工程 lint 由用户手动启动。
 - **工具路径**：`verible-verilog-ls`、`slang`、`slang-server`、`verible-verilog-format`、verible 规则文件。留空表示用随包或自动发现的版本。
 - **Host shell**：选择启动新终端和后续 Git/SVN 任务使用的宿主机 shell。详见附录 D。
-- **Include dirs (-I)**、**Defines (-D)**：一行一个，交给工程级 lint 使用。
-- 页底说明：这些值存在设置文件里；保存后的改动**立即生效**（运行中的程序约 300 ms 内读入设置文件）：实时 LSP 会话用新选择的后端重启并重新分析当前文件，lint 引擎在下一次 `Lint Project` 时生效，`-I` / `-D` 交给工程级 lint。
+- **Include dirs (-I)**、**Defines (-D)**：一行一个。导入 filelist 后，这些设置补充工程展开的包含目录与宏，供 slang 实时分析及工程级 lint 使用。同名宏优先采用工程中的值（见 2.4）。
+- 页底说明：这些值存在设置文件里；保存后的改动**立即生效**（运行中的程序约 300 ms 内读入设置文件）。实时 LSP 会话用新选择的后端重启并重新分析当前文件，lint 引擎在下一次 `Lint Project` 时生效。
 
 ### 8.5 FIM（可选的补全服务）
 
@@ -807,7 +808,7 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 5. **模块树与接口的规模上限**：层级深度上限 64 层、最多 20000 行；超限或环形例化显示一行标记。本版工程模式需要**显式导入 filelist**：没有 filelist 时模块树/顶层选择禁用，显示空态原因；没有工程或 `slang` 没报出模块时，也只显示一行原因。工程超过 5000 个文件时模块树不会自动跑全量目录，需要输入顶层或显式 `Refresh`；全量目录默认 120 秒业务超时，可 `Cancel`。
 6. **`Alt` 手势可能被窗口管理器截获**：KDE / GNOME 默认用 `Alt+拖拽`（以及 `Alt+点击`）移动窗口，事件到不了应用。因此块选择与加光标的**主手势**是 `Shift+Alt+拖拽` 与 `Ctrl+Alt+点击`（窗口管理器不占用它们）；`Alt+...` 只作为次选手势保留。见 7.2。
 7. **中文宽度 1.60 倍**：中英文混排的注释列对齐是近似的（见 9.3）。
-8. **工程面板不能增删 `-I` / `-D`**：`Project` 面板里的 `Include dirs (-I)` 与 `Defines (-D)` 是从 filelist 展开得到的**只读**结果，没有按工程增删的入口。要调整交给工程级 lint 的 `-I` / `-D`，用 `Edit → Preferences… → Tools` 的全局设置（见 8.4）；要改变展开结果，改 filelist 后按 `Refresh`。
+8. **工程面板与原生 slang 配置**。`Project` 面板的 `Remove` 只移除本工程在面板中添加的包含目录或宏。要修改 filelist 中的原始定义，请编辑 filelist 后点 `Refresh`。导入 filelist 后，slang 实时分析优先使用面板中的宏定义，覆盖原生 slang 配置中的同名 `-D`。移除面板条目后，原生配置和 filelist 恢复原有优先级。原生 `-U` 仍会取消对应宏的定义。
 9. **发布包的 `Auto` 界面语言通常为英文**。包内只有 `C.UTF-8`，需要中文请显式选择（见 9.1）。
 10. **打包产物的语法定义范围**。发布包只加载随包白名单里的语法定义。
 11. **桌面验证范围**。合并到本版的交互改动在 X11/Xvfb 下验证。原生 Wayland、各桌面环境的 DPI、字体和输入法组合仍需单独验证。
@@ -827,32 +828,32 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 从 [GitHub Releases](https://github.com/HaroldZ32/VEdit/releases) 下载所需的 Linux x86_64 格式及同版本的 `SHA256SUMS`。把文件放在同一目录。以下示例校验 AppImage，下载其他格式时把 `asset` 改成对应文件名。输出应为该文件的 `OK`。下载全部三种格式时，直接运行 `sha256sum --check --strict SHA256SUMS`。
 
 ```sh
-asset=VEdit-0.4.1-x86_64.AppImage
+asset=VEdit-0.5.0-x86_64.AppImage
 awk -v asset="$asset" '$2 == asset' SHA256SUMS | sha256sum --check
 ```
 
 **AppImage**。直接运行需要 FUSE（`libfuse2`）。没有 FUSE 时使用下方的解包运行命令。
 
 ```sh
-chmod +x VEdit-0.4.1-x86_64.AppImage
-./VEdit-0.4.1-x86_64.AppImage path/to/top.sv
-./VEdit-0.4.1-x86_64.AppImage --appimage-extract-and-run path/to/top.sv
+chmod +x VEdit-0.5.0-x86_64.AppImage
+./VEdit-0.5.0-x86_64.AppImage path/to/top.sv
+./VEdit-0.5.0-x86_64.AppImage --appimage-extract-and-run path/to/top.sv
 ```
 
 **`.tar.gz` 目录包**。解开后从目录外运行 `AppRun`，保留整个目录供后续使用。
 
 ```sh
-tar -xzf vedit-0.4.1-linux-x86_64.tar.gz
-./vedit-0.4.1-linux-x86_64/AppRun path/to/top.sv
+tar -xzf vedit-0.5.0-linux-x86_64.tar.gz
+./vedit-0.5.0-linux-x86_64/AppRun path/to/top.sv
 ```
 
 **`.run` 自解压包**。直接运行会临时解包并启动，程序退出后清理临时目录。也可以用 `--extract` 将包解到指定的新目录，保留文件供后续启动。新目录的父目录须已存在。
 
 ```sh
-chmod +x VEdit-0.4.1-x86_64.run
-./VEdit-0.4.1-x86_64.run path/to/top.sv
-./VEdit-0.4.1-x86_64.run --extract ./vedit-install
-./vedit-install/vedit-0.4.1-linux-x86_64/AppRun path/to/top.sv
+chmod +x VEdit-0.5.0-x86_64.run
+./VEdit-0.5.0-x86_64.run path/to/top.sv
+./VEdit-0.5.0-x86_64.run --extract ./vedit-install
+./vedit-install/vedit-0.5.0-linux-x86_64/AppRun path/to/top.sv
 ```
 
 三个包使用同一 Qt6 应用、运行库、字体和 HDL、VHDL、Scala 工具（见[构建指南](BUILD.md) §7.3）。`.tar.gz` 和 `.run` 使用宿主机上的标准解压工具，无需 FUSE。三种格式的启动脚本都需要宿主机的 `/bin/sh`，终端使用设置中选定的系统 shell。要使用版本控制，请在宿主安装所需的 `git` 或 `svn`，详见附录 D。
@@ -940,11 +941,19 @@ vedit-app --no-session-restore    # 忽略上次会话，干净启动
 
 ### D.1.1 并排比较文件与 SVN 修订
 
-从 `File` 菜单选择文件比较命令，或在 `Files` 树右键选中的文件，再选另一份文件。两侧按行对齐，色块标出新增、删除和替换。用 `Previous difference` / `Next difference` 选择差异，再点中间的 `←` 或 `→` 将这一块应用到箭头指向的一侧。`Undo hunk` 可以撤销这一步。目标文件已在编辑器打开时，比较会使用它当前的编辑缓冲区。核对完内容后，点目标一侧的保存按钮写入磁盘。
+用 `File → Compare Files…` 选择两份文件，或在 `Files` 树中右键点击文件，选 `Compare With…` 再选择另一份。比对结果首次在当前分屏以标签打开。左右两侧都是编辑器视图，保留 Verilog 和 SystemVerilog 等语言的语法高亮，并以背景色标出差异。两侧对应行中实际改动的文字用更醒目的背景色标出，比对视图获得焦点时可按 `Alt+PageUp` 或 `Alt+PageDown` 跳到上一处或下一处差异。
 
-在 SVN 工作副本的 `Source Control` 中，`Working tree` 可打开工作文件与 `BASE`（本地检出基线）或 `HEAD`（仓库最新版本）的同一比较窗口。在文件历史中，可以比较选中修订和该文件的上一次改动、比较两个修订，或比较选中修订与当前工作文件。两个历史快照都只读；与工作文件比较时，可将选中的历史块取回工作文件再保存。
+- 用 `Previous difference` 和 `Next difference` 跳转差异块。勾选 `Sync scroll` 可同步滚动两侧。
+- 可写的本地文件可以直接编辑。点击 `←` 或 `→` 将选中的差异块从另一侧应用到箭头所指的一侧。`Undo` 撤销最近编辑一侧的操作，包括刚应用的差异块。历史快照只读。
+- 已打开的可写文件会在普通标签和比对标签间共享缓冲区，包括未保存内容。编辑和应用差异块先修改缓冲区。核对后用 `Save left` 或 `Save right` 将对应一侧写入磁盘。文件在比对期间被其他程序修改时，保存会提示重新核对。
+- 关闭比对标签后，仍在其他视图打开的缓冲区会保留修改。关闭比对中某个已修改文档的最后一个视图时，可以保存、丢弃或取消。比对标签仅用于当前会话。
 
-比较支持 UTF-8 文本，每侧最多 8 MiB、100,000 行。窗口显示末行是否缺少换行，并保留目标侧的 CRLF。文件在比较期间被其他程序修改时，保存会提示重新核对。
+在普通编辑器中激活 SVN 文件，可直接从 `File` 菜单操作。命令按该文件所在的工作副本读取，`Source Control` 中选中的工作副本可以保持原样。
+
+- `Current File: Compare With SVN BASE`（`当前文件：与 SVN BASE 比对`）将当前缓冲区与本地的 `BASE` 基线比对，包含尚未保存的修改。
+- `Current File: SVN History`（`当前文件：SVN 历史`）打开该文件的修订列表。选中一条修订后，可用 `Compare With Working Copy` 与当前缓冲区比对，或用 `Compare With Previous Revision` 与该文件的上一次修订比对。选中两条修订后用 `Compare selected` 比对，也可以用 `Compare Revisions…` 输入两个修订号。
+
+也可从 `Source Control` 的 `Working tree` 对比工作文件与 `BASE` 或 `HEAD`（仓库最新版本）。比对支持 UTF-8 文本，每侧最多 8 MiB 和 100,000 行。
 
 ### D.2 系统 shell 与版本控制工具
 
@@ -962,7 +971,7 @@ Git / SVN 操作从宿主机的有效 `PATH` 查找 `git` 或 `svn`。也可以�
 - SVN 日常操作：在 `Working tree` 查看状态、变更和所属 changelist。选中一项或多项后可添加、移除、重命名、忽略、还原，或只提交所选路径。也可按 changelist 提交、导出选中项／整组／全部变更的补丁。
 - SVN 分支和维护：从 `SVN Actions` 创建或切换分支、合并、解决冲突、清理工作副本，或刷新远端变更并更新选中文件。合并产生的文本冲突可先打开文件核对，再将选中项标记为已解决。
 - SVN 历史：在 `History` 页查看仓库或文件历史，按修订号或文字搜索。可以保存仓库地址，查看该地址下的历史和只读快照。比较所选版本、前一文件修订、`BASE`、`HEAD` 或当前工作副本的方法见 D.1.1。
-- 多工作副本：在 `Source Control` 的工作副本选择器中切换当前根。状态、历史、比较和刷新会跟随选择；关闭某份工作副本会停止监控，之后可重新打开。在父工程中操作嵌套工作副本时，先在这里选中它。自动发现包括工程内已检出的目录型 `svn:externals`。较深的目录可启用更大范围扫描，定时远端刷新需手动开启。
+- 多工作副本：在 `Source Control` 的工作副本选择器中切换当前根。面板中的状态、仓库历史和刷新会跟随选择。从 `File` 菜单发起的当前文件 SVN 操作使用该文件所在的工作副本。要在 `Working tree` 操作嵌套工作副本，先在选择器中选中它。关闭某份工作副本会停止监控，之后可重新打开。自动发现包括工程内已检出的目录型 `svn:externals`。较深的目录可启用更大范围扫描，定时远端刷新需手动开启。
 
 所有操作都是**异步**的：即使 `git` / `svn` 卡住，界面也不会冻结。
 

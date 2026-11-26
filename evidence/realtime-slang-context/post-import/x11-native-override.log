@@ -1,0 +1,10 @@
+Independent T10 X11 check, linked app SHA-256 60e34bef62b4e53137cdc4c10211eebe7b3a7122a89f760f75696b6d3f9bcb44.
+Qt xcb and Xvfb shared an isolated container. The actual app imported the filelist, displayed the top and child in Module Tree, and received real XTest pointer clicks and typing.
+Filelist: +define+PROJECT_WIDTH=2
+.slang/server.json flags: -DPROJECT_WIDTH=5
+
+Add PROJECT_WIDTH=10: one visible macro row. No index-oob in rendered Outline.
+Replace with PROJECT_WIDTH=4: one visible macro row. Outline: cannot refer to element 8 of 'logic[3:0]'.
+Remove PROJECT_WIDTH=4: project panel shows the remaining filelist value 2. Rendered Outline again follows native slang flags and shows 'logic[4:0]'.
+The genuine unknown module 'genuinely_missing' diagnostic remained visible.
+The application closed with exit 0. Raw local screenshots, logs and input hashes: target/qa/post-import-markers.sUaSCW/.

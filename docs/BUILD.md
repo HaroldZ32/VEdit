@@ -184,7 +184,7 @@ Actions 从对应构建任务取得 F2、Qt6 和预热的 Scala 输入。它在�
 隔离边界，并验证实际包的解包与启动。按[打包说明](../packaging/runtime/README.md)检查交付字节，暂存 AppDir
 是构建中间产物。如需复查用户安装命令，见[用户手册](USER_GUIDE.md#附录-a-产物形态与安装)。
 
-**版本号**为 **0.4.1**。`Cargo.toml` 的工作区版本必须与 `Cargo.lock`、根目录和终端的 CMake 项目版本、
+**版本号**为 **0.5.0**。`Cargo.toml` 的工作区版本必须与 `Cargo.lock`、根目录和终端的 CMake 项目版本、
 应用和窗口冒烟程序的版本一致。打包从工作区版本派生文件名和桌面文件的 `X-AppImage-Version`。
 应用的 About 与 `--version` 应显示同一版本。
 

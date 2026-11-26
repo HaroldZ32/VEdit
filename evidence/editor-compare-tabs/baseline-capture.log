@@ -1,0 +1,49 @@
++ trap 'rc=$?; printf "BASELINE_CAPTURE_EXIT=%s\n" "$rc"; exit "$rc"' EXIT
++ qa=$WORKTREE/target/editor-compare-qa
++ base=$WORKTREE/target/editor-compare-qa/baseline-9tP6tnAL
++ native_root=$WORKTREE/target/editor-compare-qa/native-tools/root
+++ mktemp -d $WORKTREE/target/editor-compare-qa/editor-capture-XXXXXXXX
++ capture=$WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda
++ printf 'module baseline_capture;\n  logic data;\nendmodule\n'
++ docker run --rm --network none -v $WORKTREE/target/editor-compare-qa/baseline-9tP6tnAL:/vedit-build:ro -v $WORKTREE/target/editor-compare-qa/native-tools/root:/native-tools:ro -v $WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda:/capture -w /vedit-build -e HOME=/tmp -e LANG=C.UTF-8 -e QT_QPA_PLATFORM=xcb -e QT_OPENGL=software -e LIBGL_ALWAYS_SOFTWARE=1 -e VEDIT_NO_ENV_AUTOCAPTURE=1 vedit-qt6-build:local bash -c $'\n  set -euxo pipefail\n  export PATH=/native-tools/usr/bin:$PATH LD_LIBRARY_PATH=/native-tools/usr/lib/x86_64-linux-gnu\n  timeout 20 xvfb-run -a -s "-screen 0 1280x800x24 -nolisten tcp" bash -c \'\n    set -euxo pipefail\n    target/qt6-build/src/app/vedit-app --no-session-restore --state-dir /capture/state --hold 10000 /capture/baseline_capture.sv > /capture/app.log 2>&1 &\n    app=$!\n    trap "kill $app 2>/dev/null || :" EXIT\n    window=$(timeout 8 xdotool search --sync --onlyvisible --name "VEdit|baseline_capture" | awk "NR==1")\n    xdotool getwindowname "$window"\n    xdotool getwindowgeometry "$window"\n    xdotool mousemove 800 600\n    xwd -root -silent -out /capture/frame-0001.xwd\n    xdotool mousemove 600 400\n    xwd -root -silent -out /capture/frame-0002.xwd\n    wait "$app"\n  \'\n  printf "xvfb_child_exit=0\\n"\n'
++ export PATH=/native-tools/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin LD_LIBRARY_PATH=/native-tools/usr/lib/x86_64-linux-gnu
++ PATH=/native-tools/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ LD_LIBRARY_PATH=/native-tools/usr/lib/x86_64-linux-gnu
++ timeout 20 xvfb-run -a -s '-screen 0 1280x800x24 -nolisten tcp' bash -c $'\n    set -euxo pipefail\n    target/qt6-build/src/app/vedit-app --no-session-restore --state-dir /capture/state --hold 10000 /capture/baseline_capture.sv > /capture/app.log 2>&1 &\n    app=$!\n    trap "kill $app 2>/dev/null || :" EXIT\n    window=$(timeout 8 xdotool search --sync --onlyvisible --name "VEdit|baseline_capture" | awk "NR==1")\n    xdotool getwindowname "$window"\n    xdotool getwindowgeometry "$window"\n    xdotool mousemove 800 600\n    xwd -root -silent -out /capture/frame-0001.xwd\n    xdotool mousemove 600 400\n    xwd -root -silent -out /capture/frame-0002.xwd\n    wait "$app"\n  '
++ app=22
++ trap 'kill 22 2>/dev/null || :' EXIT
++ target/qt6-build/src/app/vedit-app --no-session-restore --state-dir /capture/state --hold 10000 /capture/baseline_capture.sv
+++ timeout 8 xdotool search --sync --onlyvisible --name 'VEdit|baseline_capture'
+++ awk NR==1
++ window=4194311
++ xdotool getwindowname 4194311
+VEdit — /capture/baseline_capture.sv
++ xdotool getwindowgeometry 4194311
+Window 4194311
+  Position: 0,0 (screen: 0)
+  Geometry: 1280x820
++ xdotool mousemove 800 600
++ xwd -root -silent -out /capture/frame-0001.xwd
++ xdotool mousemove 600 400
++ xwd -root -silent -out /capture/frame-0002.xwd
++ wait 22
++ kill 22
++ :
++ printf 'xvfb_child_exit=0\n'
+xvfb_child_exit=0
++ ffmpeg -hide_banner -loglevel error -i $WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda/frame-0001.xwd -frames:v 1 -update 1 $WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda/baseline.png
++ ffmpeg -hide_banner -loglevel error -framerate 2 -i $WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda/frame-%04d.xwd -c:v libx264 -pix_fmt yuv420p $WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda/baseline.mp4
++ ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames -of default=nw=1 $WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda/baseline.png
+codec_name=png
+width=1280
+height=800
+nb_frames=N/A
++ ffprobe -v error -show_entries stream=codec_name,width,height,nb_frames -of default=nw=1 $WORKTREE/target/editor-compare-qa/editor-capture-1pMDLAda/baseline.mp4
+codec_name=h264
+width=1280
+height=800
+nb_frames=2
++ rc=0
++ printf 'BASELINE_CAPTURE_EXIT=%s\n' 0
+BASELINE_CAPTURE_EXIT=0
++ exit 0

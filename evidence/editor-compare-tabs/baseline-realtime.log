@@ -1,0 +1,32 @@
++ trap 'rc=$?; printf "BASELINE_REALTIME_EXIT=%s\n" "$rc"; exit "$rc"' EXIT
++ qa=$WORKTREE/target/editor-compare-qa
++ base=$WORKTREE/target/editor-compare-qa/baseline-9tP6tnAL
+++ mktemp -d $WORKTREE/target/editor-compare-qa/ctest-baseline-realtime-XXXXXXXX
++ state=$WORKTREE/target/editor-compare-qa/ctest-baseline-realtime-KkZ1QRtX
++ docker run --rm --network none -v $WORKTREE/target/editor-compare-qa/baseline-9tP6tnAL:/vedit-build:ro -v $WORKTREE/target/editor-compare-qa/ctest-baseline-realtime-KkZ1QRtX:/vedit-build/target/qt6-build/Testing -v $WORKTREE/target/editor-compare-qa/native-tools/root:/native-tools:ro -w /vedit-build -e HOME=/tmp -e LANG=C.UTF-8 -e QT_QPA_PLATFORM=offscreen -e VEDIT_NO_ENV_AUTOCAPTURE=1 sha256:809c8072ac65be85a15bfc010400f1a0b2cffa10966cfebd4e7dcd0b418360c1 bash -c $'\n  set -euxo pipefail\n  export PATH=/native-tools/usr/bin:$PATH VEDIT_VERIBLE_LS=/native-tools/usr/bin/verible-verilog-ls VEDIT_VERIBLE_BIN_DIR=/native-tools/usr/bin VEDIT_SLANG_SERVER=/native-tools/usr/bin/slang-server VEDIT_SLANG=/vedit-build/build/slang/out/slang\n  verible-verilog-ls --version\n  slang-server --version\n  ctest --test-dir target/qt6-build --output-on-failure -R "^vedit-realtime-depth-switch-e2e$"\n'
++ export PATH=/native-tools/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin VEDIT_VERIBLE_LS=/native-tools/usr/bin/verible-verilog-ls VEDIT_VERIBLE_BIN_DIR=/native-tools/usr/bin VEDIT_SLANG_SERVER=/native-tools/usr/bin/slang-server VEDIT_SLANG=/vedit-build/build/slang/out/slang
++ PATH=/native-tools/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ VEDIT_VERIBLE_LS=/native-tools/usr/bin/verible-verilog-ls
++ VEDIT_VERIBLE_BIN_DIR=/native-tools/usr/bin
++ VEDIT_SLANG_SERVER=/native-tools/usr/bin/slang-server
++ VEDIT_SLANG=/vedit-build/build/slang/out/slang
++ verible-verilog-ls --version
+Verible Verilog Language Server built at v0.0-4298-g085eef05
+commandline: verible-verilog-ls --version
+Version	v0.0-4298-g085eef05
+Commit-Timestamp	2026-10-29T12:47:31Z
+Built	2026-10-29T12:52:33Z
++ slang-server --version
+slang-server version 0.3.1+
++ ctest --test-dir target/qt6-build --output-on-failure -R '^vedit-realtime-depth-switch-e2e$'
+Test project /vedit-build/target/qt6-build
+    Start 76: vedit-realtime-depth-switch-e2e
+1/1 Test #76: vedit-realtime-depth-switch-e2e ...   Passed    6.88 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   6.89 sec
++ rc=0
++ printf 'BASELINE_REALTIME_EXIT=%s\n' 0
+BASELINE_REALTIME_EXIT=0
++ exit 0

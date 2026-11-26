@@ -197,7 +197,8 @@ public:
     /// `tools.include_dirs` / `tools.defines`, so the project's list is the
     /// complete one. With nothing discovered yet the settings values stay in
     /// force. Returns false only when this build has no LSP backend.
-    bool setProjectEnvironment(const QStringList &includeDirs, const QStringList &defines);
+    bool setProjectEnvironment(const QStringList &includeDirs, const QStringList &defines,
+                               const QStringList &defineOverrides = {});
     /// What the backends currently hold as the project environment (observable).
     const QStringList &projectIncludeDirs() const { return projectIncludeDirs_; }
     const QStringList &projectDefines() const { return projectDefines_; }

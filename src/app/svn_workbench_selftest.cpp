@@ -9,23 +9,32 @@
 #include "vcs_panel.h"
 
 #include <KTextEditor/Document>
+#include <KTextEditor/View>
 #include <QApplication>
 #include <QComboBox>
 #include <QDialog>
+#include <QDockWidget>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QFontMetrics>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMenu>
+#include <QMenuBar>
 #include <QPlainTextEdit>
 #include <QProcess>
 #include <QPushButton>
+#include <QStatusBar>
+#include <QStyle>
+#include <QStyleOptionButton>
 #include <QTabWidget>
 #include <QTemporaryDir>
 #include <QThread>
 #include <QTimer>
+#include <QTranslator>
+#include <QTreeWidget>
 #include <QUrl>
 
 #include <cstdio>
@@ -108,11 +117,33 @@ QDialog *visibleDialog(const QWidget &parent, const QString &title)
     return nullptr;
 }
 
+QWidget *comparisonPage(const app::ApplicationShell &shell)
+{
+    return shell.findChild<QWidget *>(QStringLiteral("file-comparison"));
+}
+
 bool comparisonReady(const app::ApplicationShell &shell)
 {
-    const auto *dialog = shell.findChild<QDialog *>(QStringLiteral("file-comparison"));
-    const auto *status = dialog ? dialog->findChild<QLabel *>(QStringLiteral("compare-status")) : nullptr;
+    const auto *page = comparisonPage(shell);
+    const auto *status = page ? page->findChild<QLabel *>(QStringLiteral("compare-status")) : nullptr;
     return status && (status->text().startsWith(QStringLiteral("Difference")) || status->text() == QStringLiteral("No differences"));
+}
+
+KTextEditor::Document *comparisonDocument(const app::ApplicationShell &shell, const QString &name)
+{
+    auto *page = comparisonPage(shell);
+    auto *view = page ? page->findChild<KTextEditor::View *>(name) : nullptr;
+    return view ? view->document() : nullptr;
+}
+
+void closeComparison(app::ApplicationShell &shell)
+{
+    if (comparisonPage(shell)) {
+        auto *pane = shell.editorArea()->activePane();
+        const int index = pane->activeTabIndex();
+        if (pane->isAuxiliaryTab(index)) { pane->closeTab(index); }
+    }
+    QApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
 }
 
 void capture(QWidget &widget, const char *name)
@@ -121,7 +152,138 @@ void capture(QWidget &widget, const char *name)
     if (!directory.isEmpty()) { check(name, widget.grab().save(directory + u'/' + QString::fromLatin1(name) + QStringLiteral(".png"))); }
 }
 
-void exercise(const QString &svn, const QString &root, const QString &url)
+bool historyButtonFits(const VcsHistoryPanel &history, const QPushButton &button)
+{
+    QStyleOptionButton option;
+    option.initFrom(&button);
+    option.text = button.text();
+    const QRect contents = button.style()->subElementRect(QStyle::SE_PushButtonContents, &option, &button);
+    const int textWidth = button.fontMetrics().horizontalAdvance(button.text());
+    std::printf("SVN-HISTORY width=%d button=%d contents=%d text=%d %s\n", history.width(), button.width(),
+                contents.width(), textWidth, qPrintable(button.text()));
+    return button.isVisible() && button.isEnabled() && contents.width() >= textWidth
+        && history.rect().contains(QRect(button.mapTo(&history, QPoint()), button.size()));
+}
+
+void checkHistoryCompareLayout(app::ApplicationShell &shell, VcsHistoryPanel &history, bool chinese = false)
+{
+    auto *commits = history.findChild<QTreeWidget *>(QStringLiteral("vcs-history-commits"));
+    const auto *previous = history.findChild<QPushButton *>(QStringLiteral("vcs-history-action-compare"));
+    const auto *working = history.findChild<QPushButton *>(QStringLiteral("svn-history-compare-working"));
+    auto *dock = shell.panels()->dock(QStringLiteral("vcs"));
+    if (!check("svn.ui.history-layout-controls", commits && previous && working && dock && commits->topLevelItemCount() > 0)) { return; }
+    const int originalWidth = dock->width();
+    commits->setCurrentItem(commits->topLevelItem(commits->topLevelItemCount() - 1));
+    const QString previousLabel = chinese ? QStringLiteral("与上次修订比较") : QStringLiteral("Compare With Previous Revision");
+    const QString workingLabel = chinese ? QStringLiteral("与工作副本比较") : QStringLiteral("Compare With Working Copy");
+    for (const bool narrow : {false, true}) {
+        if (narrow) { shell.resizeDocks({dock}, {500}, Qt::Horizontal); }
+        QApplication::processEvents();
+        const bool previousFits = historyButtonFits(history, *previous);
+        const bool workingFits = historyButtonFits(history, *working);
+        check("svn.ui.history-compare-previous-fits", previousFits && previous->text() == previousLabel);
+        check("svn.ui.history-compare-working-fits", workingFits && working->text() == workingLabel);
+        capture(shell, narrow ? "editor-file-history-narrow" : "editor-file-history");
+    }
+    shell.resizeDocks({dock}, {originalWidth}, Qt::Horizontal);
+}
+
+void exerciseActiveEditor(app::ApplicationShell &shell, VcsPanel &panel, VcsHistoryPanel &history,
+                          const QString &root, const QString &working, const QString &peer)
+{
+    const auto file = QStringLiteral("a space.sv");
+    const auto activePath = working + u'/' + file;
+    const auto plainPath = root + QStringLiteral("/outside.sv");
+    auto *historyAction = shell.commands()->action(QStringLiteral("file.svn-history"));
+    auto *baseAction = shell.commands()->action(QStringLiteral("file.svn-compare-base"));
+    QMenu *fileMenu = nullptr;
+    for (auto *menu : shell.menuBar()->findChildren<QMenu *>()) {
+        if (menu->actions().contains(historyAction) && menu->actions().contains(baseAction)) { fileMenu = menu; }
+    }
+    if (!check("svn.ui.editor-file-menu", fileMenu != nullptr)) { return; }
+
+    shell.setProjectRoot(root);
+    auto *selector = panel.findChild<QComboBox *>(QStringLiteral("svn-working-copy-selector"));
+    if (!check("svn.ui.editor-copy-discovered", selector && until([&] { return selector->findData(peer) >= 0; }))) { return; }
+    const int peerIndex = selector->findData(peer);
+    selector->setCurrentIndex(peerIndex);
+    emit selector->activated(peerIndex);
+    if (!check("svn.ui.editor-different-copy-selected", QString::fromStdString(panel.root()) == peer)) { return; }
+    auto *pane = shell.editorArea()->activePane();
+    if (!check("svn.ui.editor-fixture", put(plainPath, "module outside; endmodule\n") && pane
+              && pane->openFile(plainPath) && pane->openFile(activePath))) { return; }
+    const int activeIndex = pane->tabIndexForPath(activePath);
+    const int plainIndex = pane->tabIndexForPath(plainPath);
+    if (!check("svn.ui.editor-file-tabs", activeIndex >= 0 && plainIndex >= 0)) { return; }
+    pane->setActiveTab(activeIndex);
+    auto *buffer = editor::documentFor(pane->editorWidget());
+    if (!check("svn.ui.editor-unsaved-buffer", buffer && buffer->setText(QStringLiteral("module editor_unsaved; endmodule\n")) && buffer->isModified())) { return; }
+
+    if (qEnvironmentVariableIsSet("VEDIT_SVN_UI_CAPTURE")) {
+        fileMenu->popup(shell.menuBar()->mapToGlobal(QPoint(0, shell.menuBar()->height())));
+        QApplication::processEvents();
+        capture(*fileMenu, "editor-svn-file-menu");
+        fileMenu->close();
+    }
+
+    const auto left = QStringLiteral("compare-left-editor");
+    const auto right = QStringLiteral("compare-right-editor");
+    const auto hasText = [&](const QString &side, const QString &text) {
+        const auto *doc = comparisonDocument(shell, side);
+        return doc && doc->text().contains(text);
+    };
+    baseAction->trigger();
+    check("svn.ui.editor-base", until([&] { return comparisonReady(shell); })
+          && hasText(left, QStringLiteral("selected_ui")) && comparisonDocument(shell, right) == buffer
+          && hasText(right, QStringLiteral("editor_unsaved")) && !comparisonDocument(shell, left)->isReadWrite());
+    if (auto *page = comparisonPage(shell)) { capture(*page, "editor-buffer-to-base"); }
+    closeComparison(shell);
+    pane->setActiveTab(activeIndex);
+
+    historyAction->trigger();
+    const auto *path = history.findChild<QLineEdit *>(QStringLiteral("vcs-history-path"));
+    check("svn.ui.editor-history", until([&] { return history.commitHashes() == QStringList({QStringLiteral("3"), QStringLiteral("2"), QStringLiteral("1")}); })
+          && path && path->text() == file && QString::fromStdString(history.lastRequest().root) == working
+          && QString::fromStdString(panel.root()) == peer);
+    auto *commits = history.findChild<QTreeWidget *>(QStringLiteral("vcs-history-commits"));
+    auto *compareWorking = history.findChild<QPushButton *>(QStringLiteral("svn-history-compare-working"));
+    auto *compareSelected = history.findChild<QPushButton *>(QStringLiteral("vcs-history-action-compare"));
+    if (!check("svn.ui.editor-history-controls", compareWorking && compareSelected && commits && commits->topLevelItemCount() == 3)) { return; }
+    checkHistoryCompareLayout(shell, history);
+    commits->setCurrentItem(commits->topLevelItem(2));
+    check("svn.ui.editor-compare-working-enabled", compareWorking->isEnabled());
+    compareWorking->click();
+    check("svn.ui.editor-revision-to-buffer", until([&] { return comparisonReady(shell); })
+          && hasText(left, QStringLiteral("base_a")) && comparisonDocument(shell, right) == buffer
+          && hasText(right, QStringLiteral("editor_unsaved")));
+    closeComparison(shell);
+    pane->setActiveTab(activeIndex);
+
+    commits->topLevelItem(1)->setSelected(true);
+    compareSelected->click();
+    check("svn.ui.editor-revision-pair", until([&] { return comparisonReady(shell); })
+          && hasText(left, QStringLiteral("base_a")) && hasText(right, QStringLiteral("selected_ui"))
+          && !comparisonDocument(shell, left)->isReadWrite() && !comparisonDocument(shell, right)->isReadWrite());
+    if (auto *page = comparisonPage(shell)) { capture(*page, "editor-revision-pair"); }
+    closeComparison(shell);
+    pane->setActiveTab(activeIndex);
+
+    baseAction->trigger();
+    const QString loading = shell.statusBar()->currentMessage();
+    pane->setActiveTab(plainIndex);
+    check("svn.ui.editor-non-svn-actions", !historyAction->isEnabled() && !baseAction->isEnabled()
+          && !compareWorking->isEnabled() && !compareSelected->isEnabled());
+    pane->setActiveTab(activeIndex);
+    check("svn.ui.editor-reject-stale-base", !loading.isEmpty() && until([&] {
+        return shell.statusBar()->currentMessage() != loading;
+    }) && !comparisonPage(shell));
+
+    QFile disk(activePath);
+    check("svn.ui.editor-buffer-preserved", buffer->isModified() && disk.open(QIODevice::ReadOnly)
+          && disk.readAll() == QByteArray("module selected_ui; endmodule\n"));
+}
+
+void exercise(const QString &svn, const QString &root, const QString &url, bool chinese)
 {
     const auto working = root + QStringLiteral("/wc");
     const auto first = working + QStringLiteral("/a space.sv");
@@ -143,6 +305,17 @@ void exercise(const QString &svn, const QString &root, const QString &url)
     auto *history = shell.findChild<VcsHistoryPanel *>();
     auto *tabs = shell.findChild<QTabWidget *>(QStringLiteral("vcs-tabs"));
     if (!check("svn.ui.ready", panel && history && tabs && until([&] { return panel->fileCount() == 2; }))) { return; }
+    if (chinese) {
+        auto *fileHistory = shell.commands()->action(QStringLiteral("file.svn-history"));
+        if (check("svn.ui.zh-history-action", shell.openPaths({first}) && fileHistory && fileHistory->isEnabled()
+                  && fileHistory->text() == QStringLiteral("当前文件：SVN 历史"))) {
+            fileHistory->trigger();
+            if (check("svn.ui.zh-file-history", until([&] { return history->commitCount() == 1; }))) {
+                checkHistoryCompareLayout(shell, *history, true);
+            }
+        }
+        return;
+    }
     auto *changes = panel->findChild<QListWidget *>(QStringLiteral("vcs-changes"));
     check("svn.ui.history-deferred", history->commitCount() == 0);
     panel->setConfirmProvider([](const QString &, const QString &) { return true; });
@@ -210,8 +383,7 @@ void exercise(const QString &svn, const QString &root, const QString &url)
     check("svn.ui.revision-to-base", until([&] {
         return comparisonReady(shell);
     }));
-    if (auto *comparison = shell.findChild<QDialog *>(QStringLiteral("file-comparison"))) { comparison->close(); }
-    QApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    closeComparison(shell);
 
     auto *repositories = history->findChild<QComboBox *>(QStringLiteral("svn-saved-repositories"));
     auto *addRepository = history->findChild<QPushButton *>(QStringLiteral("svn-repository-add"));
@@ -233,8 +405,7 @@ void exercise(const QString &svn, const QString &root, const QString &url)
     }
     emit history->svnRemoteFileRequested(url, QStringLiteral("/a space.sv"), 2, false, true);
     check("svn.ui.remote-shared-comparison", until([&] { return comparisonReady(shell); }));
-    if (auto *comparison = shell.findChild<QDialog *>(QStringLiteral("file-comparison"))) { comparison->close(); }
-    QApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    closeComparison(shell);
     removeRepository->click();
     check("svn.ui.remove-saved-repository", repositories->count() == 1);
 
@@ -256,7 +427,7 @@ void exercise(const QString &svn, const QString &root, const QString &url)
         check("svn.ui.incoming-shared-comparison", until([&] {
             return comparisonReady(shell);
         }));
-        if (auto *comparison = shell.findChild<QDialog *>(QStringLiteral("file-comparison"))) { comparison->close(); }
+        closeComparison(shell);
         incoming->close();
     }
     auto *checkout = shell.commands()->action(QStringLiteral("file.svn-checkout"));
@@ -274,6 +445,7 @@ void exercise(const QString &svn, const QString &root, const QString &url)
     }
     check("svn.ui.file-menu-checkout", checkout && until([&] { return shell.projectRoot() == root + QStringLiteral("/new wc"); }));
     check("svn.ui.unselected-edit-on-disk", QFile::exists(second));
+    exerciseActiveEditor(shell, *panel, *history, root, working, peer);
 }
 
 } // namespace
@@ -282,6 +454,13 @@ int main(int argc, char **argv)
 {
     vedit_runtime_init();
     QApplication app(argc, argv);
+    QTranslator chineseCatalog;
+    const QString catalogs = qEnvironmentVariable("VEDIT_SVN_ZH_CATALOGS");
+    const bool chinese = !catalogs.isEmpty();
+    if (chinese && !check("svn.ui.zh-catalog", chineseCatalog.load(QStringLiteral("vedit_zh_CN"), catalogs)
+                          && app.installTranslator(&chineseCatalog))) {
+        return 1;
+    }
     const auto svn = qEnvironmentVariable("VEDIT_SVN_BIN");
     const auto admin = qEnvironmentVariable("VEDIT_SVNADMIN");
     if (svn.isEmpty() || admin.isEmpty()) { std::puts("SVN-WORKBENCH-SKIP configure VEDIT_SVN_BIN and VEDIT_SVNADMIN"); return 77; }
@@ -298,7 +477,7 @@ int main(int argc, char **argv)
               && run(svn, working, {QStringLiteral("add"), QStringLiteral("a space.sv"), QStringLiteral("b.sv")})
               && run(svn, working, {QStringLiteral("commit"), QStringLiteral("-qm"), QStringLiteral("Initial files")})
               && put(a, "module selected_ui; endmodule\n") && put(b, "module unselected_ui; endmodule\n"))) {
-        exercise(svn, root, url);
+        exercise(svn, root, url, chinese);
     }
     std::printf("SVN-WORKBENCH failures=%d\n", failures);
     return failures == 0 ? 0 : 1;

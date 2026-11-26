@@ -1,0 +1,120 @@
++ bash $WORKTREE/target/editor-compare-qa/run-qt.sh env QT_QPA_PLATFORM=xcb QT_OPENGL=software LIBGL_ALWAYS_SOFTWARE=1 VEDIT_VERIBLE_LS=/native-tools/usr/bin/verible-verilog-ls VEDIT_VERIBLE_BIN_DIR=/native-tools/usr/bin VEDIT_SLANG_SERVER=/native-tools/usr/bin/slang-server timeout 55 xvfb-run -a -s '-screen 0 1440x900x24 -nolisten tcp' bash /qa/capture-compare.sh /qa/final-runtime-tdh2ILv5/compare
+h264,1440,900,92
+MANUAL_CASE=compare EXIT=0
++ bash $WORKTREE/target/editor-compare-qa/run-qt.sh env QT_QPA_PLATFORM=xcb QT_OPENGL=software LIBGL_ALWAYS_SOFTWARE=1 VEDIT_VERIBLE_LS=/native-tools/usr/bin/verible-verilog-ls VEDIT_VERIBLE_BIN_DIR=/native-tools/usr/bin VEDIT_SLANG_SERVER=/native-tools/usr/bin/slang-server timeout 55 xvfb-run -a -s '-screen 0 1440x900x24 -nolisten tcp' bash /qa/capture-overflow.sh /qa/final-runtime-tdh2ILv5/overflow
+h264,1440,900,62
+MANUAL_CASE=overflow EXIT=0
+FINAL_MANUAL_EXIT=124
++ bash $WORKTREE/target/editor-compare-qa/run-qt.sh env QT_QPA_PLATFORM=xcb QT_OPENGL=software LIBGL_ALWAYS_SOFTWARE=1 timeout 25 xvfb-run -a -s '-screen 0 1440x900x24 -nolisten tcp' bash /qa/capture-svn.sh /qa/final-runtime-tdh2ILv5/svn-replay
+h264,1440,900,56
+FINAL_SVN_REPLAY_EXIT=0
+
+[compare]
+1f80fe4c6fa79399cabde0b12e72b5959a3fd6a76f74d4221aadfea313f8424d  target/qt6-build/src/app/vedit-app
++ target/qt6-build/src/app/vedit-app --no-session-restore --state-dir /qa/final-runtime-tdh2ILv5/compare/state --project /qa/final-runtime-tdh2ILv5/compare/fixture /qa/final-runtime-tdh2ILv5/compare/fixture/compare_left.sv
++ xdotool windowmove 4194311 0 0 windowsize 4194311 1440 900 windowfocus --sync 4194311
++ xdotool getwindowname 4194311
++ xdotool getwindowgeometry 4194311
++ xdotool windowfocus --sync 4194311
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 113 148 click 1
++ xdotool type --clearmodifiers /qa/final-runtime-tdh2ILv5/compare/fixture/compare_left.sv
++ xdotool key Return
++ xdotool type --clearmodifiers /qa/final-runtime-tdh2ILv5/compare/fixture/compare_right.sv
++ xdotool key Return
++ xdotool mousemove 793 157 click 1 key alt+Page_Down
++ xdotool key alt+Page_Up
++ xdotool key alt+Page_Down
++ xdotool mousemove 644 74 click 1
++ xdotool mousemove 608 40 click 1
++ xdotool mousemove 875 449 click 1
++ xdotool mousemove 608 40 click 1
++ xdotool mousemove 777 449 click 1
++ cmp /qa/final-runtime-tdh2ILv5/compare/fixture/compare_right.sv /qa/final-runtime-tdh2ILv5/compare/original-right.sv
+DISCARD_DISK_UNCHANGED=1
++ xdotool windowfocus --sync 4194311
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 113 148 click 1
++ xdotool type --clearmodifiers /qa/final-runtime-tdh2ILv5/compare/fixture/compare_left.sv
++ xdotool key Return
++ xdotool type --clearmodifiers /qa/final-runtime-tdh2ILv5/compare/fixture/compare_right.sv
++ xdotool key Return
++ xdotool mousemove 510 74 click 1
++ xdotool mousemove 644 74 click 1
++ xdotool mousemove 961 105 click 1
++ cmp /qa/final-runtime-tdh2ILv5/compare/fixture/compare_right.sv /qa/final-runtime-tdh2ILv5/compare/expected-hunk-save.sv
+HUNK_SAVE_DISK_MATCH=1
++ xdotool mousemove 798 250 click 1 key ctrl+Home Down End
++ xdotool type --clearmodifiers ' // QA typed and saved'
++ xdotool key ctrl+s
+DIRECT_SAVE_DISK_MATCH=1
++ xdotool mousemove 608 40 click 1
++ xdotool windowfocus --sync 4194311
++ xdotool key ctrl+shift+v
++ xdotool mousemove 475 505 click 1
++ xdotool windowfocus --sync 4194311
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 113 148 click 1
++ xdotool type --clearmodifiers /qa/final-runtime-tdh2ILv5/compare/fixture/compare_left.sv
++ xdotool key Return
++ xdotool type --clearmodifiers /qa/final-runtime-tdh2ILv5/compare/fixture/compare_right.sv
++ xdotool key Return
++ xdotool windowfocus --sync 4194311
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 73 398 click 1
+APP_EXIT=0
+QT_RUNNER_EXIT=0
+
+[overflow]
+1f80fe4c6fa79399cabde0b12e72b5959a3fd6a76f74d4221aadfea313f8424d  target/qt6-build/src/app/vedit-app
++ target/qt6-build/src/app/vedit-app --state-dir /qa/final-runtime-tdh2ILv5/overflow/state
++ xdotool windowmove 4194311 0 0 windowsize 4194311 1440 900 windowfocus --sync 4194311
+ACTIVE_TITLE_BEFORE=VEdit — compare_left.sv
++ xdotool getwindowgeometry 4194311
++ xdotool mousemove 430 40 click --repeat 5 --delay 65 5
+ACTIVE_TITLE_AFTER_WHEEL=VEdit — compare_left.sv
++ xdotool mousemove 430 40 click --repeat 5 --delay 65 4
++ xdotool mousemove 330 58 mousedown 1 mousemove 600 58 mouseup 1
+ACTIVE_TITLE_AFTER_DRAG=VEdit — compare_left.sv
++ xdotool mousemove 430 41
++ xdotool mousemove 175 501 click --repeat 2 --delay 90 1
+ACTIVE_TITLE_AFTER_SELECTION=VEdit — tab_18_long_systemverilog_filename_to_exercise_elision.sv
++ xdotool mousemove 147 104 click 3
++ xdotool mousemove 226 163 click 1
++ xdotool type --clearmodifiers /qa/final-runtime-tdh2ILv5/overflow/fixture/compare_left.sv
++ xdotool key Return
++ xdotool windowfocus --sync 4194311
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 73 398 click 1
+APP_EXIT=0
+QT_RUNNER_EXIT=0
+
+[svn-replay]
++ svnadmin create /qa/final-runtime-tdh2ILv5/svn-replay/repo
++ svn import --non-interactive -m initial /qa/final-runtime-tdh2ILv5/svn-replay/import file:///qa/final-runtime-tdh2ILv5/svn-replay/repo/trunk
++ svn checkout --non-interactive file:///qa/final-runtime-tdh2ILv5/svn-replay/repo/trunk /qa/final-runtime-tdh2ILv5/svn-replay/wc
++ svn info --show-item revision /qa/final-runtime-tdh2ILv5/svn-replay/wc/qa.sv
+1f80fe4c6fa79399cabde0b12e72b5959a3fd6a76f74d4221aadfea313f8424d  target/qt6-build/src/app/vedit-app
++ target/qt6-build/src/app/vedit-app --no-session-restore --state-dir /qa/final-runtime-tdh2ILv5/svn-replay/state --project /qa/final-runtime-tdh2ILv5/svn-replay/wc /qa/final-runtime-tdh2ILv5/svn-replay/wc/qa.sv
++ xdotool windowmove 4194311 0 0 windowsize 4194311 1440 900 windowfocus --sync 4194311
++ xdotool getwindowgeometry 4194311
++ xdotool mousemove 435 93 click 1 key ctrl+Home ctrl+a
++ xdotool type --clearmodifiers 'module qa_unsaved; endmodule'
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 173 345 click 1
++ cmp /qa/final-runtime-tdh2ILv5/svn-replay/wc/qa.sv /qa/final-runtime-tdh2ILv5/svn-replay/import/qa.sv
++ svn status /qa/final-runtime-tdh2ILv5/svn-replay/wc/qa.sv
+SVN_WORKING_FILE_UNCHANGED=1
++ xdotool windowfocus --sync 4194311
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 73 398 click 1
++ xdotool key Escape
++ xdotool windowfocus --sync 4194311
++ xdotool mousemove 389 41 click 1
++ xdotool mousemove 430 92 click 1
++ xdotool key ctrl+z ctrl+z ctrl+z ctrl+z
++ xdotool mousemove 42 11 click 1
++ xdotool mousemove 73 398 click 1
++ cmp /qa/final-runtime-tdh2ILv5/svn-replay/wc/qa.sv /qa/final-runtime-tdh2ILv5/svn-replay/import/qa.sv
+APP_EXIT=0
+QT_RUNNER_EXIT=0

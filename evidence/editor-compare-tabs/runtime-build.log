@@ -1,0 +1,50 @@
++ git rev-parse HEAD
+78093bf6d584533a17e38258b2139fa3bffe38fb
++ sha256sum $WORKTREE/target/editor-compare-qa/final-runtime-tdh2ILv5/product-source-before.sha256 target/release/libvd_ffi.a
+88ca4739c227e7484b81a729fc1fefed265bd0632324a56c13b21aa8593d99d4  $WORKTREE/target/editor-compare-qa/final-runtime-tdh2ILv5/product-source-before.sha256
+505a5945bf24e8ad01a37b81f62bd822ec700309735324951fdf33742c8f6934  target/release/libvd_ffi.a
++ docker run --rm --network none -v $WORKTREE:/vedit-build:ro -v $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build:/vedit-build/target/qt6-build -v $MAIN_CHECKOUT/.git:$MAIN_CHECKOUT/.git:ro -w /vedit-build -e HOME=/tmp -e XDG_RUNTIME_DIR=/tmp/xdg-runtime -e LANG=C.UTF-8 -e GIT_OPTIONAL_LOCKS=0 -e VEDIT_QT6_BUILD_JOBS=6 -e VEDIT_CI_LOG_DIR=target/qt6-build/qa-logs-final sha256:809c8072ac65be85a15bfc010400f1a0b2cffa10966cfebd4e7dcd0b418360c1 bash scripts/build-qt-in-container.sh --no-tests
+[qt6] container facts
+[qt6] cmake configure (versions are requested EXACT from scripts/versions-qt.env)
+[qt6] cmake build
+[qt6] cmake --parallel 6
+[36/100] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/ktexteditor_provider.cpp.o
+[40/98] Linking CXX executable src/app/vedit-editor-area-selftest
+[41/98] Linking CXX executable src/app/vedit-svn-workbench-selftest
+[43/98] Linking CXX executable src/app/vedit-app
+[50/98] Building CXX object src/app/editor-lane/CMakeFiles/vedit-undo-view-lifetime-tests.dir/kernel/undo_view_lifetime_test.cpp.o
+[59/98] Building CXX object src/app/CMakeFiles/vedit-file-compare-selftest.dir/file_compare_selftest.cpp.o
+1f80fe4c6fa79399cabde0b12e72b5959a3fd6a76f74d4221aadfea313f8424d  /vedit-build/target/qt6-build/src/app/vedit-app
+55dbe2ed92b2b5cb9214e19adfdb6078d049b941f1244c9eee138180d3700bac  /vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
++ sha256sum --check --strict $WORKTREE/target/editor-compare-qa/final-runtime-tdh2ILv5/product-source-before.sha256
+docs/USER_GUIDE.md: OK
+src/app/app_shell.cpp: OK
+src/app/app_shell.h: OK
+src/app/CMakeLists.txt: OK
+src/app/editor_area.cpp: OK
+src/app/editor_area.h: OK
+src/app/editor_area_selftest.cpp: OK
+src/app/editor_provider.h: OK
+src/app/file_compare.cpp: OK
+src/app/file_compare.h: OK
+src/app/file_compare_page.cpp: OK
+src/app/file_compare_selftest.cpp: OK
+src/app/svn_workbench_selftest.cpp: OK
+src/editor/kernel/document_io.cpp: OK
+src/editor/kernel/document_io.h: OK
+src/editor/kernel/ktexteditor_provider.cpp: OK
+src/editor/kernel/ktexteditor_provider.h: OK
+src/editor/kernel/undo_view_lifetime_test.cpp: OK
+src/workspace/vcs/vcs_history.cpp: OK
+src/workspace/vcs/vcs_history.h: OK
+src/workspace/vcs/vcs_integration.cpp: OK
+translations/vedit_zh_CN.ts: OK
++ cmp $WORKTREE/target/editor-compare-qa/final-runtime-tdh2ILv5/product-source-before.sha256 $WORKTREE/target/editor-compare-qa/final-runtime-tdh2ILv5/product-source-after.sha256
++ sha256sum $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-app $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-file-compare-selftest $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-editor-area-selftest $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-svn-workbench-selftest $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/editor-lane/vedit-undo-view-lifetime-tests $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+1f80fe4c6fa79399cabde0b12e72b5959a3fd6a76f74d4221aadfea313f8424d  $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-app
+fff23a7f96ae956542249ef76e64bb4fb63c0faf1d24a5604dd2e7c06e21f7d1  $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-file-compare-selftest
+f7a7ec6742696c35bdf6ad810eedea642d09b65793f62c404f78ed61d78b909e  $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-editor-area-selftest
+ff25833a76e217c020e6cbfc0af4d212da5e2411d6060c43597f32f947e27098  $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/vedit-svn-workbench-selftest
+ead212ce88b7ef53d9bee8b0ba128d510fdf0ffa29794e9541202b2186ced281  $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/editor-lane/vedit-undo-view-lifetime-tests
+cc85fbb99afeddfd26495d9be944064055b9d75acce9939f245ee71b153edc05  $WORKTREE/target/editor-compare-qa/clean-qt6-final-1VVRuYot/build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+FINAL_RUNTIME_BUILD_EXIT=0

@@ -1,7 +1,10 @@
 #pragma once
 
 #include <QByteArray>
+#include <QPointer>
 #include <QString>
+
+class QWidget;
 
 namespace vedit::app {
 
@@ -13,6 +16,8 @@ struct CompareInput {
     QString label;
     QByteArray snapshot;
     bool missing = false;
+    QString logicalPath = {};
+    QPointer<QWidget> editorView = {};
 };
 
 void chooseFilesToCompare(ApplicationShell &shell, const QString &first = {});

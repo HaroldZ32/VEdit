@@ -68,6 +68,13 @@ impl DocumentStore {
         Ok(self.lock()?.remove(uri))
     }
 
+    pub(crate) fn matches_text(&self, uri: &Url, text: &str) -> Result<bool> {
+        Ok(self
+            .lock()?
+            .get(uri)
+            .is_some_and(|document| document.text == text))
+    }
+
     pub(crate) fn get(&self, uri: &Url) -> Result<Option<OpenDocument>> {
         Ok(self.lock()?.get(uri).cloned())
     }

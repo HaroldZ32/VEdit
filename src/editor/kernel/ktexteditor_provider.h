@@ -13,6 +13,7 @@
 
 #include <QHash>
 #include <QMetaObject>
+#include <QPointer>
 #include <QString>
 
 #include <functional>
@@ -55,6 +56,9 @@ public:
     // closing one pane keeps the other pane's buffer (and its unsaved flag)
     // alive.
     QWidget *createEditorForExistingDocument(QWidget *sourceEditor, QWidget *parent) override;
+    QWidget *createComparisonEditor(QWidget *sourceEditor, QWidget *parent,
+                                    const vedit::app::ComparisonEditorInput &input, QString *error) override;
+    QWidget *createEditorForOpenComparison(const QString &path, QWidget *parent) override;
 
     // UI-Mosaic F2: the editor owns the syntax-theme rendering. The name comes
     // from vedit::app::ThemeManager; it is applied to every open view and to
@@ -64,6 +68,7 @@ public:
     bool openFile(QWidget *editor, const QString &absolutePath, QString *error) override;
     QString currentFilePath(QWidget *editor) const override;
     bool saveFile(QWidget *editor, QString *error) override;
+    bool saveFileAs(QWidget *editor, const QString &path, QWidget **replacement, QString *error) override;
     bool isModified(QWidget *editor) const override;
     QString comparisonText(QWidget *editor) const override;
     bool replaceComparisonText(QWidget *editor, qsizetype start, qsizetype length,
@@ -96,6 +101,9 @@ private:
     // created with a fresh document (createEditor) or shared from another
     // pane's document (createEditorForExistingDocument).
     void configureView(KTextEditor::View *view);
+    KTextEditor::View *createDocumentView(QWidget *parent);
+    KTextEditor::View *createSharedView(QWidget *sourceEditor, QWidget *parent);
+    QHash<QString, QPointer<KTextEditor::Document>> comparisonDocuments_;
 
     // UI-Mosaic F2: the last theme name KTextEditor accepted, so a view created
     // after the switch starts out with the right colors instead of the library

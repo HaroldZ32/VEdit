@@ -1,0 +1,30 @@
+Intermediate integration snapshot after T2/T7, before T9/T10. CTest exited 0.
+ 1/14 Test #59: vedit-workspace-project-selftest .......   Passed    0.66 sec
+ 2/14 Test #60: vedit-module-tree-selftest .............   Passed    0.56 sec
+ 3/14 Test #61: vedit-module-tree-catalog-test .........   Passed    4.04 sec
+ 4/14 Test #62: vedit-module-tree-lane-b-test ..........   Passed    5.02 sec
+ 5/14 Test #65: vedit-workspace-diagnostics-selftest ...   Passed    4.49 sec
+ 6/14 Test #75: vedit-project-lint-e2e .................   Passed  144.61 sec
+76: CHECK switch.realtime-set-is-one-level PASS  /tmp/vedit-realtime-depth-switch-e2e-Vxrheh/top.sv,/tmp/vedit-realtime-depth-switch-e2e-Vxrheh/sub.sv
+76: CHECK switch.diagnostics-request-set-bounded PASS  requested=2 session=3
+76: CHECK switch.p95-under-50ms PASS  p95=10ms
+76: CHECK switch.no-new-session PASS  before=1 after=1
+76: CHECK switch.no-session-stop PASS  before=0 after=0
+ 7/14 Test #76: vedit-realtime-depth-switch-e2e ........   Passed    7.36 sec
+ 8/14 Test #86: vedit-module-closure-e2e ...............   Passed   11.61 sec
+87: DIRECT-CHILD tree=1 pass=1 inputs=[<project>/lib/alternate.sv,<project>/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_bad_port' does not exist in 'alternate'|unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+87: DIRECT-CHILD-CORRECTED fresh=1 disk-unchanged=1 rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+87: PROJECT-MANUAL-ONLY pass=1
+87: MACRO-OVERRIDE FILELIST pass=1 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[1:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+87: MACRO-OVERRIDE ADDED pass=1 authored=[DOCK_OVERRIDE_WIDTH=3] resolved=[DOCK_OVERRIDE_WIDTH=3,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=3] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[2:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+87: MACRO-OVERRIDE UPDATED-NAME-ONLY pass=1 authored=[DOCK_OVERRIDE_WIDTH] resolved=[DOCK_OVERRIDE_WIDTH,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[0:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+87: MACRO-OVERRIDE REMOVED pass=1 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[1:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+ 9/14 Test #87: vedit-realtime-context-e2e .............   Passed   14.49 sec
+10/14 Test #88: vedit-filelist-authority-e2e ...........   Passed    4.71 sec
+11/14 Test #89: vedit-filelist-authority-verible-e2e ...   Passed    1.99 sec
+12/14 Test #90: vedit-filelist-authority-config-e2e ....   Passed    4.70 sec
+13/14 Test #91: vedit-filelist-authority-include-e2e ...   Passed    2.31 sec
+14/14 Test #92: vedit-filelist-authority-wrapper-e2e ...   Passed    1.98 sec
+100% tests passed, 0 tests failed out of 14
+SUMMARY checks=11 failures=0 skips=0
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0

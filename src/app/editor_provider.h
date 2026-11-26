@@ -8,8 +8,9 @@
 // a QPlainTextEdit-based placeholder so the layout is runnable and demonstrable;
 // it is explicitly not the product editor.
 //
-// The shell never includes a KTextEditor header, so adding the real editor does
-// not change this lane's build.
+// Ordinary editor tabs use this seam. Comparison views use the same provider
+// to create and share documents, and compose native views in the comparison page.
+#include <QCryptographicHash>
 #include <QFile>
 #include <QFileInfo>
 #include <QPlainTextEdit>
@@ -29,6 +30,23 @@
 #include <QCoreApplication>
 
 namespace vedit::app {
+
+inline constexpr auto comparisonDiskDigestProperty = "vedit.comparisonDiskDigest";
+
+inline QByteArray comparisonDiskDigest(QByteArrayView bytes)
+{
+    return QCryptographicHash::hash(bytes, QCryptographicHash::Sha256);
+}
+
+struct ComparisonEditorInput {
+    static constexpr qsizetype maxBytes = 8 * 1024 * 1024;
+    static constexpr qsizetype maxLines = 100000;
+
+    QString localPath;
+    QString backingPath;
+    QString logicalPath;
+    bool readOnly;
+};
 
 struct RevisionMark {
     int line = 0;
@@ -61,6 +79,11 @@ public:
     // cannot honour that contract returns nullptr and the caller keeps today's
     // empty-pane split behaviour.
     virtual QWidget *createEditorForExistingDocument(QWidget *sourceEditor, QWidget *parent);
+    virtual QWidget *createComparisonEditor(QWidget *, QWidget *, const ComparisonEditorInput &, QString *)
+    {
+        return nullptr;
+    }
+    virtual QWidget *createEditorForOpenComparison(const QString &, QWidget *) { return nullptr; }
 
     // --- syntax-theme seam (UI-Mosaic F2) -----------------------------------
     // Hands the ACTIVE syntax theme name (ThemeManager::syntaxThemeName()) to
@@ -88,6 +111,8 @@ public:
                           QString *error = nullptr);
     virtual QString currentFilePath(QWidget *editor) const;
     virtual bool saveFile(QWidget *editor, QString *error = nullptr);
+    // A shared provider may return a replacement view for the same regular tab.
+    virtual bool saveFileAs(QWidget *editor, const QString &path, QWidget **replacement, QString *error);
     // T130: closing a pane must not silently discard an unsaved document.
     virtual bool isModified(QWidget *editor) const;
     virtual QString comparisonText(QWidget *editor) const;
@@ -148,6 +173,18 @@ public:
 // and calls these defaults for its fallback widget. Defining them here keeps the
 // kernel lane linkable on its own (`cmake -S src/editor`), without linking the
 // shell implementation it only needs the interface from.
+
+inline bool EditorProvider::saveFileAs(QWidget *editor, const QString &path, QWidget **replacement, QString *error)
+{
+    *replacement = nullptr;
+    const QVariant previousPath = editor->property("vedit.openFilePath");
+    editor->setProperty("vedit.openFilePath", path);
+    if (saveFile(editor, error)) {
+        return true;
+    }
+    editor->setProperty("vedit.openFilePath", previousPath);
+    return false;
+}
 
 inline bool EditorProvider::openFile(QWidget *editor, const QString &absolutePath, QString *error)
 {

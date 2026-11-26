@@ -1,0 +1,412 @@
++ bash $WORKTREE/target/editor-compare-qa/run-qt.sh bash /qa/run-native-checks.sh /qa/final-runtime-tdh2ILv5/native
+NotoSansCJK-Regular.ttc: "Noto Sans CJK SC" "Regular"
++ bash /qa/run-native-checks.sh /qa/final-runtime-tdh2ILv5/native
+1f80fe4c6fa79399cabde0b12e72b5959a3fd6a76f74d4221aadfea313f8424d  target/qt6-build/src/app/vedit-app
+fff23a7f96ae956542249ef76e64bb4fb63c0faf1d24a5604dd2e7c06e21f7d1  target/qt6-build/src/app/vedit-file-compare-selftest
+f7a7ec6742696c35bdf6ad810eedea642d09b65793f62c404f78ed61d78b909e  target/qt6-build/src/app/vedit-editor-area-selftest
+ff25833a76e217c020e6cbfc0af4d212da5e2411d6060c43597f32f947e27098  target/qt6-build/src/app/vedit-svn-workbench-selftest
+XCB_CASE=smoke EXIT=0
+XCB_CASE=compare EXIT=0
+XCB_CASE=compare-zh EXIT=0
+XCB_CASE=tabs EXIT=0
+XCB_CASE=svn-en EXIT=0
+XCB_CASE=svn-zh EXIT=0
+XCB_ALL_EXIT=0
+FINAL_NATIVE_XCB_EXIT=0
+
+[smoke]
++ timeout 120 xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' target/qt6-build/cmake/smoke/vedit-m0-smoke --selfcheck
+M0-SMOKE ok=1 platform=xcb qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=451 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=450 whitelist_verilog=0 highlight_formats=-1 kshlib=/usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+M0-SMOKE theme=Atom One Dark
+
+[compare]
++ timeout 120 xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' env VEDIT_COMPARE_SCREENSHOT=/qa/final-runtime-tdh2ILv5/native/native-compare.png VEDIT_COMPARE_SVN_SCREENSHOT=/qa/final-runtime-tdh2ILv5/native/svn-compare.png target/qt6-build/src/app/vedit-file-compare-selftest
+CHECK comparison.tempdir PASS
+CHECK invalid.valid-peer-fixture PASS
+CHECK invalid.binary-is-writable-hardlink PASS
+CHECK invalid.nul-hardlink.file-menu PASS
+CHECK invalid.nul-hardlink.right.diagnostic PASS
+CHECK invalid.nul-hardlink.right.clean-and-immovable PASS
+CHECK invalid.nul-hardlink.right.closes-without-discard PASS
+CHECK invalid.nul-hardlink.right.bytes-inode-mtime-links PASS
+CHECK invalid.nul-hardlink.left.diagnostic PASS
+CHECK invalid.nul-hardlink.left.clean-and-immovable PASS
+CHECK invalid.nul-hardlink.left.closes-without-discard PASS
+CHECK invalid.nul-hardlink.left.bytes-inode-mtime-links PASS
+CHECK invalid.invalid-utf8.right.diagnostic PASS
+CHECK invalid.invalid-utf8.right.clean-and-immovable PASS
+CHECK invalid.invalid-utf8.right.closes-without-discard PASS
+CHECK invalid.invalid-utf8.right.bytes-inode-mtime-links PASS
+CHECK invalid.invalid-utf8.left.diagnostic PASS
+CHECK invalid.invalid-utf8.left.clean-and-immovable PASS
+CHECK invalid.invalid-utf8.left.closes-without-discard PASS
+CHECK invalid.invalid-utf8.left.bytes-inode-mtime-links PASS
+CHECK invalid.size-limit.right.diagnostic PASS
+CHECK invalid.size-limit.right.clean-and-immovable PASS
+CHECK invalid.size-limit.right.closes-without-discard PASS
+CHECK invalid.size-limit.right.bytes-inode-mtime-links PASS
+CHECK invalid.size-limit.left.diagnostic PASS
+CHECK invalid.size-limit.left.clean-and-immovable PASS
+CHECK invalid.size-limit.left.closes-without-discard PASS
+CHECK invalid.size-limit.left.bytes-inode-mtime-links PASS
+CHECK invalid.line-limit.right.diagnostic PASS
+CHECK invalid.line-limit.right.clean-and-immovable PASS
+CHECK invalid.line-limit.right.closes-without-discard PASS
+CHECK invalid.line-limit.right.bytes-inode-mtime-links PASS
+CHECK invalid.line-limit.left.diagnostic PASS
+CHECK invalid.line-limit.left.clean-and-immovable PASS
+CHECK invalid.line-limit.left.closes-without-discard PASS
+CHECK invalid.line-limit.left.bytes-inode-mtime-links PASS
+CHECK invalid.read-failure.right.diagnostic PASS
+CHECK invalid.read-failure.right.clean-and-immovable PASS
+CHECK invalid.read-failure.right.closes-without-discard PASS
+CHECK invalid.read-failure.right.bytes-inode-mtime-links PASS
+CHECK invalid.read-failure.left.diagnostic PASS
+CHECK invalid.read-failure.left.clean-and-immovable PASS
+CHECK invalid.read-failure.left.closes-without-discard PASS
+CHECK invalid.read-failure.left.bytes-inode-mtime-links PASS
+CHECK local.fixture PASS
+CHECK local.file-menu-command PASS
+CHECK local.ktexteditor-buffer PASS
+CHECK local.diff-ready PASS
+CHECK local.in-page-native-shared-editors PASS
+CHECK local.native-diff-ranges PASS
+CHECK local.reuses-comparison-tab PASS
+CHECK local.apply-left-stays-in-buffer PASS
+CHECK local.undo-retains-prior-unsaved-buffer PASS
+CHECK local.apply-right-stays-in-buffer PASS
+CHECK local.save-selected-only PASS
+CHECK tab.closed PASS
+CHECK local.readonly-snapshot PASS
+CHECK local.apply-eof-to-open-buffer PASS
+CHECK local.ordinary-save-shared-buffer PASS
+CHECK local.save-crlf-and-final-newline PASS
+CHECK local.shared-save-reactivates-same-comparison PASS
+CHECK tab.closed PASS
+CHECK local.invalid-encoding PASS
+CHECK tab.closed PASS
+CHECK local.empty-fixture PASS
+CHECK local.empty-file-vs-insert PASS
+CHECK local.pure-insert-alignment PASS
+CHECK local.external-change-fixture PASS
+CHECK local.external-change-refuses-save PASS
+CHECK local.cancel-close-preserves-dirty-page PASS
+CHECK tab.closed PASS
+CHECK local.close-after-conflict-preserves-disk PASS
+CHECK local.pure-delete-ready PASS
+CHECK local.pure-delete-saves-empty PASS
+CHECK tab.closed PASS
+CHECK local.readonly-fixture PASS
+CHECK local.readonly-disk-blocks-patch PASS
+CHECK tab.closed PASS
+CHECK tab.closed PASS
+CHECK local.close-retains-live-editor-buffer PASS
+CHECK local.ordinary-undo-retains-history PASS
+CHECK native.fixtures PASS
+CHECK native.both-editors-ready PASS
+CHECK native.syntax-and-diff-coexist PASS
+CHECK native.capture PASS
+CHECK native.scroll-aligns-unchanged-lines PASS
+CHECK native.keyboard-window-active PASS
+CHECK native.keyboard-editor-focused PASS
+CHECK native.typing-stays-in-buffer PASS
+CHECK native.edit-invalidates-hunk-actions PASS
+CHECK native.recomputed-after-keyboard-edit PASS
+CHECK native.ctrl-z-routes-shell-command PASS
+CHECK native.ctrl-z-restores-baseline PASS
+CHECK native.ctrl-s-routes-shell-command PASS
+CHECK native.ctrl-s-persists-typed-edit PASS
+CHECK native.ordinary-tab-open-shares-comparison PASS
+CHECK native.opening-pair-reactivates-page PASS
+CHECK tab.closed PASS
+CHECK native.historical-syntax PASS
+CHECK native.historical-typing-blocked PASS
+CHECK tab.closed PASS
+CHECK inline.fixture PASS
+CHECK inline.native-views-ready PASS
+CHECK inline.range-prefix-suffix PASS
+CHECK inline.unicode-safe PASS
+CHECK inline.background-only-with-original-native-text PASS
+CHECK inline.one-sided-line-keeps-block-cue PASS
+CHECK navigation.alt-page-down PASS
+CHECK navigation.alt-page-up PASS
+CHECK navigation.shortcuts-discoverable PASS
+CHECK navigation.ordinary-tab-focused PASS
+CHECK navigation.shortcuts-stay-in-compare PASS
+CHECK tab.closed PASS
+CHECK save-as.fixture PASS
+CHECK save-as.compare-shares-a PASS
+CHECK save-as.return-to-a PASS
+CHECK save-as.refuses-other-compared-destination PASS
+CHECK save-as.refuses-disappeared-compared-destination PASS
+CHECK save-as.does-not-write-unreadable-target PASS
+CHECK save-as.detaches-b-model PASS
+CHECK save-as.b-typing-does-not-edit-a PASS
+CHECK save-as.reopens-a-as-original-model PASS
+CHECK save-as.reuses-comparison-with-original-model PASS
+CHECK save-as.a-can-edit-independently PASS
+CHECK save-as.saving-a-preserves-b-dirty-state-and-disk PASS
+CHECK tab.closed PASS
+CHECK save-as.saves-b-only-via-its-tab PASS
+CHECK mixed.fixture PASS
+CHECK mixed.comparison-ready PASS
+CHECK mixed.applies-hunk-without-writing PASS
+CHECK mixed.preserves-bom-lf-crlf-and-no-final-newline PASS
+CHECK mixed.eof-hunk-ready PASS
+CHECK mixed.eof-hunk-updates-native-buffer PASS
+CHECK mixed.eof-hunk-preserves-other-line-endings PASS
+CHECK tab.closed PASS
+CHECK mixed.join-undo-fixture PASS
+CHECK mixed.join-undo-ready PASS
+CHECK mixed.joins-crlf-boundary PASS
+CHECK mixed.undo-join-retains-other-dirty-edit PASS
+CHECK mixed.undo-join-restores-original-crlf PASS
+CHECK tab.closed PASS
+CHECK save-all.fixture PASS
+CHECK save-all.shared-ready PASS
+CHECK save-all.dirty-with-external-edit PASS
+CHECK save-all.ordinary-first-refuses-external-overwrite PASS
+CHECK tab.closed PASS
+CHECK save-all.closed-compare-retains-shared-dirty-buffer PASS
+CHECK save-all.closed-compare-still-refuses-external-overwrite PASS
+CHECK save-all.fixture PASS
+CHECK save-all.shared-ready PASS
+CHECK save-all.dirty-with-external-edit PASS
+CHECK save-all.compare-first-refuses-external-overwrite PASS
+CHECK tab.closed PASS
+CHECK save-all.closed-compare-retains-shared-dirty-buffer PASS
+CHECK save-all.closed-compare-still-refuses-external-overwrite PASS
+CHECK svn.fixture PASS
+CHECK svn.panel.reachable PASS
+CHECK svn.file-history-skips-unrelated-and-follows-copy PASS
+CHECK svn.stale-file-selection-discards-result PASS
+CHECK svn.previous-actual-revision PASS
+CHECK svn.capture PASS
+CHECK tab.closed PASS
+CHECK svn.two-selected-revisions PASS
+CHECK tab.closed PASS
+CHECK svn.arbitrary-revisions-can-include-unrelated-commit PASS
+CHECK tab.closed PASS
+CHECK svn.first-add-has-absent-side PASS
+CHECK tab.closed PASS
+CHECK svn.selected-revision-to-working-copy PASS
+CHECK svn.restore-hunk-excludes-disk-until-save PASS
+CHECK svn.restore-undo PASS
+CHECK svn.restore-explicit-save PASS
+CHECK tab.closed PASS
+CHECK svn.working-tree-selection PASS
+CHECK BASE PASS
+CHECK tab.closed PASS
+CHECK HEAD PASS
+CHECK tab.closed PASS
+CHECK svn.deleted-file-history PASS
+CHECK svn.deleted-revision-is-absent PASS
+CHECK tab.closed PASS
+CHECK svn.root-switch-fixture PASS
+CHECK svn.stale-root-discards-result PASS
+FILE-COMPARE-SELFTEST failures=0
+
+[compare-zh]
++ timeout 120 xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' env VEDIT_COMPARE_ZH_CATALOGS=/vedit-build/target/qt6-build/src/app/translations target/qt6-build/src/app/vedit-file-compare-selftest
+CHECK comparison.tempdir PASS
+CHECK invalid.zh-catalogs PASS
+CHECK invalid.zh-menu-and-diagnostic PASS
+CHECK invalid.valid-peer-fixture PASS
+CHECK invalid.binary-is-writable-hardlink PASS
+CHECK invalid.nul-hardlink.file-menu PASS
+CHECK invalid.nul-hardlink.right.diagnostic PASS
+CHECK invalid.nul-hardlink.right.clean-and-immovable PASS
+CHECK invalid.nul-hardlink.right.closes-without-discard PASS
+CHECK invalid.nul-hardlink.right.bytes-inode-mtime-links PASS
+CHECK invalid.nul-hardlink.left.diagnostic PASS
+CHECK invalid.nul-hardlink.left.clean-and-immovable PASS
+CHECK invalid.nul-hardlink.left.closes-without-discard PASS
+CHECK invalid.nul-hardlink.left.bytes-inode-mtime-links PASS
+CHECK invalid.invalid-utf8.right.diagnostic PASS
+CHECK invalid.invalid-utf8.right.clean-and-immovable PASS
+CHECK invalid.invalid-utf8.right.closes-without-discard PASS
+CHECK invalid.invalid-utf8.right.bytes-inode-mtime-links PASS
+CHECK invalid.invalid-utf8.left.diagnostic PASS
+CHECK invalid.invalid-utf8.left.clean-and-immovable PASS
+CHECK invalid.invalid-utf8.left.closes-without-discard PASS
+CHECK invalid.invalid-utf8.left.bytes-inode-mtime-links PASS
+CHECK invalid.size-limit.right.diagnostic PASS
+CHECK invalid.size-limit.right.clean-and-immovable PASS
+CHECK invalid.size-limit.right.closes-without-discard PASS
+CHECK invalid.size-limit.right.bytes-inode-mtime-links PASS
+CHECK invalid.size-limit.left.diagnostic PASS
+CHECK invalid.size-limit.left.clean-and-immovable PASS
+CHECK invalid.size-limit.left.closes-without-discard PASS
+CHECK invalid.size-limit.left.bytes-inode-mtime-links PASS
+CHECK invalid.line-limit.right.diagnostic PASS
+CHECK invalid.line-limit.right.clean-and-immovable PASS
+CHECK invalid.line-limit.right.closes-without-discard PASS
+CHECK invalid.line-limit.right.bytes-inode-mtime-links PASS
+CHECK invalid.line-limit.left.diagnostic PASS
+CHECK invalid.line-limit.left.clean-and-immovable PASS
+CHECK invalid.line-limit.left.closes-without-discard PASS
+CHECK invalid.line-limit.left.bytes-inode-mtime-links PASS
+CHECK invalid.read-failure.right.diagnostic PASS
+CHECK invalid.read-failure.right.clean-and-immovable PASS
+CHECK invalid.read-failure.right.closes-without-discard PASS
+CHECK invalid.read-failure.right.bytes-inode-mtime-links PASS
+CHECK invalid.read-failure.left.diagnostic PASS
+CHECK invalid.read-failure.left.clean-and-immovable PASS
+CHECK invalid.read-failure.left.closes-without-discard PASS
+CHECK invalid.read-failure.left.bytes-inode-mtime-links PASS
+FILE-COMPARE-SELFTEST failures=0
+
+[tabs]
++ timeout 120 xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' target/qt6-build/src/app/vedit-editor-area-selftest
+CHECK fixture.temp PASS
+CHECK scroll.strip PASS
+CHECK scroll.fits-hidden PASS
+CHECK scroll.long-full-tooltip PASS
+CHECK scroll.fixed-width PASS  single=160 first=160 last=160
+CHECK scroll.overflow PASS  maximum=1455
+CHECK scroll.open-reveals PASS
+CHECK scroll.select-reveals PASS
+CHECK scroll.wheel-keeps-file PASS
+CHECK scroll.trackpad-keeps-file PASS
+CHECK scroll.thumb-drag-keeps-file PASS  value=679
+CHECK scroll.reopen-reveals PASS
+CHECK scroll.drop-maps-visible-tab PASS  target=10 actual=10
+CHECK scroll.scrollbar-hides-again PASS
+CHECK aux.open-ordinary PASS
+CHECK aux.hosted-in-tab PASS
+CHECK aux.same-id-activates PASS
+CHECK aux.dirty-label PASS
+CHECK aux.session-ordinary-only PASS
+CHECK aux.save-current PASS
+CHECK aux.save-as-refused-before-dialog PASS
+CHECK aux.shell-undo PASS
+CHECK aux.split-preserves-source PASS
+CHECK aux.move-keeps-identity PASS
+CHECK aux.activate-moved-page PASS
+CHECK aux.save-all PASS
+CHECK aux.veto-guards-tab-pane-window PASS
+CHECK aux.failed-save-blocks-window PASS
+CHECK aux.window-save-uses-title PASS
+CHECK aux.close-cancel-keeps-page PASS
+CHECK aux.close-save-releases-page PASS
+CHECK pane.created PASS
+CHECK tabs.opened PASS  3
+CHECK tabs.paths PASS
+CHECK drag.order PASS  [0]=/tmp/vedit-editor-area-selftest-QiGWpS/b.txt [1]=/tmp/vedit-editor-area-selftest-QiGWpS/c.txt [2]=/tmp/vedit-editor-area-selftest-QiGWpS/a.txt
+CHECK drag.tab-editor-aligned PASS
+CHECK drag.index-for-path PASS
+CHECK menu.created PASS
+CHECK menu.items PASS
+CHECK menu.copy-path PASS  /tmp/vedit-editor-area-selftest-QiGWpS/b.txt
+CHECK menu.close PASS  count=2
+CHECK menu.close-others PASS  count=1
+CHECK menu.close-left PASS  count=1 path=/tmp/vedit-editor-area-selftest-QiGWpS/c.txt
+CHECK menu.close-right PASS  count=1 path=/tmp/vedit-editor-area-selftest-QiGWpS/a.txt
+CHECK menu.close-all PASS  count=1 path=
+CHECK dirty.active-tab PASS
+CHECK dirty.cancel-keeps-tab PASS  prompts=1 count=3
+CHECK dirty.discard-closes PASS  prompts=2 count=2
+CHECK split.new-pane PASS  panes=2
+CHECK split.empty-pane PASS
+CHECK shared.pane PASS
+CHECK shared.open PASS
+CHECK shared.left-view PASS
+CHECK shared.split PASS  panes=2
+CHECK shared.one-document PASS  left=100682909794656 right=100682909794656
+CHECK shared.path PASS  /tmp/vedit-editor-area-selftest-QiGWpS/split.txt
+CHECK shared.no-empty-tab PASS  tabs=1
+CHECK shared.typing-shared PASS  left='Qfirst line
+CHECK shared.modified-both PASS
+CHECK shared.close-right PASS
+CHECK shared.document-survives PASS  panes=1 same=1
+CHECK shared.modified-survives PASS  modified=1 text='Qfirst line
+CHECK commands.block-selection PASS  Ctrl+Shift+B
+CHECK commands.multi-cursor-from-selection PASS  Alt+Shift+I
+CHECK commands.preferences-still-last PASS
+EDITOR-AREA-SELFTEST ok=1 checks=65 failures=0
+
+[svn-en]
++ timeout 120 xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' env VEDIT_SVN_UI_CAPTURE=/qa/final-runtime-tdh2ILv5/native/svn-en target/qt6-build/src/app/vedit-svn-workbench-selftest
+CHECK svn.ui.fixture PASS
+CHECK svn.ui.ready PASS
+CHECK svn.ui.history-deferred PASS
+CHECK svn.ui.assign-changelist PASS
+CHECK svn.ui.open-file PASS
+CHECK svn.ui.editor-gutter PASS
+CHECK working-tree-and-gutter PASS
+CHECK svn.ui.patch-changelist PASS
+CHECK changelist-patch PASS
+CHECK svn.ui.commit-selected PASS
+CHECK svn.ui.gutter-clears-on-commit PASS
+CHECK svn.ui.previous-message-picker PASS
+CHECK svn.ui.repository-log PASS
+CHECK svn.ui.text-search PASS
+CHECK svn.ui.revision-search PASS
+CHECK repository-history PASS
+CHECK svn.ui.file-log PASS
+CHECK file-history PASS
+CHECK svn.ui.revision-to-base PASS
+CHECK svn.ui.add-saved-repository PASS
+CHECK svn.ui.persist-saved-repository PASS
+CHECK svn.ui.remote-detail PASS
+CHECK svn.ui.open-remote-revision PASS
+CHECK remote-revision PASS
+CHECK svn.ui.remote-shared-comparison PASS
+CHECK svn.ui.remove-saved-repository PASS
+CHECK svn.ui.remote-fixture PASS
+CHECK svn.ui.remote-refresh PASS
+CHECK incoming-changes PASS
+CHECK svn.ui.incoming-shared-comparison PASS
+CHECK checkout-dialog PASS
+CHECK svn.ui.file-menu-checkout PASS
+CHECK svn.ui.unselected-edit-on-disk PASS
+CHECK svn.ui.editor-file-menu PASS
+CHECK svn.ui.editor-copy-discovered PASS
+CHECK svn.ui.editor-different-copy-selected PASS
+CHECK svn.ui.editor-fixture PASS
+CHECK svn.ui.editor-file-tabs PASS
+CHECK svn.ui.editor-unsaved-buffer PASS
+CHECK editor-svn-file-menu PASS
+CHECK svn.ui.editor-base PASS
+CHECK editor-buffer-to-base PASS
+CHECK svn.ui.editor-history PASS
+CHECK svn.ui.editor-history-controls PASS
+CHECK svn.ui.history-layout-controls PASS
+SVN-HISTORY width=663 button=208 contents=206 text=194 Compare With Previous Revision
+SVN-HISTORY width=663 button=187 contents=185 text=172 Compare With Working Copy
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+CHECK editor-file-history PASS
+SVN-HISTORY width=663 button=208 contents=206 text=194 Compare With Previous Revision
+SVN-HISTORY width=663 button=187 contents=185 text=172 Compare With Working Copy
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+CHECK editor-file-history-narrow PASS
+CHECK svn.ui.editor-compare-working-enabled PASS
+CHECK svn.ui.editor-revision-to-buffer PASS
+CHECK svn.ui.editor-revision-pair PASS
+CHECK editor-revision-pair PASS
+CHECK svn.ui.editor-non-svn-actions PASS
+CHECK svn.ui.editor-reject-stale-base PASS
+CHECK svn.ui.editor-buffer-preserved PASS
+SVN-WORKBENCH failures=0
+
+[svn-zh]
++ timeout 120 xvfb-run -a -s '-screen 0 1600x1000x24 -nolisten tcp' env VEDIT_SVN_ZH_CATALOGS=/vedit-build/target/qt6-build/src/app/translations VEDIT_SVN_UI_CAPTURE=/qa/final-runtime-tdh2ILv5/native/svn-zh target/qt6-build/src/app/vedit-svn-workbench-selftest
+CHECK svn.ui.zh-catalog PASS
+CHECK svn.ui.fixture PASS
+CHECK svn.ui.ready PASS
+CHECK svn.ui.zh-history-action PASS
+CHECK svn.ui.zh-file-history PASS
+CHECK svn.ui.history-layout-controls PASS
+SVN-HISTORY width=784 button=98 contents=96 text=84 与上次修订比较
+SVN-HISTORY width=784 button=98 contents=96 text=84 与工作副本比较
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+CHECK editor-file-history PASS
+SVN-HISTORY width=606 button=98 contents=96 text=84 与上次修订比较
+SVN-HISTORY width=606 button=98 contents=96 text=84 与工作副本比较
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+CHECK editor-file-history-narrow PASS
+SVN-WORKBENCH failures=0

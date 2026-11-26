@@ -1,0 +1,32 @@
+Exact application SHA-256 e50752632d8b6332a5910a91e724f7dc8ddce8a3463f6bc9a45ef5f134f4b748
+Qt xcb and Xvfb in the pinned offline container; XTest clicks and keystrokes.
+
+native target/qa/post-import-markers.m8OPpL
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=10'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=4'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+
+plain target/qa/post-import-markers.dgKDEO
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=10'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=4'
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=2'
+
+manual target/qa/post-import-markers.4DcBzr
+LINT-PASS-FINISHED automatic=0 errors=1 files=2 dialogs=0 notice=1
+PROJECT-ROOT-ENV root='<project>' source=project pinned=1 include-dirs=0 defines=1 env='-DPROJECT_WIDTH=10'
+
+Observed in the rendered Outline after import with native compiler flags width 5: logic[4:0], then no index-oob after Add 10, then logic[3:0] after Add 4, then logic[4:0] after Remove 4.
+
+Without native compiler flags: Add 10 cleared index-oob; Add 4 showed logic[3:0]; Remove 4 restored filelist width 2 and logic[1:0].
+
+The genuinely missing module diagnostic appeared after each edit in both sessions.
+
+After manual Project Lint in the undefined-width fixture, the old line 9 undeclared-identifier row disappeared from the rendered Outline when adding width 10. The line 4 genuine unknown module and separate previous project-lint result remained.
+
+Direct realtime-context Qt regression under X11 with pinned Slang, exit 0:
+DIRECT-CHILD-CORRECTED fresh=1 disk-unchanged=1 rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+SAVED-REOPEN pass=1 saved=1 inputs=[<project>/lib/alternate.sv,<project>/rtl/original.sv,<project>/rtl/top.sv] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+MACRO-CHILD pass=1 before=1 inputs=[<project>/lib/alternate.sv,<project>/rtl/macro_parent.sv] rows=[port 'macro_bad_port' does not exist in 'alternate'|input port 'correct' has no connection|unknown module 'genuinely_missing']
+MACRO-OVERRIDE NATIVE-FILES-UNCHANGED pass=1
