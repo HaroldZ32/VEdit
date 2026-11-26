@@ -73,8 +73,8 @@ docs(evidence): workspace gate green at T19 delivery (T17 deeplint landed)
 
 ```sh
 git switch main && git pull --ff-only
-git tag -a v0.4.1 -m "VEdit 0.4.1"
-git push origin refs/tags/v0.4.1
+git tag -a v0.5.0 -m "VEdit 0.5.0"
+git push origin refs/tags/v0.5.0
 ```
 
 ## 5. 发布产物（GitHub Release 附件，不进 git）

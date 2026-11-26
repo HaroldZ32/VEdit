@@ -178,17 +178,17 @@ utf8-zero	0.8.1	MIT OR Apache-2.0	https://github.com/algesten/utf8-zero
 utf8_iter	1.1.0	Apache-2.0 OR MIT	https://github.com/hsivonen/utf8_iter
 utf8parse	0.2.2	Apache-2.0 OR MIT	https://github.com/alacritty/vte
 utf_types	1.0.0	Apache-2.0 OR MIT	https://github.com/hsivonen/utf_types
-vd-app	0.4.1	project-licence (see ./LICENSE)	-
-vd-config	0.4.1	project-licence (see ./LICENSE)	-
-vd-deeplint	0.4.1	project-licence (see ./LICENSE)	-
-vd-editor	0.4.1	project-licence (see ./LICENSE)	-
-vd-ffi	0.4.1	project-licence (see ./LICENSE)	-
-vd-fim	0.4.1	project-licence (see ./LICENSE)	-
-vd-lsp	0.4.1	project-licence (see ./LICENSE)	-
-vd-search	0.4.1	project-licence (see ./LICENSE)	-
-vd-settings	0.4.1	project-licence (see ./LICENSE)	-
-vd-syntax	0.4.1	project-licence (see ./LICENSE)	-
-vd-vcs	0.4.1	project-licence (see ./LICENSE)	-
+vd-app	0.5.0	project-licence (see ./LICENSE)	-
+vd-config	0.5.0	project-licence (see ./LICENSE)	-
+vd-deeplint	0.5.0	project-licence (see ./LICENSE)	-
+vd-editor	0.5.0	project-licence (see ./LICENSE)	-
+vd-ffi	0.5.0	project-licence (see ./LICENSE)	-
+vd-fim	0.5.0	project-licence (see ./LICENSE)	-
+vd-lsp	0.5.0	project-licence (see ./LICENSE)	-
+vd-search	0.5.0	project-licence (see ./LICENSE)	-
+vd-settings	0.5.0	project-licence (see ./LICENSE)	-
+vd-syntax	0.5.0	project-licence (see ./LICENSE)	-
+vd-vcs	0.5.0	project-licence (see ./LICENSE)	-
 version-compare	0.2.1	MIT	https://gitlab.com/timvisee/version-compare
 version_check	0.9.5	MIT/Apache-2.0	https://github.com/SergioBenitez/version_check
 waitpid-any	0.3.0	MIT OR Apache-2.0	https://github.com/oxalica/waitpid-any
