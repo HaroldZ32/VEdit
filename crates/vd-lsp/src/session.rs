@@ -867,7 +867,7 @@ async fn session_loop(
     // flag keeps the periodic check from re-reporting the same death.
     let backend = inner.lock_status().backend;
     let mut child_exit_noted = false;
-    let mut context_file: Option<ContextFile> = None;
+    let mut applied_context: Option<AppliedBuildContext> = None;
     loop {
         let command = tokio::select! {
             command = commands.recv() => command,
@@ -915,7 +915,7 @@ async fn session_loop(
                     &mut client,
                     &path,
                     text,
-                    has_slang_project_index && context_file.is_some(),
+                    has_slang_project_index && applied_context.is_some(),
                 )
                 .await;
                 match outcome {
@@ -945,7 +945,7 @@ async fn session_loop(
                     &include_dirs,
                     &defines,
                     &files,
-                    &mut context_file,
+                    &mut applied_context,
                 )
                 .await;
                 match outcome {
@@ -972,12 +972,18 @@ async fn session_loop(
     // every exit path this loop can take - a normal stop, a closed command
     // channel, or an unwinding panic. A `SIGKILL` cannot run it; under
     // `XDG_RUNTIME_DIR` the session manager removes the directory then.
-    drop(context_file);
+    drop(applied_context);
 
     if let Err(error) = client.shutdown().await {
         inner.lock_status().message = format!("shutdown reported: {error}");
     }
     inner.stopped();
+}
+
+struct AppliedBuildContext {
+    _file: ContextFile,
+    text: String,
+    restart: u32,
 }
 
 /// The generated slang build file and the private directory holding it.
@@ -1274,16 +1280,10 @@ pub fn build_context_text(
 /// creates `<workspace>/.slang/local/server.json` inside the user's project and
 /// merges into it on every call (batch-20261118 AC-1 forbids touching the
 /// project), and the accumulated flags outlive the session.
-fn write_context_file(
-    include_dirs: &[PathBuf],
-    defines: &[String],
-    files: &[PathBuf],
-) -> Result<ContextFile> {
-    let text = build_context_text(include_dirs, defines, files)?;
-
+fn write_context_file(text: &str) -> Result<ContextFile> {
     let mut last_error = None;
     for base in context_base_dirs() {
-        match create_context_file(&base, &text) {
+        match create_context_file(&base, text) {
             Ok(context) => return Ok(context),
             Err(error) => last_error = Some(error),
         }
@@ -1308,7 +1308,7 @@ async fn apply_build_context(
     include_dirs: &[PathBuf],
     defines: &[String],
     files: &[PathBuf],
-    context_file: &mut Option<ContextFile>,
+    applied_context: &mut Option<AppliedBuildContext>,
 ) -> Result<String> {
     if backend != LspBackend::Slang {
         // Verible's build context already reaches it as a file list on its
@@ -1318,17 +1318,24 @@ async fn apply_build_context(
     if include_dirs.is_empty() && defines.is_empty() && files.is_empty() {
         return Ok(String::new());
     }
-    let context = write_context_file(include_dirs, defines, files)?;
-    let argument = Value::String(context.path.display().to_string());
-    // A rejected push returns here; `context` drops with it, so the generated
-    // file and its private directory are removed on that path too.
-    client
-        .execute_command("slang.setBuildFile", vec![argument])
-        .await?;
-    if let Some(previous) = context_file.replace(context) {
-        // A later push REPLACES the driver; the previous generated file (and
-        // its private directory) is removed by the guard.
-        drop(previous);
+    let text = build_context_text(include_dirs, defines, files)?;
+    let already_applied = client.is_running()
+        && applied_context.as_ref().is_some_and(|previous| {
+            previous.restart == client.restart_count() && previous.text == text
+        });
+    if !already_applied {
+        let context = write_context_file(&text)?;
+        let argument = Value::String(context.path.display().to_string());
+        client
+            .execute_command("slang.setBuildFile", vec![argument])
+            .await?;
+        // The request can restart the child. Record the receiving generation
+        // after its reply and keep its build file alive until replacement.
+        *applied_context = Some(AppliedBuildContext {
+            _file: context,
+            text,
+            restart: client.restart_count(),
+        });
     }
     Ok(format!(
         "build context: {} include dir(s), {} define(s), {} session file(s)",
@@ -1710,9 +1717,9 @@ pub const fn range_parts(range: Range) -> (u32, u32, u32, u32) {
 #[cfg(test)]
 mod tests {
     use super::{
-        context_base_dirs, context_base_dirs_from, create_context_file_with, create_private_file,
-        flatten_symbols, flatten_workspace_edit, hover_text, language_id, parameter_label_text,
-        severity_code, signature_help_result, write_context_file,
+        build_context_text, context_base_dirs, context_base_dirs_from, create_context_file_with,
+        create_private_file, flatten_symbols, flatten_workspace_edit, hover_text, language_id,
+        parameter_label_text, severity_code, signature_help_result, write_context_file,
     };
     use anyhow::Result;
     use lsp_types::{
@@ -1894,7 +1901,7 @@ mod tests {
 
     #[test]
     fn the_context_file_carries_incdirs_defines_and_the_session_files() -> Result<()> {
-        let context = write_context_file(
+        let text = build_context_text(
             &[PathBuf::from("/project/inc")],
             &["WIDTH=8".to_string(), "SIM".to_string()],
             &[
@@ -1902,6 +1909,7 @@ mod tests {
                 PathBuf::from("/project/rtl/uart.v"),
             ],
         )?;
+        let context = write_context_file(&text)?;
         let text = std::fs::read_to_string(&context.path)?;
         assert_eq!(
             text,
@@ -1923,7 +1931,7 @@ mod tests {
     /// so the file-list parser cannot split or terminate it early.
     #[test]
     fn the_context_file_quotes_and_escapes_every_argument() -> Result<()> {
-        let context = write_context_file(
+        let text = build_context_text(
             &[
                 PathBuf::from("/project/inc dir"),
                 PathBuf::from("/project/q\"uote\\dir"),
@@ -1931,6 +1939,7 @@ mod tests {
             &["WIDTH=8 + 4".to_string(), "MSG=\"hi\"".to_string()],
             &[PathBuf::from("/project/build dir/top file.sv")],
         )?;
+        let context = write_context_file(&text)?;
         let text = std::fs::read_to_string(&context.path)?;
         assert_eq!(
             text.lines().collect::<Vec<_>>(),
@@ -1947,12 +1956,12 @@ mod tests {
 
     #[test]
     fn a_path_with_a_line_break_is_refused() {
-        let error = match write_context_file(&[PathBuf::from("/project/a\nb")], &[], &[]) {
+        let error = match build_context_text(&[PathBuf::from("/project/a\nb")], &[], &[]) {
             Ok(_) => panic!("a line break inside an include directory must be refused"),
             Err(error) => error,
         };
         assert!(error.to_string().contains("line break"), "{error}");
-        let error = match write_context_file(&[], &[], &[PathBuf::from("/project/a\rb")]) {
+        let error = match build_context_text(&[], &[], &[PathBuf::from("/project/a\rb")]) {
             Ok(_) => panic!("a line break inside a session file must be refused"),
             Err(error) => error,
         };
@@ -1961,7 +1970,7 @@ mod tests {
 
     #[test]
     fn a_define_with_a_line_break_is_refused() {
-        let error = match write_context_file(&[], &["A=1\n-DEVIL".to_string()], &[]) {
+        let error = match build_context_text(&[], &["A=1\n-DEVIL".to_string()], &[]) {
             Ok(_) => panic!("a line break inside a define must be refused"),
             Err(error) => error,
         };
@@ -2051,7 +2060,7 @@ mod tests {
 
     #[test]
     fn the_context_directory_and_file_are_private_and_removed_by_the_guard() -> Result<()> {
-        let context = write_context_file(&[], &["WIDTH=8".to_string()], &[])?;
+        let context = write_context_file("-D\"WIDTH=8\"\n")?;
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;

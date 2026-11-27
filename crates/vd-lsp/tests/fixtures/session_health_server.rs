@@ -80,13 +80,28 @@ pub fn run(mode: &str) -> Result<()> {
                     .as_str()
                     .context("missing build file")?;
                 let content = std::fs::read_to_string(path)?;
-                ensure!(
-                    content.contains("+incdir+")
-                        && content.contains(DEFINE)
-                        && content.contains("top.sv"),
-                    "missing build context inputs"
-                );
-                writeln!(events, "context {pid}")?;
+                if mode == "context-interleave" {
+                    let encoded = serde_json::to_string(&content)?;
+                    if Path::new("reject-context").is_file() {
+                        std::fs::remove_file("reject-context")?;
+                        writeln!(events, "context rejected {pid} {encoded}")?;
+                        send(
+                            &mut output,
+                            &json!({"jsonrpc": "2.0", "id": message["id"],
+                                    "error": {"code": -32602, "message": "fixture rejected build context"}}),
+                        )?;
+                        continue;
+                    }
+                    writeln!(events, "context {pid} {encoded}")?;
+                } else {
+                    ensure!(
+                        content.contains("+incdir+")
+                            && content.contains(DEFINE)
+                            && content.contains("top.sv"),
+                        "missing build context inputs"
+                    );
+                    writeln!(events, "context {pid}")?;
+                }
                 Value::Null
             }
             Some("textDocument/documentSymbol") => json!([]),

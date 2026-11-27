@@ -404,3 +404,101 @@ fn restart_reopens_the_buffer_and_the_caller_reapplies_build_context_once() -> R
     assert!(session.wait_for_stop());
     Ok(())
 }
+
+#[test]
+fn recovery_coalesces_only_successful_identical_build_contexts() -> Result<()> {
+    let project = Project::new("context-interleave")?;
+    let session = project.start("context-interleave")?;
+    let initial = ready(&session, 0)?.server_pid.context("initial PID")?;
+    project.push_context(&session)?;
+    wire_barrier(&project, &session)?;
+    project.crash(&session, initial)?;
+    project.change(&session)?;
+    let sampled = ready(&session, 1)?.server_pid.context("sampled PID")?;
+    project.crash(&session, sampled)?;
+
+    // The old Ready sample triggers recovery itself. The next sample requeues
+    // the same push against the replacement that already received it.
+    project.push_context(&session)?;
+    let pid = ready(&session, 2)?.server_pid.context("replacement PID")?;
+    project.push_context(&session)?;
+    wire_barrier(&project, &session)?;
+    let original = |include: &std::path::Path, define: &str| -> Result<String> {
+        let text = format!(
+            "+incdir+\"{}\"\n-D\"{define}\"\n\"{}\"\n",
+            include.display(),
+            project.file().display()
+        );
+        Ok(serde_json::to_string(&text)?)
+    };
+    let first = original(&project.0, server::DEFINE)?;
+    let replayed = project.events()?;
+    assert!(
+        replayed.contains(&format!("open {pid} unsaved\n")),
+        "{replayed}"
+    );
+    let initial_context = format!("context {initial} {first}");
+    assert_eq!(
+        replayed
+            .lines()
+            .filter(|line| *line == initial_context)
+            .count(),
+        1
+    );
+    assert!(
+        !replayed.contains(&format!("context {sampled} ")),
+        "{replayed}"
+    );
+    let same = format!("context {pid} {first}");
+    let replay_count = replayed.lines().filter(|line| *line == same).count();
+
+    // Change one input at a time and compare the actual .f read by that PID.
+    let define = "WIDTH=32";
+    session.set_build_context(vec![project.0.clone()], vec![define.into()])?;
+    wire_barrier(&project, &session)?;
+    let macro_change = format!("context {pid} {}", original(&project.0, define)?);
+    assert!(project.events()?.lines().any(|line| line == macro_change));
+
+    let include = project.0.join("new-inc");
+    std::fs::create_dir(&include)?;
+    std::fs::write(project.0.join("reject-context"), "")?;
+    session.set_build_context(vec![include.clone()], vec![define.into()])?;
+    let rejected = wait_status(&session, "build context error", |status| {
+        status.phase == SessionPhase::Failed
+            && status.message.contains("fixture rejected build context")
+    })?;
+    assert_eq!(rejected.server_pid, Some(pid));
+    session.set_build_context(vec![include.clone()], vec![define.into()])?;
+    assert_eq!(ready(&session, 2)?.server_pid, Some(pid));
+    wire_barrier(&project, &session)?;
+    let updated = original(&include, define)?;
+    let events = project.events()?;
+    assert!(
+        events
+            .lines()
+            .any(|line| line == format!("context rejected {pid} {updated}")),
+        "{events}"
+    );
+    assert!(
+        events
+            .lines()
+            .any(|line| line == format!("context {pid} {updated}")),
+        "{events}"
+    );
+
+    // A user can also explicitly restore an older context in the same process.
+    project.push_context(&session)?;
+    wire_barrier(&project, &session)?;
+    let events = project.events()?;
+    assert_eq!(
+        events.lines().filter(|line| *line == same).count(),
+        replay_count + 1
+    );
+    assert!(session.wait_for_stop());
+    println!("sampled PID={sampled}, replacement PID={pid}, identical recovery pushes={replay_count}\n{events}");
+    assert_eq!(
+        replay_count, 1,
+        "the replacement received the same build context twice"
+    );
+    Ok(())
+}
