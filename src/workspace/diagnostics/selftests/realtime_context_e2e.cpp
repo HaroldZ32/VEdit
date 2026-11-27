@@ -7,6 +7,7 @@
 #include "ktexteditor_provider.h"
 #include "module_tree_integration.h"
 #include "module_tree_panel.h"
+#include "panel_registry.h"
 #include "project_integration.h"
 #include "project_model.h"
 #include "project_macro_override_fixture.h"
@@ -27,6 +28,8 @@
 #include <QTemporaryDir>
 #include <QThread>
 #include <QTimer>
+#include <QTreeWidget>
+#include <QTreeWidgetItemIterator>
 
 #include <algorithm>
 #include <cstdio>
@@ -110,6 +113,10 @@ int main(int argc, char **argv)
     const QString alternate = root + u"/include/alternate.svh"_s;
     const QString alternateOwner = root + u"/lib/alternate.sv"_s;
     const QString macroParent = root + u"/rtl/macro_parent.sv"_s;
+    const QString scopedParent = root + u"/rtl/scoped_parent.sv"_s;
+    const QString scopedBridge = root + u"/rtl/scoped_bridge.sv"_s;
+    const QString variant = root + u"/rtl/variant.sv"_s;
+    const QString driver = root + u"/rtl/variant_driver.sv"_s;
     const QString filelist = root + u"/sources.f"_s;
     const QByteArray literalInstance = "  alternate via_literal (.correct(1'b0));\n";
     const QByteArray macroParentText =
@@ -138,7 +145,22 @@ int main(int argc, char **argv)
         || !writeFile(alternateOwner, "`define ENABLE_ALTERNATE\n`include \"alternate.svh\"\n")
         || !writeFile(root + u"/rtl/options.svh"_s, "logic probe;\n")
         || !writeFile(macroParent, macroParentText)
-        || !writeFile(filelist, "rtl/top.sv\nrtl/original.sv\nlib/alternate.sv\nrtl/macro_parent.sv\n+incdir+rtl+include\n")
+        || !writeFile(scopedParent, "module scoped_top; scoped_bridge u_bridge (); endmodule\n"
+                                    "module scoped_sibling;\n"
+                                    "  alternate u_child (.sibling_bad_port(1'b0));\n"
+                                    "  genuinely_missing u_missing ();\nendmodule\n")
+        || !writeFile(scopedBridge, "module scoped_bridge; alternate u_child (.correct(1'b0)); endmodule\n")
+        || !writeFile(variant, "module variant #(parameter bit USE_ALTERNATE = 1);\n"
+                               "  if (USE_ALTERNATE) begin : use_alternate\n"
+                               "    alternate u_child (.variant_bad_port(1'b0));\n"
+                               "    genuinely_missing u_missing ();\n"
+                               "  end else begin : use_original\n"
+                               "    original u_child (.correct(1'b0));\n"
+                               "  end\nendmodule\n")
+        || !writeFile(driver, "module variant_driver; variant #(.USE_ALTERNATE(0)) u_variant (); endmodule\n")
+        || !writeFile(filelist, "rtl/top.sv\nrtl/original.sv\nlib/alternate.sv\nrtl/macro_parent.sv\n"
+                              "rtl/scoped_parent.sv\nrtl/scoped_bridge.sv\nrtl/variant.sv\nrtl/variant_driver.sv\n"
+                              "+incdir+rtl+include\n")
         || !writeFile(state + u"/settings.toml"_s, "\"tools.lsp_backend\" = \"slang\"\n")) {
         std::puts("FAIL: fixture creation");
         return 1;
@@ -158,6 +180,7 @@ int main(int argc, char **argv)
     workspace::installProject(shell, integration);
     workspace::installModuleTree(shell, integration);
     workspace::installDiagnostics(shell, integration);
+    shell.panels()->showPanel(u"outline"_s, &shell);
     shell.resize(1050, 700);
     shell.show();
 
@@ -265,6 +288,48 @@ int main(int argc, char **argv)
     std::printf("SAVED-REOPEN pass=%d saved=%d inputs=[%s] rows=[%s]\n", reopened, saved,
                 qPrintable(controller->fileSetReport().files.join(u',')), qPrintable(diagnosticsText()));
 
+    const auto *moduleTree = tree->findChild<QTreeWidget *>(u"module-tree"_s);
+    auto *outline = shell.findChild<QTreeWidget *>(u"diagnosticsIssues"_s);
+    const auto outlineRows = [&] {
+        QStringList messages;
+        if (outline != nullptr) {
+            for (QTreeWidgetItemIterator item(outline); *item != nullptr; ++item) {
+                if ((*item)->parent() != nullptr) {
+                    messages.append((*item)->text(0));
+                }
+            }
+        }
+        return messages.join(u'|');
+    };
+    model->setTop(u"scoped_top"_s);
+    const bool scopedTreeReady = waitFor([&] {
+        const auto catalog = tree->catalog();
+        return catalog.valid && catalog.top == u"scoped_top" && catalog.reachableFiles.contains(scopedParent)
+            && moduleTree != nullptr
+            && !moduleTree->findItems(u"alternate"_s, Qt::MatchExactly | Qt::MatchRecursive, 0).isEmpty();
+    });
+    const bool openedScopedParent = pane->closeTab(pane->activeTabIndex()) && pane->openFile(scopedParent, &error);
+    const bool siblingResolved = openedScopedParent && waitFor([&] {
+        const QString rows = outlineRows();
+        return controller->analyzeFileName() == scopedParent && !controller->analyzeWasDirty()
+            && controller->fileSetReport().files == QStringList{alternateOwner, scopedBridge, scopedParent}
+            && rows.contains(u"sibling_bad_port") && rows.contains(u"genuinely_missing")
+            && !rows.contains(u"unknown module 'alternate'");
+    });
+    std::printf("SCOPED-SIBLING tree=%d pass=%d inputs=[%s] outline=[%s]\n", scopedTreeReady, siblingResolved,
+                qPrintable(controller->fileSetReport().files.join(u',')), qPrintable(outlineRows()));
+    model->setTop({});
+    const bool restoredAuto = waitFor([&] { return tree->catalog().valid && tree->catalog().top.isEmpty(); });
+    const bool openedVariant = pane->closeTab(pane->activeTabIndex()) && pane->openFile(variant, &error);
+    const bool variantResolved = openedVariant && waitFor([&] {
+        const QString rows = outlineRows();
+        return controller->analyzeFileName() == variant && !controller->analyzeWasDirty()
+            && controller->fileSetReport().files == QStringList{alternateOwner, original, variant}
+            && rows.contains(u"variant_bad_port") && rows.contains(u"genuinely_missing")
+            && !rows.contains(u"unknown module 'alternate'");
+    });
+    std::printf("AUTO-VARIANT pass=%d inputs=[%s] outline=[%s]\n", variantResolved,
+                qPrintable(controller->fileSetReport().files.join(u',')), qPrintable(outlineRows()));
     const bool openedMacroParent = pane->closeTab(pane->activeTabIndex()) && pane->openFile(macroParent, &error);
     const auto macroRows = [&] {
         QStringList messages;
@@ -303,6 +368,7 @@ int main(int argc, char **argv)
         shell, *model, *controller, state, writeFile,
         [](auto predicate) { return waitFor(predicate); }, addDefine, removeDefine);
     return initial && added && catalogReady && importedMacro && changed && changedMacro
-            && removed && removedMacro && childResolved && fresh && reopened && keptMacroOwner
-            && manualOnly && macroOverride ? 0 : 1;
+            && removed && removedMacro && childResolved && fresh && reopened && scopedTreeReady
+            && siblingResolved && restoredAuto && variantResolved && keptMacroOwner && manualOnly
+            && macroOverride ? 0 : 1;
 }

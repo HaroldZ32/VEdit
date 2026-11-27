@@ -634,7 +634,7 @@ private:
         goldenRevision_ = revision;
         catalogRevision_ = catalogRevision;
         hasFilelist_ = project;
-        editedClosures_.clear();
+        bufferClosures_.clear();
         shadowedFiles_ = shadowed;
         const QStringList members = shell_->property("vedit.diagnostics.projectFiles").toStringList();
         goldenFiles_ = diagnostics::realtime_scope::goldenFileSetFrom(members);
@@ -650,7 +650,7 @@ private:
     }
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-    void updateEditedClosure(const QFileInfo &source, const QString &disk, const QString &text)
+    void updateBufferClosure(const QFileInfo &source, const QString &disk, const QString &text)
     {
         namespace scope = diagnostics::realtime_scope;
         const QString path = source.filePath();
@@ -659,14 +659,17 @@ private:
         const QDateTime diskTime = source.lastModified();
         const bool catalogSawDisk = catalogCutoff > 0 && diskTime.isValid()
             && diskTime.toMSecsSinceEpoch() < catalogCutoff;
-        if ((!modified && catalogSawDisk) || !hasFilelist_ || !scope::isGoldenFile(goldenFiles_, path)) {
-            editedClosures_.remove(path);
+        const bool unchanged = !modified && catalogSawDisk;
+        if (!hasFilelist_ || !scope::isGoldenFile(goldenFiles_, path)) {
+            bufferClosures_.remove(path);
             return;
         }
         const QVariantMap owners = shell_->property("vedit.moduleTree.owners").toMap();
         if (owners.isEmpty()) {
             return;
         }
+        // The project elaboration can omit siblings or specialize generate branches
+        // differently from the active file's compilation, even for unchanged text.
         const auto references = diagnostics::literalModuleReferences(text);
         QSet<QString> activeOwners;
         for (auto it = references.cbegin(); it != references.cend(); ++it) {
@@ -705,14 +708,20 @@ private:
         // When the source was saved after the catalog, add the live children
         // and keep old catalog edges whose provenance can no longer be proved.
         const QSet<QString> known(catalogChildren.cbegin(), catalogChildren.cend());
-        QStringList children = (activeOwners - known).values();
-        children.sort();
+        QStringList additional = (activeOwners - known).values();
+        additional.sort();
+        // Keep elaborated dependencies ahead of inferred ones for a clean file.
+        // Literal references may also occur in an inactive preprocessor branch.
+        QStringList children = unchanged ? QStringList{} : additional;
         for (const QString &child : catalogChildren) {
             if (activeOwners.contains(child) || !removable.contains(child)) {
                 children.append(child);
             }
         }
-        editedClosures_.insert(path, children);
+        if (unchanged) {
+            children.append(additional);
+        }
+        bufferClosures_.insert(path, children);
     }
 #endif
 
@@ -725,7 +734,7 @@ private:
     QStringList realtimeFileSetFor(const QString &path, bool *truncated = nullptr) const
     {
         return diagnostics::realtime_scope::realtimeFileSetFor(
-            goldenFiles_, moduleClosure(), path, kRealtimeClosureMaxFiles, truncated, editedClosures_);
+            goldenFiles_, moduleClosure(), path, kRealtimeClosureMaxFiles, truncated, bufferClosures_);
     }
 
     /// A61.3 + G1-a: the session covers the union of the GOLDEN open documents'
@@ -752,12 +761,12 @@ private:
                 }
             }
         }
-        editedClosures_.removeIf([&openDocuments](QHash<QString, QStringList>::iterator entry) {
+        bufferClosures_.removeIf([&openDocuments](QHash<QString, QStringList>::iterator entry) {
             return !openDocuments.contains(entry.key());
         });
         return diagnostics::realtime_scope::openDocumentSessionSet(
             goldenFiles_, moduleClosure(), openDocuments, kRealtimeClosureMaxFiles,
-            kRealtimeSessionMaxFiles, &outsideFileCount_, truncated, editedClosures_);
+            kRealtimeSessionMaxFiles, &outsideFileCount_, truncated, bufferClosures_);
     }
 
     /// The AC-3/AC-5 probe surface: what the realtime analysis covers right now.
@@ -937,7 +946,7 @@ private:
         publishWatchStats();
         refreshProjectScope();
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-        updateEditedClosure(source, disk, text);
+        updateBufferClosure(source, disk, text);
 #endif
         // AC-3.1/AC-5.1: publish the analysis closure and hand the stable session
         // set to the controller BEFORE the analysis, so the switch that triggered
@@ -970,7 +979,7 @@ private:
     bool hasFilelist_ = false;
     QStringList projectIndex_;
     QStringList shadowedFiles_;
-    QHash<QString, QStringList> editedClosures_;
+    QHash<QString, QStringList> bufferClosures_;
     /// Open documents excluded from the session by the golden rule (published).
     int outsideFileCount_ = 0;
     /// One notice per truncation episode, not one per 400 ms tick.

@@ -1,0 +1,12 @@
+module-tree: catalog ready files=4 modules=4 source='live project file set'
+REALTIME-SET active='rtl/variant.sv' files=3 session=3
+REALTIME-SET active='rtl/variant.sv' files=3 session=3
+REALTIME-SET active='rtl/variant.sv' files=3 session=3
+REALTIME-SET active='rtl/variant.sv' files=3 session=3
+REALTIME-SET active='rtl/variant.sv' files=3 session=3
+REALTIME-SET active='rtl/variant.sv' files=3 session=3
+DIAG-ROW file='rtl/variant.sv' line=3 column=15 severity=2 code='unconnected-input-port' option='' source='slang' origin=0
+DIAG-ROW file='rtl/variant.sv' line=3 column=25 severity=1 code='' option='' source='slang' origin=0
+DIAG-ROW file='rtl/variant.sv' line=4 column=5 severity=1 code='' option='' source='slang' origin=0
+diagnostics: 3 inline annotation(s) on rtl/variant.sv
+VEDIT_APP_XCB_EXIT=0

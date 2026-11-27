@@ -12,12 +12,15 @@ namespace vedit::workspace::diagnostics {
 
 LiteralModuleReferences literalModuleReferences(const QString &text)
 {
-    // Unparameterized module instances can use the grammar's checker rule.
-    // Requiring an instance name excludes function calls parsed by that rule.
+    // The grammar can classify module instances as checkers or interfaces.
+    // The caller matches the types against module definitions in the catalog.
+    // Requiring an instance name excludes function calls parsed as checkers.
     static constexpr char patterns[] = R"(
       (module_instantiation [(simple_identifier) (escaped_identifier)] @type
         (hierarchical_instance (name_of_instance) @site))
       (checker_instantiation (checker_identifier) @type (name_of_instance) @site)
+      (interface_instantiation (interface_identifier) @type
+        (hierarchical_instance (name_of_instance) @site))
     )";
     const auto *language = tree_sitter_verilog();
     static const auto query = [] {

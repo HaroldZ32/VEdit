@@ -1,0 +1,9 @@
+88: SCOPED-SIBLING tree=1 pass=0 inputs=[rtl/scoped_bridge.sv,rtl/scoped_parent.sv] outline=[scoped_parent.sv:3:3 — unknown module 'alternate' [slang]|scoped_parent.sv:4:3 — unknown module 'genuinely_missing' [slang]]
+88: AUTO-VARIANT pass=0 inputs=[rtl/original.sv,rtl/variant.sv] outline=[variant.sv:3:5 — unknown module 'alternate' [slang]|variant.sv:4:5 — unknown module 'genuinely_missing' [slang]]
+1/1 Test #88: vedit-realtime-context-e2e .......***Failed   28.63 sec
+BASELINE_ORIGINAL_CTEST_EXIT=8
+BASELINE_INCLUDED_ATTEMPT=1 EXIT=1
+BASELINE_INCLUDED_ATTEMPT=2 EXIT=0
+BASELINE_INCLUDED_ATTEMPT=3 EXIT=0
+BASELINE_INCLUDED_ATTEMPT=4 EXIT=0
+BASELINE_INCLUDED_ATTEMPT=5 EXIT=0
