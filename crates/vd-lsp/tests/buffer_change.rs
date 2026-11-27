@@ -58,27 +58,32 @@ impl Drop for Scratch {
     }
 }
 
-fn diagnostics_of(session: &SessionHandle, file: &Path) -> Result<Vec<SessionDiagnostic>> {
-    let id = session.request(SessionRequest::Diagnostics {
-        file: file.to_path_buf(),
-    })?;
+fn poll_response(session: &SessionHandle, request: SessionRequest) -> Result<SessionResponse> {
+    let id = session.request(request)?;
     let deadline = Instant::now() + Duration::from_secs(5);
     loop {
         match session.poll(id) {
             PollOutcome::Pending => {}
-            PollOutcome::Ready(SessionResponse::Diagnostics {
-                rows: diagnostics, ..
-            }) => {
-                return Ok(diagnostics);
-            }
-            PollOutcome::Ready(other) => bail!("unexpected response: {other:?}"),
-            PollOutcome::Failed(error) => bail!("diagnostics request failed: {error}"),
-            PollOutcome::Unknown => bail!("diagnostics request was consumed unexpectedly"),
+            PollOutcome::Ready(response) => return Ok(response),
+            PollOutcome::Failed(error) => bail!("request failed: {error}"),
+            PollOutcome::Unknown => bail!("request was consumed unexpectedly"),
         }
         if Instant::now() >= deadline {
-            bail!("diagnostics request did not settle");
+            bail!("request did not settle");
         }
         std::thread::sleep(Duration::from_millis(20));
+    }
+}
+
+fn diagnostics_of(session: &SessionHandle, file: &Path) -> Result<Vec<SessionDiagnostic>> {
+    match poll_response(
+        session,
+        SessionRequest::Diagnostics {
+            file: file.to_path_buf(),
+        },
+    )? {
+        SessionResponse::Diagnostics { rows, .. } => Ok(rows),
+        other => bail!("unexpected response: {other:?}"),
     }
 }
 
@@ -207,6 +212,57 @@ fn change_opens_a_document_the_session_did_not_have() -> Result<()> {
         .collect::<Vec<_>>()
         .join(" | ");
     eprintln!("closed-set file diagnostics: {error_message}");
+    session.stop();
+    Ok(())
+}
+
+#[cfg(unix)]
+#[test]
+fn unsaved_buffers_keep_distinct_symbols_across_a_symlink_parent() -> Result<()> {
+    let ls = binary("verible-verilog-ls");
+    if !ls.is_file() {
+        eprintln!("SKIP: verible-verilog-ls is not available");
+        return Ok(());
+    }
+    let scratch = Scratch::new("symlink-parent")?;
+    let root = scratch.path.canonicalize()?;
+    std::fs::create_dir(root.join("alias"))?;
+    std::fs::create_dir_all(root.join("physical/nested"))?;
+    std::os::unix::fs::symlink("../physical/nested", root.join("alias/link"))?;
+    let saved = root.join("top.sv");
+    std::fs::write(&saved, GOOD)?;
+
+    let via_link = root.join("alias/link/../ghost/spelling.sv");
+    let physical = root.join("physical/ghost/spelling.sv");
+    let lexical = root.join("alias/ghost/spelling.sv");
+    let session = session_over(&root, &saved)?;
+    wait_for(Duration::from_secs(20), || {
+        Ok(session.status().phase == SessionPhase::Ready)
+    })?;
+
+    let assert_symbol = |file: &Path, expected: &str| -> Result<()> {
+        let response = poll_response(
+            &session,
+            SessionRequest::DocumentSymbols {
+                file: file.to_path_buf(),
+            },
+        )?;
+        let SessionResponse::Symbols(symbols) = response else {
+            bail!("unexpected response: {response:?}");
+        };
+        let names: Vec<_> = symbols.iter().map(|symbol| symbol.name.as_str()).collect();
+        assert_eq!(names, [expected], "symbol for {file:?}");
+        Ok(())
+    };
+    session.change_document(&via_link, "module from_link; endmodule\n".into())?;
+    assert_symbol(&via_link, "from_link")?;
+    session.change_document(&lexical, "module lexical; endmodule\n".into())?;
+    assert_symbol(&lexical, "lexical")?;
+    assert_symbol(&via_link, "from_link")?;
+    assert_symbol(&physical, "from_link")?;
+    assert!(!root.join("alias/ghost").exists());
+    assert!(!root.join("physical/ghost").exists());
+
     session.stop();
     Ok(())
 }

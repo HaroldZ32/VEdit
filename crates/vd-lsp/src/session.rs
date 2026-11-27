@@ -1586,17 +1586,19 @@ fn document_uri(path: &Path) -> Result<Url> {
         Url::from_file_path(file)
             .map_err(|()| anyhow!("{} is not an absolute file path", file.display()))
     };
-    let uri = to_uri(path)?;
+    let mut uri = to_uri(path)?;
     if !path.components().any(|part| part == Component::ParentDir) {
         return Ok(uri);
     }
 
-    // Incoming LSP URLs collapse `..`. Resolve the parent on disk first so a
-    // symlink followed by `..` still names the file we opened. An unsaved path
-    // may have no parent on disk, so it uses the URL parser's normalization.
-    let resolved_parent = path.parent().map(Path::canonicalize);
-    if let (Some(Ok(parent)), Some(name)) = (resolved_parent, path.file_name()) {
-        return to_uri(&parent.join(name));
+    // Resolve symlinks and `..` through the deepest existing ancestor, even
+    // when an unsaved document's immediate parent is missing. The URL parser
+    // then normalizes any `..` in the unresolved suffix.
+    for ancestor in path.ancestors().skip(1) {
+        if let Ok(resolved) = ancestor.canonicalize() {
+            uri = to_uri(&resolved.join(path.strip_prefix(ancestor)?))?;
+            break;
+        }
     }
     Ok(Url::parse(uri.as_str())?)
 }
