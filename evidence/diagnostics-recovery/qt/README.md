@@ -1,6 +1,6 @@
 # Qt 诊断会话恢复
 
-基线为 `dev` 的 `752c8ab8e2e22528f4e863da8318d81e177203e8`。在主检出的 `fix/diagnostics-recovery` 上，RED 使用这版 Qt 产品源码和新断言，链接分支上已完成的 Rust 静态库。GREEN 复跑同一回归，另经真实 Rust FFI 驱动受控 LSP 子进程。[冻结契约](../../../.mpd/workspace-audits/cleanup-20261127/contract.md) · [运行日志节选](raw.log)
+基线为 `dev` 的 `752c8ab8e2e22528f4e863da8318d81e177203e8`。在主检出的 `fix/diagnostics-recovery` 上，RED 使用这版 Qt 产品源码和新断言，链接分支上已完成的 Rust 静态库。GREEN 复跑同一回归，另经真实 Rust FFI 驱动受控 LSP 子进程。[运行日志节选](raw.log)
 
 | 场景 | RED | GREEN |
 | --- | --- | --- |
@@ -32,9 +32,12 @@ docker run --rm --network none -v "$repo:/src" -v "$cache:/src/target/outline-qa
   cargo build --offline --locked --release -p vd-ffi
 '
 
-# 可复用 Rust 回归生成的 session_health 可执行文件。否则先编译，再从 Cargo 输出取路径。
-CARGO_HOME="$repo/target/cargo-home" cargo +stable test --locked --offline -p vd-lsp --test session_health --no-run
-fixture=$repo/target/debug/deps/session_health-2ac3201dffcf8dc9
+# 从 Cargo 本次构建的输出获取实际测试可执行文件。
+set -o pipefail
+fixture=$(CARGO_HOME="$repo/target/cargo-home" cargo +stable test --locked --offline \
+  -p vd-lsp --test session_health --no-run --message-format=json |
+  jq -ers 'map(select(.reason == "compiler-artifact" and .target.name == "session_health" and .executable != null)) | last.executable // error("session_health missing")')
+test -x "$fixture" || exit 1
 printf '%s\n' '#!/bin/sh' 'export VEDIT_TEST_SESSION_HEALTH_MODE=live' \
   'exec 3>&1 1>/dev/null' \
   'exec /tools/session_health --exact startup_failure_includes_child_stderr --nocapture' \
