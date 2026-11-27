@@ -1,0 +1,9 @@
+ 59/100 Test  #14: vedit-signal-trace-selftest ......................***Failed    8.90 sec
+FAIL new shortcut triggers the same chain in the live editor
+ 98/100 Test  #23: vedit-svn-workbench-selftest .....................***Skipped   0.07 sec
+ 99/100 Test  #95: vedit-svn-workspaces-selftest ....................***Skipped   0.02 sec
+100/100 Test  #72: vedit-diagnostics-product-seam ...................***Failed    6.31 sec
+CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+98% tests passed, 2 tests failed out of 100
+Total Test time (real) = 184.64 sec
+CTEST_EXIT=8

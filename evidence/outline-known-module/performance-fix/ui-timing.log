@@ -1,0 +1,77 @@
+# Identical fixture sizes and SHA-256
+  12003  458791 large_a.sv
+  45003 1811791 large_b.sv
+  57006 2270582 total
+a3b10728fb28282595009d8b0b361fe486aa031f37062547e83b781394ab6abf  large_a.sv
+4efd401490e7f8841008e232916576e6381f5b5c23d6f6d2daa1ae74799b1540  large_b.sv
+
+# final-switch
+APP_SHA256=4db2d731ae6cd51dc4189537288794ff2413e07c9bcf697968841a625cfd1c7c
+UI-PROBE timestamp=1795747718682 interval_ms=10
+UI-PROBE timestamp=1795747718744 interval_ms=10
+UI-PULSE timestamp=1795747718855 gap_ms=110
+UI-PULSE timestamp=1795747719741 gap_ms=225
+UI-PARSE timestamp=1795747720061 gui=1 bytes=458791 duration_ms=306
+UI-PARSE timestamp=1795747721308 gui=1 bytes=1811791 duration_ms=1150
+UI-PARSE timestamp=1795747721866 gui=1 bytes=458791 duration_ms=293
+UI-PULSE timestamp=1795747721898 gap_ms=2157
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+UI-PARSE timestamp=1795747727627 gui=0 bytes=1811791 duration_ms=1203
+UI-PULSE timestamp=1795747732431 gap_ms=105
+UI-PARSE timestamp=1795747732753 gui=0 bytes=458791 duration_ms=296
+UI-PULSE timestamp=1795747734264 gap_ms=62
+UI-PULSE timestamp=1795747736119 gap_ms=44
+UI-PULSE timestamp=1795747737985 gap_ms=45
+UI-PULSE timestamp=1795747739852 gap_ms=46
+UI-PULSE timestamp=1795747741714 gap_ms=40
+UI-PULSE timestamp=1795747743579 gap_ms=44
+UI-PULSE timestamp=1795747745446 gap_ms=49
+UI-SWITCH timestamp=1795747732255 sequence=1 tab=large_a
+UI-SWITCH timestamp=1795747734147 sequence=2 tab=large_b
+UI-SWITCH timestamp=1795747736216 sequence=3 tab=large_a
+UI-SWITCH timestamp=1795747737890 sequence=4 tab=large_b
+UI-SWITCH timestamp=1795747739755 sequence=5 tab=large_a
+UI-SWITCH timestamp=1795747741620 sequence=6 tab=large_b
+UI-SWITCH timestamp=1795747743486 sequence=7 tab=large_a
+UI-SWITCH timestamp=1795747745351 sequence=8 tab=large_b
+APP_EXIT=0
+
+# dev-cold-open
+APP_SHA256=433567ed0be75a6ec0337ba6ac549d9624d901ea2fecfc8eb5bdaab81c6371ca
+UI-PROBE timestamp=1795747506416 interval_ms=10
+UI-PROBE timestamp=1795747506482 interval_ms=10
+UI-PULSE timestamp=1795747506599 gap_ms=116
+UI-PULSE timestamp=1795747507325 gap_ms=96
+UI-PARSE timestamp=1795747507632 gui=1 bytes=458791 duration_ms=299
+UI-PULSE timestamp=1795747507752 gap_ms=426
+UI-PARSE timestamp=1795747508079 gui=1 bytes=458791 duration_ms=325
+UI-PULSE timestamp=1795747508101 gap_ms=349
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+UI-PULSE timestamp=1795747514806 gap_ms=40
+Opened rtl/large_b.sv via Module Tree
+UI-PULSE timestamp=1795747514953 gap_ms=56
+UI-PARSE timestamp=1795747516083 gui=1 bytes=1811791 duration_ms=1125
+UI-PULSE timestamp=1795747516352 gap_ms=1399
+UI-OPEN timestamp=1795747514683 tab=large_b
+APP_EXIT=0
+
+# final-cold-open
+APP_SHA256=4db2d731ae6cd51dc4189537288794ff2413e07c9bcf697968841a625cfd1c7c
+UI-PROBE timestamp=1795747749629 interval_ms=10
+UI-PROBE timestamp=1795747749688 interval_ms=10
+UI-PULSE timestamp=1795747749801 gap_ms=112
+UI-PULSE timestamp=1795747750567 gap_ms=105
+UI-PARSE timestamp=1795747750880 gui=1 bytes=458791 duration_ms=304
+UI-PULSE timestamp=1795747751007 gap_ms=439
+UI-PARSE timestamp=1795747751315 gui=1 bytes=458791 duration_ms=307
+UI-PULSE timestamp=1795747751334 gap_ms=326
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+UI-PARSE timestamp=1795747755119 gui=0 bytes=458791 duration_ms=304
+UI-PULSE timestamp=1795747757845 gap_ms=40
+Opened rtl/large_b.sv via Module Tree
+UI-PULSE timestamp=1795747757996 gap_ms=49
+UI-PARSE timestamp=1795747759112 gui=1 bytes=1811791 duration_ms=1112
+UI-PULSE timestamp=1795747759389 gap_ms=1392
+UI-PARSE timestamp=1795747760525 gui=0 bytes=1811791 duration_ms=1134
+UI-OPEN timestamp=1795747757753 tab=large_b
+APP_EXIT=0
