@@ -36,7 +36,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use lsp_types::{
     Diagnostic, DocumentSymbol, DocumentSymbolResponse, HoverContents, Location, MarkedString,
     ParameterLabel, Position, Range, SignatureHelp, TextDocumentContentChangeEvent, TextEdit, Url,
@@ -867,7 +867,7 @@ async fn session_loop(
     // flag keeps the periodic check from re-reporting the same death.
     let backend = inner.lock_status().backend;
     let mut child_exit_noted = false;
-    let mut applied_context: Option<AppliedBuildContext> = None;
+    let mut build_context = BuildContextState::default();
     loop {
         let command = tokio::select! {
             command = commands.recv() => command,
@@ -915,7 +915,7 @@ async fn session_loop(
                     &mut client,
                     &path,
                     text,
-                    has_slang_project_index && applied_context.is_some(),
+                    has_slang_project_index && build_context.applied.is_some(),
                 )
                 .await;
                 match outcome {
@@ -945,7 +945,7 @@ async fn session_loop(
                     &include_dirs,
                     &defines,
                     &files,
-                    &mut applied_context,
+                    &mut build_context,
                 )
                 .await;
                 match outcome {
@@ -972,18 +972,23 @@ async fn session_loop(
     // every exit path this loop can take - a normal stop, a closed command
     // channel, or an unwinding panic. A `SIGKILL` cannot run it; under
     // `XDG_RUNTIME_DIR` the session manager removes the directory then.
-    drop(applied_context);
-
     if let Err(error) = client.shutdown().await {
         inner.lock_status().message = format!("shutdown reported: {error}");
     }
+    drop(build_context);
     inner.stopped();
 }
 
-struct AppliedBuildContext {
-    _file: ContextFile,
+#[derive(Default)]
+struct BuildContextState {
+    applied: Option<BuildContext>,
+    candidate: Option<BuildContext>,
+    confirmed_restart: Option<u32>,
+}
+
+struct BuildContext {
+    file: ContextFile,
     text: String,
-    restart: u32,
 }
 
 /// The generated slang build file and the private directory holding it.
@@ -1308,7 +1313,7 @@ async fn apply_build_context(
     include_dirs: &[PathBuf],
     defines: &[String],
     files: &[PathBuf],
-    applied_context: &mut Option<AppliedBuildContext>,
+    state: &mut BuildContextState,
 ) -> Result<String> {
     if backend != LspBackend::Slang {
         // Verible's build context already reaches it as a file list on its
@@ -1319,23 +1324,49 @@ async fn apply_build_context(
         return Ok(String::new());
     }
     let text = build_context_text(include_dirs, defines, files)?;
-    let already_applied = client.is_running()
-        && applied_context.as_ref().is_some_and(|previous| {
-            previous.restart == client.restart_count() && previous.text == text
-        });
+    let applied = state
+        .applied
+        .as_ref()
+        .filter(|previous| previous.text == text);
+    let already_applied = applied.is_some()
+        && client.is_running()
+        && state.confirmed_restart == Some(client.restart_count());
     if !already_applied {
-        let context = write_context_file(&text)?;
-        let argument = Value::String(context.path.display().to_string());
+        let path = match applied {
+            Some(previous) => &previous.file.path,
+            None => {
+                let candidate = match &mut state.candidate {
+                    Some(candidate) => {
+                        if candidate.text != text {
+                            // The server may still read this path after a timeout.
+                            // Stage in its private directory and replace atomically.
+                            let staged = create_context_file(&candidate.file.directory, &text)?;
+                            std::fs::rename(&staged.path, &candidate.file.path)
+                                .context("cannot replace the unconfirmed build-context file")?;
+                            candidate.text = text;
+                        }
+                        candidate
+                    }
+                    None => state.candidate.insert(BuildContext {
+                        file: write_context_file(&text)?,
+                        text,
+                    }),
+                };
+                &candidate.file.path
+            }
+        };
+        let argument = Value::String(path.display().to_string());
+        // Keep both file guards, but trust neither configuration until a reply.
+        state.confirmed_restart = None;
         client
             .execute_command("slang.setBuildFile", vec![argument])
             .await?;
-        // The request can restart the child. Record the receiving generation
-        // after its reply and keep its build file alive until replacement.
-        *applied_context = Some(AppliedBuildContext {
-            _file: context,
-            text,
-            restart: client.restart_count(),
-        });
+        if applied.is_none() {
+            state.applied = state.candidate.take();
+        } else {
+            state.candidate = None;
+        }
+        state.confirmed_restart = Some(client.restart_count());
     }
     Ok(format!(
         "build context: {} include dir(s), {} define(s), {} session file(s)",

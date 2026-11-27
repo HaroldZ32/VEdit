@@ -44,13 +44,18 @@ impl Project {
             "exec 3>&1 1>/dev/null; exec \"$0\" --exact startup_failure_includes_child_stderr --nocapture"
         };
         let files = vec![self.file()];
+        let request_timeout = if mode == "context-timeout" {
+            Duration::from_millis(600)
+        } else {
+            BUDGET
+        };
         let mut config = LspConfig::new("/bin/sh", &self.0)
             .with_backend(LspBackend::Slang)
             .with_extra_arg("-c")
             .with_extra_arg(script)
             .with_extra_arg(std::env::current_exe()?)
             .with_environment([(server::MODE.to_string(), mode.to_string())].into())
-            .with_timeouts(BUDGET, BUDGET, Duration::from_millis(500));
+            .with_timeouts(BUDGET, request_timeout, Duration::from_millis(500));
         if mode == "indexed" {
             config = config.with_project_index(&files)?;
         }
@@ -96,6 +101,22 @@ impl Project {
 
     fn push_context(&self, session: &SessionHandle) -> Result<()> {
         session.set_build_context(vec![self.0.clone()], vec![server::DEFINE.to_string()])
+    }
+
+    fn active_context(&self) -> Result<PathBuf> {
+        Ok(std::fs::read_to_string(self.0.join("active-context-path"))?.into())
+    }
+
+    fn time_out_context(&self, session: &SessionHandle, define: &str) -> Result<SessionStatus> {
+        std::fs::write(self.0.join("drop-context-reply"), "")?;
+        session.set_build_context(vec![self.0.clone()], vec![define.to_string()])?;
+        wait_status(session, "build context timeout", |status| {
+            status.phase == SessionPhase::Failed
+                && status
+                    .message
+                    .contains("workspace/executeCommand timed out")
+                && !self.0.join("drop-context-reply").exists()
+        })
     }
 }
 
@@ -360,6 +381,127 @@ fn startup_failure_includes_child_stderr() -> Result<()> {
     );
     assert_eq!(failed.server_pid, None);
     assert!(session.wait_for_stop());
+    Ok(())
+}
+
+#[test]
+fn build_context_timeout_requires_wire_recovery() -> Result<()> {
+    const B: &str = "WIDTH=32";
+    for recovery in [server::DEFINE, B] {
+        let project = Project::new("context-timeout")?;
+        let session = project.start("context-timeout")?;
+        let pid = ready(&session, 0)?.server_pid.context("initial PID")?;
+        let push = |define: &str| {
+            session.set_build_context(vec![project.0.clone()], vec![define.to_string()])
+        };
+        let text = |define: &str| {
+            format!(
+                "+incdir+\"{}\"\n-D\"{define}\"\n\"{}\"\n",
+                project.0.display(),
+                project.file().display()
+            )
+        };
+
+        project.push_context(&session)?;
+        wire_barrier(&project, &session)?;
+        let confirmed = project.active_context()?;
+        push("invalid\nmacro")?;
+        wait_status(&session, "local input error", |status| {
+            status.phase == SessionPhase::Failed && status.message.contains("line break")
+        })?;
+        project.push_context(&session)?;
+        assert_eq!(ready(&session, 0)?.server_pid, Some(pid));
+        assert_eq!(project.active_context()?, confirmed);
+
+        let timed_out = project.time_out_context(&session, B)?;
+        assert_eq!(timed_out.server_pid, Some(pid));
+        let uncertain = project.active_context()?;
+        assert_ne!(uncertain, confirmed);
+        assert!(project.events()?.contains(&format!("reply withheld {pid}")));
+
+        let confirmed_text = std::fs::read_to_string(&confirmed);
+        let uncertain_text = std::fs::read_to_string(&uncertain);
+        push(recovery)?;
+        assert_eq!(ready(&session, 0)?.server_pid, Some(pid));
+        let recovered = project.active_context()?;
+        push(recovery)?;
+        wire_barrier(&project, &session)?;
+        let events = project.events()?;
+        let applied = [server::DEFINE, B, recovery]
+            .map(|define| {
+                Ok(format!(
+                    "applied {pid} {}",
+                    serde_json::to_string(&text(define))?
+                ))
+            })
+            .into_iter()
+            .collect::<Result<Vec<_>>>()?;
+        assert_eq!(
+            events
+                .lines()
+                .filter(|line| line.starts_with("applied "))
+                .collect::<Vec<_>>(),
+            applied,
+            "recovery must reach the live peer\n{events}"
+        );
+        assert_eq!(
+            &recovered,
+            if recovery == B {
+                &uncertain
+            } else {
+                &confirmed
+            }
+        );
+        assert_eq!(std::fs::read_to_string(&recovered)?, text(recovery));
+        assert_eq!(confirmed_text?, text(server::DEFINE));
+        assert_eq!(uncertain_text?, text(B));
+        for retired in [&confirmed, &uncertain] {
+            if *retired != recovered {
+                assert!(!retired.exists(), "obsolete context retained: {retired:?}");
+            }
+        }
+        assert!(session.wait_for_stop());
+        assert!(!recovered.exists());
+        println!("PID {pid}: recovered {recovery} after B timed out; files cleaned\n{events}");
+    }
+    Ok(())
+}
+
+#[test]
+fn consecutive_unknown_contexts_keep_one_candidate_until_shutdown() -> Result<()> {
+    let project = Project::new("context-timeout-repeated")?;
+    let session = project.start("context-timeout")?;
+    let pid = ready(&session, 0)?.server_pid.context("initial PID")?;
+    project.push_context(&session)?;
+    wire_barrier(&project, &session)?;
+    let confirmed = project.active_context()?;
+
+    assert_eq!(
+        project.time_out_context(&session, "WIDTH=32")?.server_pid,
+        Some(pid)
+    );
+    let candidate = project.active_context()?;
+    assert!(std::fs::read_to_string(&candidate)?.contains("WIDTH=32"));
+    // A buffer reply leaves the uncertain build context in use.
+    project.change(&session)?;
+    assert_eq!(ready(&session, 0)?.server_pid, Some(pid));
+
+    assert_eq!(
+        project.time_out_context(&session, "WIDTH=64")?.server_pid,
+        Some(pid)
+    );
+    assert_eq!(project.active_context()?, candidate);
+    assert!(std::fs::read_to_string(&candidate)?.contains("WIDTH=64"));
+    assert!(std::fs::read_to_string(&confirmed)?.contains(server::DEFINE));
+    assert!(session.wait_for_stop());
+    let events = project.events()?;
+    assert!(
+        events.contains(&format!("context readable at shutdown {pid}")),
+        "{events}"
+    );
+    assert!(!candidate.exists());
+    assert!(!confirmed.exists());
+    println!("PID {pid}: reused the candidate for different timed-out requests and read it during shutdown");
     Ok(())
 }
 

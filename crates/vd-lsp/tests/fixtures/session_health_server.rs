@@ -80,7 +80,15 @@ pub fn run(mode: &str) -> Result<()> {
                     .as_str()
                     .context("missing build file")?;
                 let content = std::fs::read_to_string(path)?;
-                if mode == "context-interleave" {
+                if mode == "context-timeout" {
+                    std::fs::write("active-context-path", path)?;
+                    writeln!(events, "applied {pid} {}", serde_json::to_string(&content)?)?;
+                    if Path::new("drop-context-reply").is_file() {
+                        std::fs::remove_file("drop-context-reply")?;
+                        writeln!(events, "reply withheld {pid}")?;
+                        continue;
+                    }
+                } else if mode == "context-interleave" {
                     let encoded = serde_json::to_string(&content)?;
                     if Path::new("reject-context").is_file() {
                         std::fs::remove_file("reject-context")?;
@@ -105,7 +113,14 @@ pub fn run(mode: &str) -> Result<()> {
                 Value::Null
             }
             Some("textDocument/documentSymbol") => json!([]),
-            Some("shutdown") => Value::Null,
+            Some("shutdown") => {
+                if mode == "context-timeout" {
+                    let path = std::fs::read_to_string("active-context-path")?;
+                    std::fs::read_to_string(path)?;
+                    writeln!(events, "context readable at shutdown {pid}")?;
+                }
+                Value::Null
+            }
             Some("exit") => return Ok(()),
             Some("initialized") => continue,
             other => bail!("unexpected fixture method: {other:?}"),
