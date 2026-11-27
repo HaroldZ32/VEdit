@@ -1,0 +1,75 @@
+[RED | pinned Qt Release Ninja | Qt source at 752c8ab; branch Rust archive]
+-- VEdit: Rust service layer vd-ffi -> /src/target/outline-qa/rust/release/libvd_ffi.a
+[109/111] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-lint-experience-selftest.dir/selftests/lint_experience_selftest.cpp.o
+[111/111] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-experience-selftest
+4a0377ded8d82095f93eb873141d5f28ae5f37eabb25bb3eaf1cea77ac6b3df2  vedit-lint-experience-selftest
+CHECK FAIL ac2.status-names-silence  a.sv — analyzed 04:54:58 (saved file): 0 diagnostic(s)
+CHECK FAIL ac2.status-does-not-report-zero  a.sv — analyzed 04:54:58 (saved file): 0 diagnostic(s)
+CHECK PASS recovery.published-empty-is-clean  a.sv — analyzed 04:54:58 (saved file): 0 diagnostic(s)
+CHECK PASS recovery.initial-context-once  1
+CHECK FAIL recovery.idle-failure-visible  a.sv — analyzed 04:54:58 (saved file): 0 diagnostic(s)
+CHECK FAIL recovery.failed-no-stale-clean  No diagnostics — no problems reported for a.sv — edit or save it to run the analysis again.
+CHECK FAIL recovery.failed-round-keeps-server-reason  failed: lsp 1/1 file(s), diagnostics 0
+CHECK FAIL recovery.context-exactly-once-and-idle-quiescent  pushes=1 starts=1 requests=1→1
+SUMMARY checks=121 failures=6 skips=0
+RED_EXIT=1
+
+[GREEN | xcb + Xvfb | real DiagnosticsPanel with controlled backend and real FFI]
+CHECK PASS wire.initial-ready-and-one-context  top.sv — analyzed 05:05:03 (saved file): 0 diagnostic(s)
+CHECK PASS wire.idle-failure-visible  top.sv — session FAILED (restarts 0): backend=slang · the language server exited after Ready (0/3 restart(s)) — server stderr: fixture idle exit
+CHECK PASS wire.idle-did-not-restart  top.sv — session FAILED (restarts 0): backend=slang · the language server exited after Ready (0/3 restart(s)) — server stderr: fixture idle exit
+CHECK PASS wire.edit-wakes-session
+CHECK PASS wire.new-process-and-verdict  top.sv — analyzed 05:05:07 (editor buffer, not saved yet): 0 diagnostic(s)
+CHECK PASS wire.recovered-idle-did-not-reanalyze  requests=11→11
+CHECK PASS wire.recovery-context-exactly-once  spawn 118
+context 118
+spawn 123
+change 123 unsaved
+context 123
+change 123 unsaved
+CHECK PASS wire.recovered-unsaved-buffer  top.sv — analyzed 05:05:07 (editor buffer, not saved yet): 0 diagnostic(s)
+CHECK PASS ac2.status-names-silence  a.sv — the language server did not analyse this file — no build context / no response / the session failed
+CHECK PASS ac2.status-does-not-report-zero  a.sv — the language server did not analyse this file — no build context / no response / the session failed
+CHECK PASS recovery.published-empty-is-clean  a.sv — analyzed 05:05:09 (saved file): 0 diagnostic(s)
+CHECK PASS recovery.idle-failure-visible  a.sv — session FAILED (restarts 1): child exited after Ready (stderr: fixture failure)
+CHECK PASS recovery.failed-no-stale-clean  No diagnostics — the language server session failed — child exited after Ready (stderr: fixture failure).
+CHECK PASS recovery.failed-round-keeps-server-reason  child exited after Ready (stderr: fixture failure)
+CHECK PASS recovery.no-context-until-ready  1
+CHECK PASS recovery.ready-publishes-new-verdict  a.sv — analyzed 05:05:09 (saved file): 0 diagnostic(s)
+CHECK PASS recovery.context-exactly-once-and-idle-quiescent  pushes=2 starts=1 requests=2→2
+SUMMARY checks=135 failures=0 skips=0
+XCB_EXIT=0
+
+[GREEN | focused CTest | anonymized fixture roots]
+77: CHECK midlevel.realtime-set-exact PASS  <fixture>/sub.sv,<fixture>/leaf.sv
+77: CHECK midlevel.session-covers-tops-other-child PASS  session=<fixture>/leaf.sv,<fixture>/other.sv,<fixture>/sibling.sv,<fixture>/sub.sv,<fixture>/top.sv
+77: CHECK midlevel.request-set-exact PASS  <fixture>/leaf.sv,<fixture>/sub.sv
+1/8 Test #77: vedit-realtime-depth-switch-e2e ........   Passed    6.82 sec
+2/8 Test #89: vedit-filelist-authority-e2e ...........   Passed    4.71 sec
+3/8 Test #66: vedit-workspace-diagnostics-selftest ...   Passed    4.49 sec
+4/8 Test #74: vedit-lint-experience-selftest .........   Passed    2.71 sec
+5/8 Test #85: vedit-toolchain-ux-selftest ............   Passed    3.14 sec
+6/8 Test #78: vedit-slang-build-context-e2e ..........   Passed    0.25 sec
+7/8 Test #69: vedit-verdict-retention-selftest .......   Passed    0.00 sec
+8/8 Test #88: vedit-realtime-context-e2e .............   Passed   29.24 sec
+100% tests passed, 0 tests failed out of 8
+CTEST_EXIT=0
+
+[Product seam | first pass with slang-server, then Verible fallback]
+CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+CTEST_EXIT=8
+CHECK seam.annotation-tooltip-has-syntax PASS  syntax error at "b" [verible]
+100% tests passed, 0 tests failed out of 1
+SEAM_FALLBACK_EXIT=0
+
+[Final build and tool SHA-256]
+Generated 1894 translation(s) (1894 finished and 0 unfinished)
+53cc84ab0f7fba8221e82e6a71ab29fe5d8f9820ecd87699592a548c06a31c31  vedit-lint-experience-selftest
+997069bbd72086cd90eb30c60085ecf0b328359752bd61e04685ffa8bd6ac745  vedit-realtime-depth-switch-e2e
+8531e7675419342351003d74048ec4c0f191f97d709559e2d47bc60d96fcf1e7  libvd_ffi.a
+cb27a6fa1ae921d094b2052ac9661380b4625d7612c4eded8136f08e21aa1696  session_health fixture
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  slang
+134f4d0b495bb271bf701b109346ee0b85c191b66459  slang-server
+[Container image IDs]
+sha256:809c8072ac65be85a15bfc010400f1a0b2cffa10966cfebd4e7dcd0b418360c1  vedit-qt6-build:local
+sha256:0798e93a6d3026424dfcda486014462298474a3e773e448e31856028f921a0e0  vedit-build:local
