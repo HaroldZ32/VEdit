@@ -334,17 +334,19 @@ int main(int argc, char **argv)
     auto *variantView = qobject_cast<KTextEditor::View *>(pane->editorWidget());
     bool emptyCleared = false;
     bool oversizedCleared = false;
-    bool closedVariant = false;
-    if (variantResolved && variantView != nullptr && pane->openFile(original, &error)) {
+    bool inactiveEditCleared = false;
+    bool inactiveCloseCleared = false;
+    const auto variantOwnerInScope = [&] {
+        return controller->analyzeFileName() == variant
+            && controller->fileSetReport().files.contains(alternateOwner);
+    };
+    if (openedVariant && variantView != nullptr && variantOwnerInScope() && pane->openFile(original, &error)) {
         const int observerIndex = pane->activeTabIndex();
         auto *document = variantView->document();
         const QString savedVariant = document->text();
         const auto checkUnavailable = [&](const QString &text, QStringView reason) {
             pane->setActiveTab(variantIndex);
-            const bool repopulated = waitFor([&] {
-                return controller->analyzeFileName() == variant
-                    && controller->fileSetReport().files.contains(alternateOwner);
-            });
+            const bool repopulated = waitFor(variantOwnerInScope);
             document->setText(text);
             const bool unavailable = waitFor([&] { return controller->realtimeReason().contains(reason); });
             const auto analyses = controller->analysisCount();
@@ -361,10 +363,31 @@ int main(int argc, char **argv)
         const QString padding = (u"// "_s + QString(252, u' ') + u'\n')
                                     .repeated(workspace::kActiveFileWatchByteCap / 256 + 1);
         oversizedCleared = checkUnavailable(padding, u"file too large");
-        closedVariant = pane->closeTab(variantIndex);
+
+        const auto observeVariantOwner = [&] {
+            pane->setActiveTab(variantIndex);
+            const bool ready = waitFor(variantOwnerInScope);
+            pane->setActiveTab(observerIndex);
+            return ready && waitFor([&] {
+                return controller->analyzeFileName() == original
+                    && controller->fileSetReport().files.contains(alternateOwner);
+            });
+        };
+        const auto ownerRemoved = [&] {
+            return pane->currentFilePath() == original && controller->analyzeFileName() == original
+                && !controller->fileSetReport().files.contains(alternateOwner);
+        };
+        const bool editSetup = observeVariantOwner();
+        document->setText(QString());
+        inactiveEditCleared = editSetup && waitFor(ownerRemoved, 2500);
+        document->setText(savedVariant);
+        document->setModified(false);
+        const bool closeSetup = observeVariantOwner();
+        const bool closed = pane->closeTab(variantIndex);
+        inactiveCloseCleared = closeSetup && closed && waitFor(ownerRemoved, 2500);
     }
-    std::printf("INFERRED-SCOPE-INVALIDATION empty=%d oversized=%d closed=%d\n",
-                emptyCleared, oversizedCleared, closedVariant);
+    std::printf("INFERRED-SCOPE-INVALIDATION empty=%d oversized=%d inactive-edit=%d inactive-close=%d\n",
+                emptyCleared, oversizedCleared, inactiveEditCleared, inactiveCloseCleared);
 
     const bool openedMacroParent = pane->closeTab(pane->activeTabIndex()) && pane->openFile(macroParent, &error);
     const auto macroRows = [&] {
@@ -406,5 +429,6 @@ int main(int argc, char **argv)
     return initial && added && catalogReady && importedMacro && changed && changedMacro
             && removed && removedMacro && childResolved && fresh && reopened && scopedTreeReady
             && siblingResolved && restoredAuto && variantResolved && emptyCleared && oversizedCleared
-            && closedVariant && keptMacroOwner && manualOnly && macroOverride ? 0 : 1;
+            && inactiveEditCleared && inactiveCloseCleared && keptMacroOwner && manualOnly
+            && macroOverride ? 0 : 1;
 }

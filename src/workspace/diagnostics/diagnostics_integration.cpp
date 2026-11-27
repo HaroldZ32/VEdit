@@ -492,7 +492,9 @@ private:
         auto tracked = documents_.find(document);
         if (tracked != documents_.end()) {
             if (*tracked != path) {
-                discardBufferClosure(*tracked);
+                if (discardBufferClosure(*tracked)) {
+                    debounce_->start();
+                }
                 *tracked = path; // save-as / rename
             }
             return;
@@ -511,7 +513,9 @@ private:
             connect(text, &QTextDocument::contentsChanged, this, edited);
         }
         connect(document, &QObject::destroyed, this, [this, document]() {
-            discardBufferClosure(documents_.take(document));
+            if (discardBufferClosure(documents_.take(document))) {
+                debounce_->start();
+            }
         });
         // N2-r: an edit made in the same event-loop turn as opening a tab may
         // have missed the subscription. Check every newly tracked document.
@@ -528,16 +532,19 @@ private:
         }
         // R2: a file edited after the project pass loses its upper-layer verdict
         // at ONCE, whether or not it is the active tab.
-        discardBufferClosure(file);
+        const bool closureRemoved = discardBufferClosure(file);
         controller_->markFileEdited(file);
         vedit::app::EditorPane *pane = shell_->editorArea() != nullptr
                                            ? shell_->editorArea()->activePane()
                                            : nullptr;
-        if (pane != nullptr && pane->currentFilePath() == file) {
+        const bool active = pane != nullptr && pane->currentFilePath() == file;
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        if (active) {
             closureWaiting_ = false; // respect the active edit's debounce
+        }
 #endif
-            debounce_->start();
+        if (active || closureRemoved) {
+            debounce_->start(); // a removed background closure also changes the session union
         }
     }
 
@@ -673,15 +680,15 @@ private:
         return true;
     }
 
-    void discardBufferClosure(const QString &path)
+    bool discardBufferClosure(const QString &path)
     {
-        bufferClosures_.remove(path);
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
         bufferClosureKeys_.remove(path);
         if (path == closureWorkerPath_) {
             closureWorkerKey_.document.clear();
         }
 #endif
+        return bufferClosures_.remove(path);
     }
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
