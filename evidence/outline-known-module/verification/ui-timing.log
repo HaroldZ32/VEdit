@@ -1,0 +1,86 @@
+
+Build 7202846
+  12003  458791 target/outline-qa/reviewer-app/perf.yjjNtb/project/rtl/large_a.sv
+  45003 1811791 target/outline-qa/reviewer-app/perf.yjjNtb/project/rtl/large_b.sv
+  57006 2270582 total
+a3b10728fb28282595009d8b0b361fe486aa031f37062547e83b781394ab6abf  target/outline-qa/reviewer-app/perf.yjjNtb/project/rtl/large_a.sv
+4efd401490e7f8841008e232916576e6381f5b5c23d6f6d2daa1ae74799b1540  target/outline-qa/reviewer-app/perf.yjjNtb/project/rtl/large_b.sv
+UI-PROBE timestamp=1795746148589 interval_ms=10
+UI-PROBE timestamp=1795746148656 interval_ms=10
+UI-PULSE timestamp=1795746148761 gap_ms=105
+UI-PULSE timestamp=1795746149643 gap_ms=201
+UI-PARSE timestamp=1795746149940 gui=1 bytes=458791 duration_ms=289
+UI-PARSE timestamp=1795746151116 gui=1 bytes=1811791 duration_ms=1084
+UI-PULSE timestamp=1795746151391 gap_ms=1748
+UI-PARSE timestamp=1795746151685 gui=1 bytes=458791 duration_ms=292
+UI-PULSE timestamp=1795746151710 gap_ms=319
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+UI-PULSE timestamp=1795746161052 gap_ms=84
+UI-PULSE timestamp=1795746162895 gap_ms=53
+UI-PULSE timestamp=1795746164752 gap_ms=46
+UI-PULSE timestamp=1795746166614 gap_ms=40
+UI-PULSE timestamp=1795746168477 gap_ms=43
+UI-PULSE timestamp=1795746170347 gap_ms=49
+UI-PULSE timestamp=1795746172213 gap_ms=46
+UI-PULSE timestamp=1795746174082 gap_ms=48
+UI-SWITCH timestamp=1795746160914 sequence=1 tab=large_a
+UI-SWITCH timestamp=1795746162788 sequence=2 tab=large_b
+UI-SWITCH timestamp=1795746164658 sequence=3 tab=large_a
+UI-SWITCH timestamp=1795746166524 sequence=4 tab=large_b
+UI-SWITCH timestamp=1795746168386 sequence=5 tab=large_a
+UI-SWITCH timestamp=1795746170248 sequence=6 tab=large_b
+UI-SWITCH timestamp=1795746172115 sequence=7 tab=large_a
+UI-SWITCH timestamp=1795746173983 sequence=8 tab=large_b
+APP_EXIT=0
+
+Build 6744f231
+  12003  458791 target/outline-qa/reviewer-app/perf.ZUFmLe/project/rtl/large_a.sv
+  45003 1811791 target/outline-qa/reviewer-app/perf.ZUFmLe/project/rtl/large_b.sv
+  57006 2270582 total
+a3b10728fb28282595009d8b0b361fe486aa031f37062547e83b781394ab6abf  target/outline-qa/reviewer-app/perf.ZUFmLe/project/rtl/large_a.sv
+4efd401490e7f8841008e232916576e6381f5b5c23d6f6d2daa1ae74799b1540  target/outline-qa/reviewer-app/perf.ZUFmLe/project/rtl/large_b.sv
+UI-PROBE timestamp=1795746178046 interval_ms=10
+UI-PROBE timestamp=1795746178102 interval_ms=10
+UI-PULSE timestamp=1795746178205 gap_ms=102
+UI-PULSE timestamp=1795746179061 gap_ms=195
+UI-PARSE timestamp=1795746179355 gui=1 bytes=458791 duration_ms=286
+UI-PARSE timestamp=1795746180530 gui=1 bytes=1811791 duration_ms=1080
+UI-PULSE timestamp=1795746180805 gap_ms=1744
+UI-PARSE timestamp=1795746181109 gui=1 bytes=458791 duration_ms=302
+UI-PULSE timestamp=1795746181134 gap_ms=328
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+UI-PARSE timestamp=1795746185488 gui=1 bytes=1811791 duration_ms=1072
+UI-PULSE timestamp=1795746185769 gap_ms=1383
+UI-PULSE timestamp=1795746190471 gap_ms=102
+UI-PARSE timestamp=1795746190861 gui=1 bytes=458791 duration_ms=273
+UI-PULSE timestamp=1795746190947 gap_ms=365
+UI-PULSE timestamp=1795746192288 gap_ms=57
+UI-PARSE timestamp=1795746193589 gui=1 bytes=1811791 duration_ms=999
+UI-PULSE timestamp=1795746193871 gap_ms=1292
+UI-PULSE timestamp=1795746194142 gap_ms=40
+UI-PARSE timestamp=1795746194526 gui=1 bytes=458791 duration_ms=273
+UI-PULSE timestamp=1795746194604 gap_ms=361
+UI-PULSE timestamp=1795746196007 gap_ms=42
+UI-PARSE timestamp=1795746197207 gui=1 bytes=1811791 duration_ms=1017
+UI-PULSE timestamp=1795746197489 gap_ms=1302
+UI-PULSE timestamp=1795746197871 gap_ms=40
+UI-PARSE timestamp=1795746198178 gui=1 bytes=458791 duration_ms=267
+UI-PULSE timestamp=1795746198255 gap_ms=353
+UI-PULSE timestamp=1795746199738 gap_ms=41
+UI-PARSE timestamp=1795746200998 gui=1 bytes=1811791 duration_ms=1008
+UI-PULSE timestamp=1795746201284 gap_ms=1305
+UI-PULSE timestamp=1795746201602 gap_ms=37
+UI-PARSE timestamp=1795746201935 gui=1 bytes=458791 duration_ms=269
+UI-PULSE timestamp=1795746202015 gap_ms=351
+UI-PULSE timestamp=1795746203470 gap_ms=44
+UI-PARSE timestamp=1795746204605 gui=1 bytes=1811791 duration_ms=1014
+UI-PULSE timestamp=1795746204881 gap_ms=1299
+UI-SWITCH timestamp=1795746190311 sequence=1 tab=large_a
+UI-SWITCH timestamp=1795746192183 sequence=2 tab=large_b
+UI-SWITCH timestamp=1795746194509 sequence=3 tab=large_a
+UI-SWITCH timestamp=1795746195917 sequence=4 tab=large_b
+UI-SWITCH timestamp=1795746197781 sequence=5 tab=large_a
+UI-SWITCH timestamp=1795746199647 sequence=6 tab=large_b
+UI-SWITCH timestamp=1795746201513 sequence=7 tab=large_a
+UI-SWITCH timestamp=1795746203380 sequence=8 tab=large_b
+APP_EXIT=0
