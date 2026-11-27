@@ -26,6 +26,10 @@ The independent native reviewer passed the small CTest and the oversize selftest
 
 With `VEDIT_SLANG` set to the pinned binary and an isolated Cargo target directory, `cargo +stable test --locked --offline -p vd-deeplint --lib --test hierarchy --test real_slang --test catalog` passed 186 tests and skipped 3 existing opt-in tests. An initial isolated run without `VEDIT_SLANG` failed the existing lint fallback test because that executable could not resolve the checkout's local slang. The successful run supplied the pinned fallback through `VEDIT_SLANG`. The new parser tests compare the full trace graph of the captured small design and verify cancellation and malformed input. `cargo +stable clippy --locked --offline -p vd-deeplint --all-targets -- -D warnings` also passed. [Rust test log](rust-tests.log) · [Clippy log](clippy.log)
 
+## Trace lifecycle follow-up
+
+The subsequent cancellation and disposal change has separate Rust and Qt evidence, including rapid snapshot turnover, compiler retirement before restart and closing with a live large index. [Lifecycle verification](lifecycle.md)
+
 ## Limits
 
 The byte size of the dump no longer gates editor tracing. The projection retains only navigation data and refuses above its charged retention budget. The expanded graph has a separate budget for instances, signals, edges and their indices. The accounting is a bound on retained work, with RSS recorded separately. The compiler still produces a temporary AST with its own resource use. The existing source-file cap, compiler timeout, JSON nesting guard and bounded trace results remain in effect. No customer project was available for these measurements.

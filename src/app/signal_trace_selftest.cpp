@@ -181,6 +181,19 @@ for argument do
     esac
     previous=$argument
 done
+if [ "$trace" = yes ]; then
+    probe_dir=${VEDIT_TRACE_TEST_SIZES%/*}
+    if [ -f "$probe_dir/hold-trace" ]; then
+        printf '%s\n' "$$" > "$probe_dir/held-trace-pid"
+        exec sleep 30
+    fi
+    if [ -s "$probe_dir/held-trace-pid" ]; then
+        read -r stale < "$probe_dir/held-trace-pid"
+        if kill -0 "$stale" 2>/dev/null; then
+            : > "$probe_dir/trace-overlap"
+        fi
+    fi
+fi
 "$VEDIT_TRACE_TEST_SLANG" "$@"
 result=$?
 if [ "$trace" = yes ] && [ -f "$output" ]; then
@@ -200,8 +213,10 @@ exit "$result"
     return wrapper.fileName();
 }
 
-int verifyOversize(ApplicationShell &shell, const QDir &root, QAction *driver, QAction *load)
+int verifyOversize(std::unique_ptr<ApplicationShell> &owner, const QDir &root,
+                   QAction *driver, QAction *load, QAction *loads)
 {
+    auto &shell = *owner;
     const auto top = root.filePath(QStringLiteral("top.sv"));
     const auto leaf = root.filePath(QStringLiteral("leaf.sv"));
     QTimer heartbeat;
@@ -247,6 +262,58 @@ int verifyOversize(ApplicationShell &shell, const QDir &root, QAction *driver, Q
     std::printf("oversize trace ast_bytes=%lld\n", static_cast<long long>(bytes));
     check("compiled trace AST exceeds 96 MiB", bytes > 100663296);
     check("driver and load reuse one elaboration", sizes.atEnd());
+    sizes.close();
+
+    const auto changeSource = [&leaf] {
+        QFile input(leaf);
+        return input.open(QIODevice::Append) && input.write("\n") == 1 && input.flush();
+    };
+    view(shell)->setCursorPosition({1, 7});
+    loads->trigger();
+    if (!check("cached trace can show its result before invalidation", tree(shell))) {
+        return 1;
+    }
+    clock.restart();
+    check("source edit invalidates the cached large trace", changeSource() && until([&] {
+        return tree(shell) == nullptr;
+    }));
+    std::printf("oversize cached invalidation elapsed_ms=%lld\n", static_cast<long long>(clock.elapsed()));
+
+    QFile hold(root.filePath(QStringLiteral("hold-trace")));
+    if (!hold.open(QIODevice::WriteOnly)) {
+        return 1;
+    }
+    hold.close();
+    view(shell)->setCursorPosition({1, 7});
+    driver->trigger();
+    QFile heldPid(root.filePath(QStringLiteral("held-trace-pid")));
+    if (!check("trace starts a controlled pending job", until([&] { return heldPid.size() > 0; }))) {
+        return 1;
+    }
+    if (!heldPid.open(QIODevice::ReadOnly) || !hold.remove()) {
+        return 1;
+    }
+    const auto process = QStringLiteral("/proc/") + QString::fromUtf8(heldPid.readAll().trimmed());
+    const bool invalidated = changeSource() && until([&] {
+        return shell.statusBar()->currentMessage().contains(QStringLiteral("Project inputs changed"));
+    });
+    check("second edit cancels the active generation", invalidated);
+    if (!invalidated) {
+        return 1;
+    }
+    clock.restart();
+    driver->trigger();
+    check("replacement trace returns the driver", until([&] {
+        return view(shell)->document()->url().toLocalFile() == leaf
+            && view(shell)->cursorPosition() == KTextEditor::Cursor(0, 56);
+    }, 20000));
+    std::printf("oversize replacement elapsed_ms=%lld\n", static_cast<long long>(clock.elapsed()));
+    check("stale compiler exited before replacement started", !QFileInfo::exists(process)
+          && !root.exists(QStringLiteral("trace-overlap")));
+
+    clock.restart();
+    owner.reset();
+    std::printf("oversize window destruction elapsed_ms=%lld\n", static_cast<long long>(clock.elapsed()));
     return failures != 0;
 }
 }
@@ -281,7 +348,8 @@ int main(int argc, char **argv)
     options.restoreSession = false;
     options.deferSessionRestore = true;
     options.showDefaultPanels = false;
-    ApplicationShell shell(options);
+    auto ownedShell = std::make_unique<ApplicationShell>(options);
+    auto &shell = *ownedShell;
     shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
     vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir, true});
     shell.setProperty("vedit.diagnostics.toolchainSlang", traceSlang);
@@ -310,7 +378,7 @@ int main(int argc, char **argv)
         return 1;
     }
     if (oversize) {
-        return verifyOversize(shell, root, driver, load);
+        return verifyOversize(ownedShell, root, driver, load, loads);
     }
     vedit::workspace::settings::SettingsDialog preferences(shell.themes(), shell.commands(),
                                                           state.filePath(QStringLiteral("settings.toml")));
