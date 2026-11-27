@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QDockWidget>
 #include <QElapsedTimer>
+#include <QEventLoop>
 #include <QFile>
 #include <QImage>
 #include <QKeyEvent>
@@ -27,20 +28,37 @@
 #include <QPalette>
 #include <QStringList>
 #include <QTemporaryDir>
+#include <QTemporaryFile>
 #include <QThread>
+#include <QTimer>
 #include <QToolButton>
 
 #if defined(VEDIT_TERMINAL_HAVE_FFI)
 #include "vd_ffi.h"
 #endif
 
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
 #include <functional>
 #include <memory>
 #include <string>
 
+namespace vedit::terminal {
+
+struct PtyReadLimitProbe {
+    static void drain(PtySession &session, int fd)
+    {
+        session.master_ = fd;
+        session.readAvailable();
+    }
+};
+
+} // namespace vedit::terminal
+
+using vedit::terminal::PtyReadLimitProbe;
 using vedit::terminal::PtySession;
 using vedit::terminal::Screen;
 using vedit::terminal::TerminalOptions;
@@ -650,15 +668,57 @@ void checkPtyMasterFdDescendants()
           text.left(300));
 }
 
-// Review M3: a producer that never stops (`yes`, `cat /dev/zero`) must not keep
-// readAvailable() inside its read loop. Each activation is bounded by
-// PtySession::readChunkLimit(); the residue is rescheduled and still delivered.
+void checkPtyReadBudget()
+{
+    const qsizetype limit = PtySession::readChunkLimit();
+    const QByteArray prefix(limit, 'x');
+    const QByteArray payload = prefix + "tail-after-limit";
+    QTemporaryFile source;
+    const bool prefilled = source.open() && source.write(payload) == payload.size() &&
+                           source.flush() && source.seek(0);
+    const int fd = prefilled ? ::fcntl(source.handle(), F_DUPFD_CLOEXEC, 0) : -1;
+    if (fd < 0) {
+        check("pty.read-limit.prefilled-source", false,
+              prefilled ? QString::fromLocal8Bit(std::strerror(errno)) : source.errorString());
+        return;
+    }
+
+    // Prefill beyond the budget and omit the socket notifier so the queued
+    // continuation is the only way to drain the tail.
+    QByteArray delivered;
+    QEventLoop loop;
+    PtySession session;
+    QObject::connect(&session, &PtySession::outputReady, &loop, [&](const QByteArray &data) {
+        delivered += data;
+        if (delivered.size() >= payload.size()) {
+            loop.quit();
+        }
+    });
+    PtyReadLimitProbe::drain(session, fd);
+    check("pty.read-limit.cap-engaged",
+          delivered == prefix && session.maxBytesPerActivation() == limit &&
+              session.cappedActivations() == 1,
+          QStringLiteral("first=%1 max=%2 limit=%3 capped=%4")
+              .arg(delivered.size()).arg(session.maxBytesPerActivation())
+              .arg(limit).arg(session.cappedActivations()));
+    if (delivered.size() < payload.size()) {
+        QTimer::singleShot(8000, &loop, &QEventLoop::quit);
+        loop.exec();
+    }
+    check("pty.read-limit.rescheduled", delivered == payload,
+          QStringLiteral("delivered=%1 expected=%2").arg(delivered.size()).arg(payload.size()));
+    check("pty.read-limit.tail-below-cap", session.cappedActivations() == 1,
+          QStringLiteral("capped=%1").arg(session.cappedActivations()));
+}
+
 void checkPtyReadLimit()
 {
-    PtySession session;
     qint64 delivered = 0;
+    QEventLoop loop;
+    PtySession session;
     QObject::connect(&session, &PtySession::outputReady, &session,
                      [&delivered](const QByteArray &data) { delivered += data.size(); });
+    QObject::connect(&session, &PtySession::finished, &loop, &QEventLoop::quit);
     const qint64 produced = 4 * 1024 * 1024;
     QString error;
     const bool started =
@@ -670,18 +730,19 @@ void checkPtyReadLimit()
     if (!started) {
         return;
     }
-    const bool finished = waitFor([&session]() { return !session.isRunning(); }, 30000);
-    pump(200);
-    check("pty.read-limit.finished", finished);
-    check("pty.read-limit.delivered", delivered >= produced,
+    QTimer::singleShot(30000, &loop, &QEventLoop::quit);
+    loop.exec();
+    check("pty.read-limit.finished",
+          !session.isRunning() && session.exitKnown() && session.exitCode() == 0,
+          session.exitDescription());
+    check("pty.read-limit.delivered", delivered == produced,
           QStringLiteral("delivered=%1 produced=%2").arg(delivered).arg(produced));
     check("pty.read-limit.max-per-activation",
           session.maxBytesPerActivation() <= PtySession::readChunkLimit(),
-          QStringLiteral("max=%1 limit=%2")
+          QStringLiteral("max=%1 limit=%2 capped=%3")
               .arg(session.maxBytesPerActivation())
-              .arg(PtySession::readChunkLimit()));
-    check("pty.read-limit.cap-engaged", session.cappedActivations() > 0,
-          QStringLiteral("capped=%1").arg(session.cappedActivations()));
+              .arg(PtySession::readChunkLimit())
+              .arg(session.cappedActivations()));
 }
 
 // --- the panel --------------------------------------------------------------
@@ -925,6 +986,7 @@ int runSelfCheck()
     checkPtyChildInheritsLauncherEnvironment();
     checkPtyMasterFdNotInherited();
     checkPtyMasterFdDescendants();
+    checkPtyReadBudget();
     checkPtyReadLimit();
     checkPanelRuns();
     checkPanelExitStatusVisible();
