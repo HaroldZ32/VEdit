@@ -246,6 +246,7 @@ public:
     void showSvnFileHistory(const QString &path, std::function<bool()> stillCurrent = {});
     void compareSvnFile(const QString &path, SvnRevision revision, std::function<bool()> stillCurrent = {});
     bool svnSelectionCurrent() const { return !externalSelection_ || externalSelection_(); }
+    int svnChangeKind(const QString &path) const;
 
     bool stageSelected();
     bool unstageSelected();
@@ -445,7 +446,6 @@ private:
     void updateSvnActions();
     QStringList selectedSvnPaths() const;
     QString svnChangelist(const QString &path) const;
-    int svnChangeKind(const QString &path) const;
     void promptSvnCommit(QStringList paths, QString changelist = {});
     void promptSvnBranch(WriteOp op);
     void confirmSvnPaths(WriteOp op, const QStringList &paths);

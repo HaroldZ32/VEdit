@@ -1,0 +1,18 @@
+PASS open editor
+PASS trace actions and project model
+PASS Project menu owns the four live trace actions
+PASS folder alone disables trace
+PASS real filelist import
+PASS import enables trace
+search: jump opened '<fixture>/leaf.sv' line=1 column=57 (cursor=1:57)
+search: jump opened '<fixture>/top.sv' line=6 column=19 (cursor=6:19)
+oversize cold action elapsed_ms=2497 event_ticks=235 max_gap_ms=19
+PASS oversize driver jumps to child output declaration
+PASS oversize load jumps to the same signal's RHS occurrence
+oversize warm action elapsed_ms=0
+PASS measure the real trace AST
+oversize trace ast_bytes=138188283
+PASS compiled trace AST exceeds 96 MiB
+PASS driver and load reuse one elaboration
+trace_elapsed_s=2.95 trace_max_single_process_rss_kib=528516 exit=0
+test_container_cgroup_peak_bytes=1443057664

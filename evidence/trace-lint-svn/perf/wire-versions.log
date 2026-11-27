@@ -1,0 +1,10 @@
+slang 49 publish version absent messages expected ';'|expected a declaration name|unused variable 'a'
+slang 701 didChange version 2
+slang 702 publish version absent messages unused variable 'a'|unused variable 'b'
+slang 1202 didSave no write
+slang 1203 publish version absent messages unused variable 'a'|unused variable 'b'
+slang 1805 publish version absent messages 
+verible 12 publish version absent messages syntax error at "b"
+verible 700 didChange version 2
+verible 701 publish version absent messages 
+verible 1201 didSave no write

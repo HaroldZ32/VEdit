@@ -46,6 +46,8 @@ use vd_deeplint::{
     DEFAULT_MAX_DIAGNOSTICS, DEFAULT_TIMEOUT,
 };
 
+mod trace_jobs;
+
 /// The first batch job id. Disjoint from the service registry's ids.
 const FIRST_BATCH_ID: u64 = 1 << 32;
 
@@ -1037,13 +1039,7 @@ pub unsafe extern "C" fn vd_lint_progress_free(progress: *mut VdLintProgress) {
 const FIRST_HIER_ID: u64 = 1 << 48;
 
 struct HierarchySlot {
-    result: Mutex<Option<HierarchyResult>>,
-    cancel: AtomicBool,
-}
-
-enum HierarchyResult {
-    Report(HierarchyReport),
-    Trace(vd_deeplint::TraceIndex, Option<Vec<PathBuf>>),
+    result: Mutex<Option<HierarchyReport>>,
 }
 
 static NEXT_HIERARCHY: AtomicU64 = AtomicU64::new(0);
@@ -1271,54 +1267,59 @@ unsafe fn start_hierarchy(
         return 0;
     }
     // SAFETY: the option pointers are null or valid strings per the contract.
-    let mut hierarchy = match unsafe { build_hierarchy_options(&options) } {
+    let hierarchy = match unsafe { build_hierarchy_options(&options) } {
         Ok(built) => built,
         Err(message) => {
             state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
             return 0;
         }
     };
-    if root.is_some() {
-        if file_set.len() > 2000 {
-            state.record_error(VdError::new(
-                VD_ERR_INVALID_ARGUMENT,
-                "signal tracing supports up to 2000 source files",
-            ));
-            return 0;
-        }
-        hierarchy.max_json_bytes = 96 * 1024 * 1024;
+    if root.is_some() && file_set.len() > 2000 {
+        state.record_error(VdError::new(
+            VD_ERR_INVALID_ARGUMENT,
+            "signal tracing supports up to 2000 source files",
+        ));
+        return 0;
     }
     let id = FIRST_HIER_ID + NEXT_HIERARCHY.fetch_add(1, Ordering::Relaxed);
+    if let Some(root) = root {
+        let result = trace_jobs::get_or_start().map(|runner| {
+            runner.enqueue(
+                id,
+                trace_jobs::Request {
+                    files: file_set,
+                    options: hierarchy,
+                    root,
+                },
+            )
+        });
+        return match result {
+            Ok(true) => id,
+            Ok(false) => {
+                state.record_error(VdError::new(
+                    crate::capi::VD_ERR_SERVICE,
+                    "signal tracing is busy; release an existing trace and retry",
+                ));
+                0
+            }
+            Err(error) => {
+                state.record_error(VdError::new(
+                    crate::capi::VD_ERR_INTERNAL,
+                    &format!("cannot start the signal trace worker: {error}"),
+                ));
+                0
+            }
+        };
+    }
     let slot = Arc::new(HierarchySlot {
         result: Mutex::new(None),
-        cancel: AtomicBool::new(false),
     });
     hierarchies().insert(id, Arc::clone(&slot));
-    let worker_slot = Arc::clone(&slot);
     let spawned = std::thread::Builder::new()
         .name(format!("vd-hier-{id}"))
         .spawn(move || {
-            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                let Some(root) = root else {
-                    return HierarchyResult::Report(vd_deeplint::elaborate(&file_set, &hierarchy));
-                };
-                let (report, dependencies) = vd_deeplint::elaborate_navigation(
-                    &file_set,
-                    &hierarchy,
-                    &root,
-                    &worker_slot.cancel,
-                );
-                if report.failure.is_some() || worker_slot.cancel.load(Ordering::SeqCst) {
-                    HierarchyResult::Report(report)
-                } else {
-                    HierarchyResult::Trace(
-                        vd_deeplint::TraceIndex::from_report(report),
-                        Some(dependencies),
-                    )
-                }
-            }))
-            .unwrap_or_else(|_| {
-                HierarchyResult::Report(HierarchyReport {
+            let result = std::panic::catch_unwind(|| vd_deeplint::elaborate(&file_set, &hierarchy))
+                .unwrap_or_else(|_| HierarchyReport {
                     tool: "slang".to_string(),
                     top: hierarchy.top.clone(),
                     instances: Vec::new(),
@@ -1328,11 +1329,10 @@ unsafe fn start_hierarchy(
                     warning: None,
                     failure: Some(vd_deeplint::LintFailure::Io {
                         message: "the elaboration job panicked; its result was discarded"
-                            .to_string(),
+                            .to_owned(),
                     }),
-                })
-            });
-            if let Ok(mut slot) = worker_slot.result.lock() {
+                });
+            if let Ok(mut slot) = slot.result.lock() {
                 *slot = Some(result);
             }
         });
@@ -1377,16 +1377,13 @@ pub unsafe extern "C" fn vd_hier_poll(
         ));
         return POLL_MISUSE;
     };
-    let report = {
-        let mut guard = slot.result.lock().unwrap_or_else(|err| err.into_inner());
-        match guard.as_ref() {
-            None => return VD_STATUS_PENDING,
-            Some(HierarchyResult::Trace(..)) => return POLL_MISUSE,
-            Some(HierarchyResult::Report(_)) => guard.take(),
-        }
-    };
-    let Some(HierarchyResult::Report(report)) = report else {
-        return POLL_MISUSE;
+    let report = slot
+        .result
+        .lock()
+        .unwrap_or_else(|err| err.into_inner())
+        .take();
+    let Some(report) = report else {
+        return VD_STATUS_PENDING;
     };
     hierarchies().remove(&job);
     if let Some(failure) = &report.failure {
@@ -1432,16 +1429,19 @@ pub unsafe extern "C" fn vd_hier_trace_poll(
     if out.is_null() || direction > 3 {
         return POLL_MISUSE;
     }
-    let Some(slot) = hierarchies().get(&job).cloned() else {
+    let Some(slot) = trace_jobs::existing().and_then(|runner| runner.find(job)) else {
         return POLL_MISUSE;
     };
     let mut guard = slot
         .result
         .lock()
         .unwrap_or_else(|error| error.into_inner());
+    if slot.cancel.load(Ordering::SeqCst) {
+        return POLL_MISUSE;
+    }
     match guard.as_mut() {
         None => VD_STATUS_PENDING,
-        Some(HierarchyResult::Trace(index, dependencies)) => {
+        Some(trace_jobs::Outcome::Ready(index, dependencies)) => {
             let mut json = index.query(
                 Path::new(file),
                 line,
@@ -1456,10 +1456,7 @@ pub unsafe extern "C" fn vd_hier_trace_poll(
             unsafe { *out = c_string(&json.to_string()) };
             VD_STATUS_READY
         }
-        Some(HierarchyResult::Report(report)) => {
-            let Some(failure) = &report.failure else {
-                return POLL_MISUSE;
-            };
+        Some(trace_jobs::Outcome::Failed(failure)) => {
             state.record_error(VdError::new(
                 crate::capi::VD_ERR_SERVICE,
                 &failure.user_message(),
@@ -1478,10 +1475,10 @@ pub unsafe extern "C" fn vd_hier_trace_poll(
 #[no_mangle]
 pub unsafe extern "C" fn vd_hier_release(service: *mut VdService, job: u64) -> i32 {
     let _ = service;
-    let slot = hierarchies().remove(&job);
-    if let Some(slot) = &slot {
-        slot.cancel.store(true, Ordering::SeqCst);
+    if trace_jobs::existing().is_some_and(|runner| runner.release(job)) {
+        return 1;
     }
+    let slot = hierarchies().remove(&job);
     i32::from(slot.is_some())
 }
 

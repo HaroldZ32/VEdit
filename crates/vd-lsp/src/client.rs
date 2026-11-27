@@ -5,11 +5,11 @@
 //! headless container. JSON-RPC framing is provided by `async-lsp`; this module
 //! never serializes a frame by hand.
 
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::ops::ControlFlow;
 use std::process::Stdio;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use anyhow::{anyhow, bail, Context, Result};
 use async_lsp::router::Router;
@@ -108,6 +108,7 @@ pub struct LspClient {
     state: ClientState,
     diagnostics_rx: watch::Receiver<DiagnosticsSnapshot>,
     documents: DocumentStore,
+    document_updated_at: HashMap<Url, Instant>,
     session: Option<Session>,
     capabilities: Option<ServerCapabilities>,
     initialize_params_json: Option<Value>,
@@ -139,6 +140,7 @@ impl LspClient {
             state,
             diagnostics_rx,
             documents: DocumentStore::default(),
+            document_updated_at: HashMap::new(),
             session: None,
             capabilities: None,
             initialize_params_json: None,
@@ -245,6 +247,22 @@ impl LspClient {
         self.diagnostics_rx.borrow().generation()
     }
 
+    /// Use the document's own version and send time, since a publication from
+    /// another URI can also advance the session-wide generation.
+    pub(crate) fn current_diagnostics(&self, uri: &Url) -> Result<Option<PublishedDiagnostics>> {
+        let current = self.documents.version(uri)?;
+        let updated_at = self.document_updated_at.get(uri);
+        Ok(self
+            .diagnostics_rx
+            .borrow()
+            .for_uri(uri)
+            .filter(|entry| {
+                entry.version.is_none_or(|version| current == Some(version))
+                    && updated_at.is_none_or(|updated| entry.received_at >= *updated)
+            })
+            .cloned())
+    }
+
     /// Wait until a diagnostics notification newer than `since_generation`
     /// arrives for `uri`.
     ///
@@ -308,6 +326,7 @@ impl LspClient {
     ) -> Result<()> {
         let server = self.ensure_session().await?;
         let document = self.documents.change(uri, &changes)?;
+        self.document_updated_at.insert(uri.clone(), Instant::now());
         server
             .notify::<DidChangeTextDocument>(DidChangeTextDocumentParams {
                 text_document: VersionedTextDocumentIdentifier {
@@ -334,6 +353,8 @@ impl LspClient {
     pub async fn close_document(&mut self, uri: &Url) -> Result<()> {
         let server = self.ensure_session().await?;
         let closed = self.documents.close(uri)?;
+        self.document_updated_at.remove(uri);
+        self.state.diagnostics.forget(uri);
         if closed.is_some() {
             server
                 .notify::<DidCloseTextDocument>(DidCloseTextDocumentParams {
@@ -827,7 +848,10 @@ impl LspClient {
         Ok(())
     }
 
-    fn send_did_open(&self, server: &ServerSocket, document: &OpenDocument) -> Result<()> {
+    fn send_did_open(&mut self, server: &ServerSocket, document: &OpenDocument) -> Result<()> {
+        self.state.diagnostics.forget(&document.uri);
+        self.document_updated_at
+            .insert(document.uri.clone(), Instant::now());
         server
             .notify::<DidOpenTextDocument>(DidOpenTextDocumentParams {
                 text_document: TextDocumentItem {
@@ -1041,7 +1065,7 @@ fn client_capabilities() -> ClientCapabilities {
             publish_diagnostics: Some(PublishDiagnosticsClientCapabilities {
                 related_information: Some(false),
                 tag_support: None,
-                version_support: Some(false),
+                version_support: Some(true),
                 code_description_support: Some(false),
                 data_support: Some(false),
             }),

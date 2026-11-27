@@ -930,12 +930,13 @@ vedit-app --no-session-restore    # 忽略上次会话，干净启动
 
 ## 附录 D 版本控制面板：能做什么、工具链与安全边界
 
-### D.1 位置与两个页签
+### D.1 位置与页签
 
-`Source Control` 面板在左侧，顶部有两个页签：
+左侧的 `Source Control` 面板按当前工作副本显示页签。
 
-- **Working tree**：三栏布局——左栏 `Branches and tags`，中栏 `Changes` 与 `Staged`，右栏 `Diff`。底部是操作栏：`Refresh`、`Stage`、`Unstage`、`Discard…`、`Commit…`、`Remove…`、`Fetch`、`Pull`、`Push`、`Branch…`、`Tag…`、`Remote…`、`Workspace…`。合并/变基等操作进行中时会出现冲突提示条与 `Continue` / `Abort`。
-- **History**：提交列表与提交详情；可以按提交说明搜索、翻页（`Previous` / `Next`），也可以对某个文件看 `File history`、`Blame`，或用 `Compare selected` 比较两次提交。
+- **Working tree** 显示本地变更。SVN 工作副本中，双击变更文件会在主编辑区打开双栏比较，左侧是 `BASE`，右侧是工作文件。Git 工作树保留 `Branches and tags`、`Changes` / `Staged` 和 `Diff` 三栏，底部可刷新、暂存、提交或管理分支。
+- **History** 显示历史列表与详情，支持搜索和翻页（`Previous` / `Next`）。要查看单个 SVN 文件，可从编辑器的 `File` 菜单打开该文件的历史，操作见 D.1.1。
+- **Project History（项目历史）** 出现在 SVN 工作副本中。选择修订可列出本工程在该修订中变更的路径。双击文件会在主编辑区打开该次变更的双栏比较，两侧都是只读的历史快照。
 
 面板底部有一行**能力说明**：当前后端不支持的操作会置灰，并把**真实原因**写在提示里（不是「未实现」）。
 

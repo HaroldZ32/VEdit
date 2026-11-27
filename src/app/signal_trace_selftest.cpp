@@ -32,8 +32,10 @@
 #include <QTableWidget>
 #include <QTemporaryDir>
 #include <QTest>
+#include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItemIterator>
+#include <algorithm>
 #include <memory>
 #include <cstdio>
 
@@ -48,11 +50,11 @@ bool check(const char *name, bool ok)
     return ok;
 }
 
-bool until(const auto &predicate)
+bool until(const auto &predicate, qint64 timeoutMs = 8000)
 {
     QElapsedTimer timer;
     timer.start();
-    while (!predicate() && timer.elapsed() < 8000) {
+    while (!predicate() && timer.elapsed() < timeoutMs) {
         QTest::qWait(10);
     }
     return predicate();
@@ -137,6 +139,183 @@ void capture(QTreeWidget *tree, const QString &file)
         check("xcb screenshot", window->screen()->grabWindow(window->winId()).save(file));
     }
 }
+
+QString prepareOversizeFixture(const QDir &root, const QString &slang)
+{
+    QFile noise(root.filePath(QStringLiteral("noise.sv")));
+    if (!noise.open(QIODevice::WriteOnly)) {
+        return {};
+    }
+    for (int i = 0; i < 1000; ++i) {
+        QByteArray module = "module noise_" + QByteArray::number(i)
+            + " (input logic clk, input logic [7:0] d, output logic [7:0] q);\n"
+              "  logic [7:0] acc;\n  always_ff @(posedge clk) acc <= d;\n  assign q = acc;\n";
+        for (int signal = 0; signal < 20; ++signal) {
+            const auto id = QByteArray::number(signal);
+            module += "  wire [7:0] n" + id + ";\n  assign n" + id + " = d ^ 8'd" + id + ";\n";
+        }
+        if (i % 10 != 0) {
+            module += "  noise_" + QByteArray::number(i - 1) + " child (.clk(clk), .d(d ^ 8'd1), .q());\n";
+        }
+        module += "endmodule\n";
+        if (noise.write(module) != module.size()) {
+            return {};
+        }
+    }
+    noise.close();
+    QFile filelist(root.filePath(QStringLiteral("sources.f")));
+    if (!filelist.open(QIODevice::Append) || filelist.write("noise.sv\n") != 9) {
+        return {};
+    }
+    filelist.close();
+
+    // Read the size of the actual trace dump while its temp file is still alive.
+    // Catalog invocations have no --Mall and do not contribute to the count.
+    QFile wrapper(root.filePath(QStringLiteral("trace-slang")));
+    const QByteArray script = R"(#!/bin/sh
+previous=
+for argument do
+    case "$previous" in
+        --ast-json) output=$argument ;;
+        --Mall) trace=yes ;;
+    esac
+    previous=$argument
+done
+if [ "$trace" = yes ]; then
+    probe_dir=${VEDIT_TRACE_TEST_SIZES%/*}
+    if [ -f "$probe_dir/hold-trace" ]; then
+        printf '%s\n' "$$" > "$probe_dir/held-trace-pid"
+        exec sleep 30
+    fi
+    if [ -s "$probe_dir/held-trace-pid" ]; then
+        read -r stale < "$probe_dir/held-trace-pid"
+        if kill -0 "$stale" 2>/dev/null; then
+            : > "$probe_dir/trace-overlap"
+        fi
+    fi
+fi
+"$VEDIT_TRACE_TEST_SLANG" "$@"
+result=$?
+if [ "$trace" = yes ] && [ -f "$output" ]; then
+    wc -c < "$output" >> "$VEDIT_TRACE_TEST_SIZES"
+fi
+exit "$result"
+)";
+    if (!wrapper.open(QIODevice::WriteOnly) || wrapper.write(script) != script.size()) {
+        return {};
+    }
+    wrapper.close();
+    if (!wrapper.setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner)) {
+        return {};
+    }
+    qputenv("VEDIT_TRACE_TEST_SLANG", QFile::encodeName(QFileInfo(slang).absoluteFilePath()));
+    qputenv("VEDIT_TRACE_TEST_SIZES", QFile::encodeName(root.filePath(QStringLiteral("trace-sizes"))));
+    return wrapper.fileName();
+}
+
+int verifyOversize(std::unique_ptr<ApplicationShell> &owner, const QDir &root,
+                   QAction *driver, QAction *load, QAction *loads)
+{
+    auto &shell = *owner;
+    const auto top = root.filePath(QStringLiteral("top.sv"));
+    const auto leaf = root.filePath(QStringLiteral("leaf.sv"));
+    QTimer heartbeat;
+    QElapsedTimer clock;
+    qint64 previous = 0;
+    qint64 longestGap = 0;
+    int beats = 0;
+    QObject::connect(&heartbeat, &QTimer::timeout, &heartbeat, [&] {
+        const auto now = clock.elapsed();
+        longestGap = std::max(longestGap, now - previous);
+        previous = now;
+        ++beats;
+    });
+    view(shell)->setCursorPosition({1, 7});
+    clock.start();
+    heartbeat.start(10);
+    driver->trigger();
+    const bool jumpedToDriver = until([&] {
+        return view(shell)->document()->url().toLocalFile() == leaf;
+    }, 20000);
+    heartbeat.stop();
+    std::printf("oversize cold action elapsed_ms=%lld event_ticks=%d max_gap_ms=%lld\n",
+                static_cast<long long>(clock.elapsed()), beats, static_cast<long long>(longestGap));
+    check("oversize driver jumps to child output declaration", jumpedToDriver
+          && view(shell)->cursorPosition() == KTextEditor::Cursor(0, 56));
+    if (!jumpedToDriver || !shell.openPaths({top})) {
+        std::printf("status: %s\n", qPrintable(shell.statusBar()->currentMessage()));
+        return 1;
+    }
+    view(shell)->setCursorPosition({1, 7});
+    clock.restart();
+    load->trigger();
+    check("oversize load jumps to the same signal's RHS occurrence", until([&] {
+        return view(shell)->document()->url().toLocalFile() == top
+            && view(shell)->cursorPosition() == KTextEditor::Cursor(5, 18);
+    }));
+    std::printf("oversize warm action elapsed_ms=%lld\n", static_cast<long long>(clock.elapsed()));
+    QFile sizes(root.filePath(QStringLiteral("trace-sizes")));
+    if (!check("measure the real trace AST", sizes.open(QIODevice::ReadOnly))) {
+        return 1;
+    }
+    const auto bytes = sizes.readLine().trimmed().toLongLong();
+    std::printf("oversize trace ast_bytes=%lld\n", static_cast<long long>(bytes));
+    check("compiled trace AST exceeds 96 MiB", bytes > 100663296);
+    check("driver and load reuse one elaboration", sizes.atEnd());
+    sizes.close();
+
+    const auto changeSource = [&leaf] {
+        QFile input(leaf);
+        return input.open(QIODevice::Append) && input.write("\n") == 1 && input.flush();
+    };
+    view(shell)->setCursorPosition({1, 7});
+    loads->trigger();
+    if (!check("cached trace can show its result before invalidation", tree(shell))) {
+        return 1;
+    }
+    clock.restart();
+    check("source edit invalidates the cached large trace", changeSource() && until([&] {
+        return tree(shell) == nullptr;
+    }));
+    std::printf("oversize cached invalidation elapsed_ms=%lld\n", static_cast<long long>(clock.elapsed()));
+
+    QFile hold(root.filePath(QStringLiteral("hold-trace")));
+    if (!hold.open(QIODevice::WriteOnly)) {
+        return 1;
+    }
+    hold.close();
+    view(shell)->setCursorPosition({1, 7});
+    driver->trigger();
+    QFile heldPid(root.filePath(QStringLiteral("held-trace-pid")));
+    if (!check("trace starts a controlled pending job", until([&] { return heldPid.size() > 0; }))) {
+        return 1;
+    }
+    if (!heldPid.open(QIODevice::ReadOnly) || !hold.remove()) {
+        return 1;
+    }
+    const auto process = QStringLiteral("/proc/") + QString::fromUtf8(heldPid.readAll().trimmed());
+    const bool invalidated = changeSource() && until([&] {
+        return shell.statusBar()->currentMessage().contains(QStringLiteral("Project inputs changed"));
+    });
+    check("second edit cancels the active generation", invalidated);
+    if (!invalidated) {
+        return 1;
+    }
+    clock.restart();
+    driver->trigger();
+    check("replacement trace returns the driver", until([&] {
+        return view(shell)->document()->url().toLocalFile() == leaf
+            && view(shell)->cursorPosition() == KTextEditor::Cursor(0, 56);
+    }, 20000));
+    std::printf("oversize replacement elapsed_ms=%lld\n", static_cast<long long>(clock.elapsed()));
+    check("stale compiler exited before replacement started", !QFileInfo::exists(process)
+          && !root.exists(QStringLiteral("trace-overlap")));
+
+    clock.restart();
+    owner.reset();
+    std::printf("oversize window destruction elapsed_ms=%lld\n", static_cast<long long>(clock.elapsed()));
+    return failures != 0;
+}
 }
 
 int main(int argc, char **argv)
@@ -157,16 +336,23 @@ int main(int argc, char **argv)
             return 1;
         }
     }
+    const bool oversize = args.value(3) == QStringLiteral("--oversize");
+    const auto traceSlang = oversize ? prepareOversizeFixture(root, args[2]) : args[2];
+    if (traceSlang.isEmpty()) {
+        std::printf("could not prepare oversize fixture\n");
+        return 1;
+    }
     vedit::app::ShellOptions options;
     options.projectRoot = project.path();
     options.stateDir = state.path();
     options.restoreSession = false;
     options.deferSessionRestore = true;
     options.showDefaultPanels = false;
-    ApplicationShell shell(options);
+    auto ownedShell = std::make_unique<ApplicationShell>(options);
+    auto &shell = *ownedShell;
     shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
     vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir, true});
-    shell.setProperty("vedit.diagnostics.toolchainSlang", args[2]);
+    shell.setProperty("vedit.diagnostics.toolchainSlang", traceSlang);
     shell.startSession();
     shell.show();
     const auto top = root.filePath(QStringLiteral("top.sv"));
@@ -190,6 +376,9 @@ int main(int argc, char **argv)
     check("real filelist import", model->importFilelists({root.filePath(QStringLiteral("sources.f"))}));
     if (!check("import enables trace", until([&] { return driver->isEnabled(); }))) {
         return 1;
+    }
+    if (oversize) {
+        return verifyOversize(ownedShell, root, driver, load, loads);
     }
     vedit::workspace::settings::SettingsDialog preferences(shell.themes(), shell.commands(),
                                                           state.filePath(QStringLiteral("settings.toml")));

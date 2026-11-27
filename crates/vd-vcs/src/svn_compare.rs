@@ -1,6 +1,6 @@
 //! Typed, read-only SVN inputs for the shared two-file comparison.
 
-use crate::{detect, runner::read_output, Backend};
+use crate::{detect, svn_read, Backend};
 use std::path::{Component, Path, PathBuf};
 
 /// The requested operative revision of a file.
@@ -44,7 +44,9 @@ pub(crate) fn missing(reason: &str) -> bool {
         .iter()
         .any(|code| reason.contains(code))
         || (reason.contains("E200009:")
-            && (reason.contains("W170000:") || reason.contains("has no pristine version")))
+            && (reason.contains("W170000:")
+                || reason.contains("has no pristine version")
+                || reason.contains("has no base revision until it is committed")))
 }
 
 impl Target {
@@ -52,6 +54,7 @@ impl Target {
         let (Backend::Svn, Some(working_tree)) = detect(root) else {
             return Err("The project is not an SVN working copy.".into());
         };
+        let working_tree = std::path::absolute(working_tree).map_err(|error| error.to_string())?;
         let full = if Path::new(path).is_absolute() {
             PathBuf::from(path)
         } else {
@@ -80,44 +83,13 @@ impl Target {
         })
     }
 
-    fn run(&self, command: &str, options: &[&str], target: &str) -> Result<String, String> {
-        let args = [command, "--non-interactive", "--no-auth-cache"]
-            .into_iter()
-            .chain(options.iter().copied())
-            .chain(["--", target])
-            .map(str::to_owned)
-            .collect::<Vec<_>>();
-        let output = read_output("svn", &self.working_tree, &args)?;
-        if !output.status.success() {
-            return Err(crate::write::redact_url_userinfo(
-                String::from_utf8_lossy(&output.stderr).trim(),
-            ));
-        }
-        if output.stdout.len() > 8 * 1024 * 1024 {
-            return Err("The SVN result exceeds the 8 MiB comparison limit.".into());
-        }
-        let text = String::from_utf8(output.stdout).map_err(|_| {
-            "The SVN result uses an unsupported encoding. Comparison requires UTF-8 text."
-        })?;
-        if text.contains('\0') {
-            return Err("The SVN result is binary. Comparison requires UTF-8 text.".into());
-        }
-        Ok(text)
+    fn info(&self, target: &str) -> Result<svn_read::Info, String> {
+        svn_read::info(&self.working_tree, target)
     }
 
-    fn info(&self, item: &str, target: &str) -> Result<String, String> {
-        let value = self.run("info", &["--show-item", item, "--no-newline"], target)?;
-        if matches!(item, "url" | "repos-root-url")
-            && crate::write::redact_url_userinfo(&value) != value
-        {
-            return Err("SVN repository URL contains embedded user information.".into());
-        }
-        Ok(value)
-    }
-
-    fn url(&self) -> Result<String, String> {
-        match self.info("url", &format!("{}@", self.local_path)) {
-            Ok(url) => return Ok(url),
+    fn location(&self) -> Result<svn_read::Info, String> {
+        match self.info(&format!("{}@", self.local_path)) {
+            Ok(info) => return Ok(info),
             Err(reason) if missing(&reason) => (),
             Err(reason) => return Err(reason),
         }
@@ -129,27 +101,20 @@ impl Target {
             let Some(parent_text) = parent.to_str() else {
                 break;
             };
-            match self.info("url", &format!("{parent_text}@")) {
-                Ok(url) => {
+            match self.info(&format!("{parent_text}@")) {
+                Ok(parent) => {
                     suffix.reverse();
-                    return Ok(format!(
-                        "{}/{}",
-                        url.trim_end_matches('/'),
-                        suffix.join("/")
-                    ));
+                    return Ok(svn_read::Info {
+                        url: format!("{}/{}", parent.url.trim_end_matches('/'), suffix.join("/")),
+                        repository_root: parent.repository_root,
+                        revision: None,
+                    });
                 }
                 Err(reason) if missing(&reason) && parent != self.working_tree => path = parent,
                 Err(reason) => return Err(reason),
             }
         }
         Err("Cannot resolve the SVN repository path.".into())
-    }
-
-    fn local_peg(&self) -> Option<u64> {
-        self.info("revision", &format!("{}@", self.local_path))
-            .ok()?
-            .parse()
-            .ok()
     }
 }
 
@@ -180,19 +145,16 @@ pub fn snapshot(
 ) -> Result<Option<String>, String> {
     let target = Target::new(root, path)?;
     let operative = revision.argument();
-    let cat = |address: &str| target.run("cat", &["--ignore-keywords", "-r", &operative], address);
+    let cat = |address: &str| svn_read::cat(&target.working_tree, &operative, address);
     let result = match revision {
         Revision::Base => cat(&format!("{}@BASE", target.local_path)),
-        Revision::Head => cat(&format!("{}@HEAD", target.url()?)),
+        Revision::Head => cat(&format!("{}@HEAD", target.location()?.url)),
         Revision::Number(number) => {
-            let url = target.url()?;
-            if let Some(peg) = peg {
-                cat(&format!("{url}@{peg}"))
-            } else if let Some(base) = target.local_peg().filter(|base| *base >= number) {
-                cat(&format!("{url}@{base}"))
-            } else {
-                cat(&format!("{url}@{number}"))
-            }
+            let info = target.location()?;
+            let peg = peg
+                .or(info.revision.filter(|base| *base >= number))
+                .unwrap_or(number);
+            cat(&format!("{}@{peg}", info.url))
         }
     };
     match result {
@@ -218,60 +180,48 @@ pub(crate) fn decode_url_path(path: &str) -> Option<String> {
     String::from_utf8(decoded).ok()
 }
 
-fn deleted_revision(target: &Target, url: &str) -> Result<Option<u64>, String> {
-    let working_tree = target
-        .working_tree
-        .to_str()
-        .ok_or("The working-copy path is not UTF-8.")?;
-    let repository = target.info("repos-root-url", &format!("{working_tree}@"))?;
-    let path = url
-        .strip_prefix(&repository)
-        .filter(|path| path.starts_with('/'))
-        .and_then(decode_url_path)
-        .ok_or("Cannot resolve the repository-relative SVN URL.")?;
-    let pattern = path
-        .replace('\\', "\\\\")
-        .replace('[', "\\[")
-        .replace('*', "\\*")
-        .replace('?', "\\?");
-    let escaped_path = path
-        .replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;");
-    let xml = target.run(
-        "log",
-        &[
-            "--xml",
-            "--verbose",
-            "--search",
-            &pattern,
-            "--limit",
-            "1000",
-        ],
-        &format!("{repository}@HEAD"),
-    )?;
-    Ok(xml.split("<logentry").skip(1).find_map(|entry| {
-        let deleted = entry.split("<path\n").skip(1).any(|node| {
-            node.split_once('>').is_some_and(|(attributes, value)| {
-                attributes.contains("action=\"D\"")
-                    && value
-                        .strip_prefix(&escaped_path)
-                        .is_some_and(|rest| rest.starts_with("</path>"))
-            })
-        });
-        deleted.then(|| revision_of(entry)).flatten()
-    }))
+fn follows_base(cwd: &Path, file: &svn_read::Info, peg: u64) -> Result<bool, String> {
+    let Some(base) = file.revision else {
+        return Ok(true);
+    };
+    if peg == base {
+        return Ok(true);
+    }
+    match svn_read::info_at(cwd, &format!("{}@{peg}", file.url), base) {
+        Ok(ancestor) => Ok(ancestor.url == file.url),
+        Err(reason) if missing(&reason) => Ok(false),
+        Err(reason) => Err(reason),
+    }
 }
 
-fn revision_of(entry: &str) -> Option<u64> {
-    let (header, _) = entry.split_once('>')?;
-    header
-        .split_once("revision=\"")?
-        .1
-        .split_once('"')?
-        .0
-        .parse()
-        .ok()
+fn history_peg(target: &Target, file: &svn_read::Info) -> Result<(u64, Option<u64>), String> {
+    let cwd = &target.working_tree;
+    let unavailable = match target.info(&format!("{}@HEAD", file.url)) {
+        Ok(info) => {
+            let peg = info
+                .revision
+                .ok_or("SVN returned an invalid peg revision.")?;
+            if follows_base(cwd, file, peg)? {
+                return Ok((peg, None));
+            }
+            "The SVN path at HEAD is unrelated to the working-copy node.".into()
+        }
+        Err(reason) if missing(&reason) => reason,
+        Err(reason) => return Err(reason),
+    };
+    let deletion = svn_read::deletion(
+        cwd,
+        &format!("{}@HEAD", file.repository_root),
+        &file.repository_path()?,
+        file.revision,
+    )?;
+    if let Some(deleted) = deletion {
+        let peg = deleted.saturating_sub(1);
+        if follows_base(cwd, file, peg)? {
+            return Ok((peg, Some(deleted)));
+        }
+    }
+    file.revision.map(|base| (base, None)).ok_or(unavailable)
 }
 
 /// Read the most recent file changes or the changes at or before `upper`.
@@ -286,23 +236,10 @@ pub fn history(
     limit: usize,
 ) -> Result<FileHistory, String> {
     let target = Target::new(root, path)?;
-    let url = target.url()?;
-    let head = format!("{url}@HEAD");
+    let file = target.location()?;
     let (peg, deletion) = match peg {
         Some(peg) => (peg, None),
-        None => match target.info("revision", &head) {
-            Ok(revision) => (
-                revision
-                    .parse()
-                    .map_err(|_| "SVN returned an invalid peg revision.")?,
-                None,
-            ),
-            Err(reason) if missing(&reason) => match deleted_revision(&target, &url)? {
-                Some(deleted) => (deleted.saturating_sub(1), Some(deleted)),
-                None => (target.local_peg().ok_or(reason)?, None),
-            },
-            Err(reason) => return Err(reason),
-        },
+        None => history_peg(&target, &file)?,
     };
     let first = deletion.filter(|deleted| upper.is_none_or(|bound| bound >= *deleted));
     let upper = upper.unwrap_or(peg).min(peg);
@@ -322,10 +259,18 @@ pub fn history(
         });
     }
     let log_limit = (limit - usize::from(first.is_some())).to_string();
-    let result = target.run(
+    let result = svn_read::svn(
+        &target.working_tree,
         "log",
-        &["--xml", "--limit", &log_limit, "-r", &format!("{upper}:1")],
-        &format!("{url}@{peg}"),
+        &[
+            "--xml",
+            "--limit",
+            &log_limit,
+            "-r",
+            &format!("{upper}:1"),
+            "--",
+            &format!("{}@{peg}", file.url),
+        ],
     );
     let entries: Vec<_> = match result {
         Ok(xml) => crate::svn_read::log_entries(&xml).collect(),

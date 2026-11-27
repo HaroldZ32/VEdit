@@ -1,4 +1,6 @@
 use super::*;
+use crate::tool_paths::check_cancelled;
+use std::convert::Infallible;
 
 const NODE_LIMIT: usize = 512;
 const DEPTH_LIMIT: usize = 32;
@@ -18,14 +20,47 @@ pub struct TraceIndex {
 impl TraceIndex {
     /// Build the cursor and instance indices on the elaboration worker.
     #[must_use]
-    pub fn from_report(mut report: HierarchyReport) -> Self {
+    pub fn from_report(report: HierarchyReport) -> Self {
         let mut columns = Columns::new();
+        match Self::build(
+            report,
+            || Ok::<_, Infallible>(()),
+            |file, line, byte| Ok(columns.char_column(file, line, byte)),
+        ) {
+            Ok(index) => index,
+            Err(never) => match never {},
+        }
+    }
+
+    /// Build a trace index, checking for an invalidated snapshot between nets,
+    /// positions and source-file reads.
+    ///
+    /// # Errors
+    /// Returns `LintFailure::Cancelled` if the caller releases the job.
+    pub fn from_report_cancellable(
+        report: HierarchyReport,
+        cancel: &AtomicBool,
+    ) -> Result<Self, LintFailure> {
+        let mut columns = Columns::new();
+        Self::build(
+            report,
+            || check_cancelled(cancel),
+            |file, line, byte| columns.char_column_cancellable(file, line, byte, cancel),
+        )
+    }
+
+    fn build<E>(
+        mut report: HierarchyReport,
+        check: impl Fn() -> Result<(), E>,
+        mut column: impl FnMut(&Path, u32, u32) -> Result<u32, E>,
+    ) -> Result<Self, E> {
         let mut sites: Sites = HashMap::new();
         let mut paths = HashMap::new();
         for (id, net) in report.signals.iter_mut().enumerate() {
+            check()?;
             paths.insert(net.path.clone(), id);
             for (file, line, byte) in net.declaration.iter().chain(&net.occurrences) {
-                let column = columns.char_column(file, *line, *byte);
+                let column = column(file, *line, *byte)?;
                 let entry = sites
                     .entry(file.clone())
                     .or_default()
@@ -36,21 +71,22 @@ impl TraceIndex {
                 }
             }
             net.occurrences.clear();
-            if let Some((file, line, column)) = &mut net.declaration {
-                *column = columns.char_column(file, *line, *column);
+            if let Some((file, line, byte)) = &mut net.declaration {
+                *byte = column(file, *line, *byte)?;
             }
             for edge in net.drivers.iter_mut().chain(&mut net.loads) {
-                edge.column = columns.char_column(&edge.file, edge.line, edge.column);
+                edge.column = column(&edge.file, edge.line, edge.column)?;
             }
         }
-        Self {
+        check()?;
+        Ok(Self {
             nets: report.signals,
             sites,
             paths,
             elapsed_ms: report.elapsed.as_millis().try_into().unwrap_or(u64::MAX),
             peak_rss_kb: report.peak_rss_kb,
             warning: report.warning,
-        }
+        })
     }
 
     /// Build a bounded directional tree for a UTF-16 token start.

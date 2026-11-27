@@ -1,0 +1,144 @@
+   Compiling stable_deref_trait v1.2.1
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling utf_types v1.0.0
+   Compiling writeable v0.6.4
+   Compiling litemap v0.8.3
+   Compiling once_cell v1.21.4
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.191
+   Compiling zmij v1.0.23
+   Compiling winnow v1.0.4
+   Compiling icu_normalizer_data v2.4.0
+   Compiling zerofrom v0.1.8
+   Compiling icu_properties_data v2.4.0
+   Compiling pin-project-lite v0.2.17
+   Compiling bytes v1.12.1
+   Compiling smallvec v1.16.4
+   Compiling linux-raw-sys v0.12.1
+   Compiling yoke v0.8.4
+   Compiling percent-encoding v2.3.2
+   Compiling log v0.4.34
+   Compiling futures-core v0.3.34
+   Compiling zeroize v1.9.1
+   Compiling futures-sink v0.3.34
+   Compiling utf8_iter v1.1.0
+   Compiling untrusted v0.9.0
+   Compiling futures-io v0.3.34
+   Compiling rustls-pki-types v1.15.1
+   Compiling rustix v1.1.6
+   Compiling futures-channel v0.3.34
+   Compiling zerovec v0.11.9
+   Compiling zerotrie v0.2.5
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling form_urlencoded v1.2.2
+   Compiling getrandom v0.4.3
+   Compiling anyhow v1.0.104
+   Compiling futures-task v0.3.34
+   Compiling slab v0.4.12
+   Compiling aho-corasick v1.1.5
+   Compiling httparse v1.10.1
+   Compiling tracing-core v0.1.36
+   Compiling futures-util v0.3.34
+   Compiling subtle v2.6.1
+   Compiling regex-syntax v0.8.11
+   Compiling http v1.5.0
+   Compiling toml_writer v1.1.3+spec-1.1.0
+   Compiling base64 v0.23.1
+   Compiling bitflags v1.3.2
+   Compiling webpki-roots v1.0.11
+   Compiling thiserror v2.0.21
+   Compiling tower-service v0.3.3
+   Compiling tinystr v0.8.5
+   Compiling potential_utf v0.1.6
+   Compiling tower-layer v0.3.3
+   Compiling utf8-zero v0.8.1
+   Compiling tracing v0.1.44
+   Compiling icu_collections v2.4.0
+   Compiling icu_locale_core v2.4.0
+   Compiling getrandom v0.2.17
+   Compiling errno v0.3.14
+   Compiling mio v1.2.4
+   Compiling ring v0.17.14
+   Compiling signal-hook-registry v1.4.8
+   Compiling tokio v1.54.1
+   Compiling ureq-proto v0.6.5
+   Compiling tempfile v3.27.0
+   Compiling icu_provider v2.4.0
+   Compiling icu_normalizer v2.4.0
+   Compiling icu_properties v2.4.0
+   Compiling regex-automata v0.4.18
+   Compiling serde v1.0.229
+   Compiling serde_spanned v1.1.2
+   Compiling serde_json v1.0.154
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling toml v0.9.12+spec-1.1.0
+   Compiling toml v1.1.8+spec-1.1.0
+   Compiling rustls-webpki v0.103.16
+   Compiling waitpid-any v0.3.0
+   Compiling vd-vcs v0.5.0 (<checkout>/crates/vd-vcs)
+   Compiling rustls v0.23.46
+   Compiling cbindgen v0.29.4
+   Compiling futures v0.3.34
+   Compiling vd-deeplint v0.5.0 (<checkout>/crates/vd-deeplint)
+   Compiling idna_adapter v1.2.2
+   Compiling vd-config v0.5.0 (<checkout>/crates/vd-config)
+   Compiling vd-settings v0.5.0 (<checkout>/crates/vd-settings)
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling lsp-types v0.95.1
+   Compiling regex v1.13.1
+   Compiling vd-search v0.5.0 (<checkout>/crates/vd-search)
+   Compiling tokio-util v0.7.20
+   Compiling vd-ffi v0.5.0 (<checkout>/crates/vd-ffi)
+   Compiling ureq v3.5.0
+   Compiling vd-fim v0.5.0 (<checkout>/crates/vd-fim)
+   Compiling async-lsp v0.2.4
+   Compiling vd-lsp v0.5.0 (<checkout>/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.99s
+     Running tests/abi.rs (/tmp/vedit-svn-data-target/debug/deps/abi-6c8038f7fdad4e35)
+
+running 21 tests
+test abi_version_is_three ... ok
+test cancelling_a_job_discards_its_result ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test history_and_workspace_polls_reject_a_foreign_payload ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test settings_round_trip_through_the_abi ... ok
+test vcs_history_jobs_return_pages_detail_blame_and_comparison ... ok
+test vcs_history_op_codes_and_operation_state_are_stable ... ok
+test vcs_read_jobs_return_status_info_and_diff_from_a_real_repository ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test vcs_workspace_codes_and_listings_are_stable ... ok
+test vcs_write_codes_are_stable ... ok
+test vcs_write_job_refuses_invalid_requests ... ok
+test vcs_write_job_runs_a_real_git_round_trip ... ok
+test vcs_write_poll_misuse_is_typed ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+
+     Running tests/abi_batch.rs (/tmp/vedit-svn-data-target/debug/deps/abi_batch-d3ecf0fb7dcfaee5)
+
+running 12 tests
+test env_capture_runs_a_real_shell_and_reports_each_failure_mode ... ok
+test env_selection_load_degrades_a_broken_or_missing_store ... ok
+test env_selection_round_trips_both_layers_through_the_real_store ... ok
+test env_selection_save_validates_its_rows_before_any_job ... ok
+test lint_autofix_and_slang_waiver_knobs_are_refused_until_wired ... ok
+test rename_validates_identifiers_and_separates_its_three_job_kinds ... ok
+test scala_run_validates_argv_and_reports_the_missing_engine ... ok
+test the_frozen_surface_is_linked_at_abi_version_three ... ok
+test waiver_append_writes_a_slang_block_and_refuses_an_unloadable_file ... ok
+test waiver_append_writes_one_verible_line_and_dedupes_it ... ok
+test waiver_generate_builds_rules_and_reports_skipped_rows ... ok
+test waiver_register_updates_the_documented_settings_keys ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+

@@ -39,9 +39,9 @@ void check(const char *name, bool ok, const QString &detail = QString())
                 detail.isEmpty() ? "" : "  ", detail.isEmpty() ? "" : detail.toUtf8().constData());
 }
 
-/// A session that answers diagnostics per file. `rowsByFile` empty = the file
-/// was analysed clean (a green verdict). `statusCallsBeforeReady` > 0 keeps the
-/// session Reparsing, which is how the "not analysed yet" state is observed.
+/// A session that publishes diagnostics per file. An empty entry in
+/// `rowsByFile` is a clean publication. A missing entry has no publication.
+/// `statusCallsBeforeReady` keeps the session in Reparsing during startup.
 class RetentionFakeLsp final : public LspSessionBackend {
 public:
     QHash<QString, QVector<DiagnosticEntry>> rowsByFile;
@@ -55,6 +55,8 @@ public:
         QString file;
     };
     QVector<Ticket> tickets;
+    quint64 generation = 0;
+    QString awaitingPublication;
 
     bool start(const QString &, const QString &, const QString &, const QStringList &files,
                QString *) override
@@ -63,13 +65,21 @@ public:
         startedFiles = files;
         statusCalls = 0;
         tickets.clear();
+        generation = 0;
+        awaitingPublication.clear();
         return true;
     }
     void stop() override {}
+    bool changeBuffer(const QString &file, const QString &, QString *) override
+    {
+        awaitingPublication = file;
+        return true;
+    }
     SessionSnapshot status() const override
     {
         SessionSnapshot snapshot;
         snapshot.filesExpected = startedFiles.size();
+        snapshot.generation = generation;
         ++statusCalls;
         if (statusCalls > statusCallsBeforeReady) {
             snapshot.state = BackendState::Ready;
@@ -100,11 +110,21 @@ public:
             return LspPolled::failure(QStringLiteral("unknown fake request id"));
         }
         const QString file = tickets.at(static_cast<int>(requestId) - 1).file;
+        const auto rows = rowsByFile.constFind(file);
         LspPolled polled;
         polled.pending = false;
         polled.ready = true;
         polled.kind = ResponseKind::Diagnostics;
-        polled.diagnostics = rowsByFile.value(file);
+        polled.published = rows != rowsByFile.cend();
+        if (polled.published) {
+            if (file == awaitingPublication) {
+                // Publication follows didChange, so status() still showed the
+                // old generation when the controller queued this request.
+                ++generation;
+                awaitingPublication.clear();
+            }
+            polled.diagnostics = rows.value();
+        }
         return polled;
     }
     BackendCapabilities staticCapabilities() const override { return BackendCapabilities{}; }

@@ -114,13 +114,9 @@ fn basename(path: &str) -> String {
 }
 
 #[test]
-fn abi_version_is_two() {
-    // Version 2 (G1-c review F5): `VdModuleCatalog` grew `shadowed_files` /
-    // `shadowed_warning`. Appending fields keeps every existing OFFSET but not
-    // the SIZE, and `vd_catalog_poll` writes the whole current struct, so a
-    // consumer built against a v1 header must be recompiled - the version is the
-    // only signal that says so.
-    assert_eq!(vd_abi_version(), 2);
+fn abi_version_is_three() {
+    // Version 3 grows VdVcsFileStat, so array indexing uses a new row stride.
+    assert_eq!(vd_abi_version(), 3);
 }
 
 #[test]

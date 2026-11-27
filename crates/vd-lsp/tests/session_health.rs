@@ -468,6 +468,35 @@ fn build_context_timeout_requires_wire_recovery() -> Result<()> {
 }
 
 #[test]
+fn a_context_failure_retires_queued_diagnostics_before_buffer_recovery() -> Result<()> {
+    let project = Project::new("context-queued-diagnostics")?;
+    let session = project.start("context-timeout")?;
+    let pid = ready(&session, 0)?.server_pid.context("initial PID")?;
+    std::fs::write(project.0.join("drop-context-reply"), "")?;
+    project.push_context(&session)?;
+    let id = session.request(SessionRequest::Diagnostics {
+        file: project.file(),
+    })?;
+    project.change(&session)?;
+
+    // The wire sees the change only after the worker processed the earlier
+    // diagnostics command. That ticket must still report its original failure.
+    let changed = format!("change {pid} unsaved");
+    wait_for("editor buffer after context timeout", || {
+        let events = project.events()?;
+        Ok(events.lines().any(|line| line == changed).then_some(()))
+    })?;
+    let outcome = session.poll(id);
+    assert!(
+        matches!(&outcome, PollOutcome::Failed(reason) if reason.contains("workspace/executeCommand timed out")),
+        "{outcome:?}"
+    );
+    assert!(matches!(session.poll(id), PollOutcome::Unknown));
+    assert!(session.wait_for_stop());
+    Ok(())
+}
+
+#[test]
 fn consecutive_unknown_contexts_keep_one_candidate_until_shutdown() -> Result<()> {
     let project = Project::new("context-timeout-repeated")?;
     let session = project.start("context-timeout")?;

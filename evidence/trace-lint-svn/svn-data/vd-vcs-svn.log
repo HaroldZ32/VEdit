@@ -1,0 +1,260 @@
+   Compiling libc v0.2.191
+   Compiling rustix v1.1.6
+   Compiling getrandom v0.4.3
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling cfg-if v1.0.5
+   Compiling fastrand v2.5.0
+   Compiling once_cell v1.21.4
+   Compiling vd-vcs v0.5.0 (<checkout>/crates/vd-vcs)
+   Compiling tempfile v3.27.0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.42s
+     Running tests/svn_compare_e2e.rs (/tmp/vedit-svn-data-target/debug/deps/svn_compare_e2e-5a2f549327bb4062)
+
+running 1 test
+test checkout_history_and_comparison_work_without_recent_client_options ... EVIDENCE underlying SVN client: 1.14.5
+EVIDENCE negative control: svn: invalid option: --show-item
+EVIDENCE working tree status and exact BASE for modified, added, copied-add and deleted files
+EVIDENCE project log r3/r2 and seven in-subtree A/D/M/R rows with decoded paths and copy/move origins
+EVIDENCE file histories and exact comparison pegs matched and unsupported text was rejected
+EVIDENCE stale WC at r4 sees its original node's r5 edit and r6 deletion, excluding unrelated r7 re-add
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.09s
+
+     Running tests/svn_e2e.rs (/tmp/vedit-svn-data-target/debug/deps/svn_e2e-da86ef71fea7820a)
+
+running 1 test
+test host_subversion_reads_and_writes_run_through_the_product_path ... EVIDENCE host svn=1.14.5 svnadmin=1.14.5
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svnadmin create repo
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn checkout -q file:///tmp/.tmpSbaId9/repo wc
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn checkout -q file:///tmp/.tmpSbaId9/repo wc2
+EVIDENCE detect backend=Svn root=Some("/tmp/.tmpSbaId9/wc")
+EVIDENCE product write svn add: SvnAdd
+EVIDENCE | A         a.sv
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn status
+EVIDENCE | A       a.sv
+EVIDENCE product write svn commit: SvnCommit
+EVIDENCE | Adding         a.sv
+EVIDENCE | Transmitting file data .done
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 1.
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn log --xml file:///tmp/.tmpSbaId9/repo
+EVIDENCE | <?xml version="1.0" encoding="UTF-8"?>
+EVIDENCE | <log>
+EVIDENCE | <logentry
+EVIDENCE |    revision="1">
+EVIDENCE | <author>haroldzhao</author>
+EVIDENCE | <date>2026-11-27T08:35:28.198614Z</date>
+EVIDENCE | <msg>base revision</msg>
+EVIDENCE | </logentry>
+EVIDENCE | </log>
+EVIDENCE product status backend=Svn changes=[Change { path: "a.sv", kind: Modified }]
+EVIDENCE product info backend=Svn branch=Some("repo") revision=Some("0") note=None
+EVIDENCE product diff note=None
+Index: a.sv
+===================================================================
+--- a.sv	(revision 1)
++++ a.sv	(working copy)
+@@ -1,2 +1,3 @@
+ module a;
++// changed
+ endmodule
+
+EVIDENCE product write svn revert: SvnRevert
+EVIDENCE | Reverted 'a.sv'
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn status
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn add b.sv
+EVIDENCE | A         b.sv
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn commit -q -m second revision
+EVIDENCE product write svn update: SvnUpdate
+EVIDENCE | Updating '.':
+EVIDENCE | A    b.sv
+EVIDENCE | Updated to revision 2.
+EVIDENCE | 
+EVIDENCE product write svn remove: SvnRemove
+EVIDENCE | D         b.sv
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn status
+EVIDENCE | D       b.sv
+EVIDENCE product write svn commit remove: SvnCommit
+EVIDENCE | Deleting       b.sv
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 3.
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn log --xml file:///tmp/.tmpSbaId9/repo
+EVIDENCE | <?xml version="1.0" encoding="UTF-8"?>
+EVIDENCE | <log>
+EVIDENCE | <logentry
+EVIDENCE |    revision="3">
+EVIDENCE | <author>haroldzhao</author>
+EVIDENCE | <date>2026-11-27T08:35:28.618859Z</date>
+EVIDENCE | <msg>remove b</msg>
+EVIDENCE | </logentry>
+EVIDENCE | <logentry
+EVIDENCE |    revision="2">
+EVIDENCE | <author>haroldzhao</author>
+EVIDENCE | <date>2026-11-27T08:35:28.431155Z</date>
+EVIDENCE | <msg>second revision</msg>
+EVIDENCE | </logentry>
+EVIDENCE | <logentry
+EVIDENCE |    revision="1">
+EVIDENCE | <author>haroldzhao</author>
+EVIDENCE | <date>2026-11-27T08:35:28.198614Z</date>
+EVIDENCE | <msg>base revision</msg>
+EVIDENCE | </logentry>
+EVIDENCE | </log>
+EVIDENCE svn log after remove:
+<?xml version="1.0" encoding="UTF-8"?>
+<log>
+<logentry
+   revision="3">
+<author>haroldzhao</author>
+<date>2026-11-27T08:35:28.618859Z</date>
+<msg>remove b</msg>
+</logentry>
+<logentry
+   revision="2">
+<author>haroldzhao</author>
+<date>2026-11-27T08:35:28.431155Z</date>
+<msg>second revision</msg>
+</logentry>
+<logentry
+   revision="1">
+<author>haroldzhao</author>
+<date>2026-11-27T08:35:28.198614Z</date>
+<msg>base revision</msg>
+</logentry>
+</log>
+
+EVIDENCE product write svn remove missing: SvnRemove
+EVIDENCE | 
+EVIDENCE | svn: E200005: Use --force to override this restriction (local modifications may be lost)
+EVIDENCE | svn: E200005: '/tmp/.tmpSbaId9/wc/missing.sv' is not under version control
+EVIDENCE svn remove missing stderr="svn: E200005: Use --force to override this restriction (local modifications may be lost)\nsvn: E200005: '/tmp/.tmpSbaId9/wc/missing.sv' is not under version control\n"
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn mkdir -m Create layout file:///tmp/.tmpSbaId9/repo/trunk file:///tmp/.tmpSbaId9/repo/branches
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 4.
+EVIDENCE product write checkout: SvnCheckout
+EVIDENCE | Checked out revision 4.
+EVIDENCE | 
+EVIDENCE product write add two files: SvnAdd
+EVIDENCE | A         a space.sv
+EVIDENCE | A         b.sv
+EVIDENCE | 
+EVIDENCE product write commit initial: SvnCommit
+EVIDENCE | Adding         a space.sv
+EVIDENCE | Adding         b.sv
+EVIDENCE | Transmitting file data ..done
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 5.
+EVIDENCE | 
+EVIDENCE product write set changelist: SvnChangelist
+EVIDENCE | A [Second group] b.sv
+EVIDENCE | 
+EVIDENCE reads selected/all/changelist scopes match fixture
+EVIDENCE product write commit selected: SvnCommit
+EVIDENCE | Sending        a space.sv
+EVIDENCE | Transmitting file data .done
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 6.
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn status
+EVIDENCE | 
+EVIDENCE | --- Changelist 'Second group':
+EVIDENCE | M       b.sv
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn status
+EVIDENCE | 
+EVIDENCE | --- Changelist 'Second group':
+EVIDENCE | M       b.sv
+EVIDENCE product write commit changelist: SvnCommit
+EVIDENCE | Sending        b.sv
+EVIDENCE | Transmitting file data .done
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 7.
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn status
+EVIDENCE product write set changelist again: SvnChangelist
+EVIDENCE | A [Second group] b.sv
+EVIDENCE | 
+EVIDENCE product write remove changelist: SvnChangelistRemove
+EVIDENCE | D [Second group] b.sv
+EVIDENCE | 
+EVIDENCE product write create branch: SvnBranchCreate
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 8.
+EVIDENCE | 
+EVIDENCE product write switch to branch: SvnSwitch
+EVIDENCE | At revision 8.
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn info --show-item url
+EVIDENCE | file:///tmp/.tmpSbaId9/repo/branches/feature
+EVIDENCE product write commit feature change: SvnCommit
+EVIDENCE | Sending        a space.sv
+EVIDENCE | Transmitting file data .done
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 9.
+EVIDENCE | 
+EVIDENCE product write switch back: SvnSwitch
+EVIDENCE | U    a space.sv
+EVIDENCE | Updated to revision 9.
+EVIDENCE | 
+EVIDENCE product write commit trunk change: SvnCommit
+EVIDENCE | Sending        a space.sv
+EVIDENCE | Transmitting file data .done
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 10.
+EVIDENCE | 
+EVIDENCE product write update trunk before merging: SvnUpdate
+EVIDENCE | Updating '.':
+EVIDENCE | At revision 10.
+EVIDENCE | 
+EVIDENCE product write merge creates real text conflict: SvnMerge
+EVIDENCE | --- Merging r8 through r10 into '.':
+EVIDENCE | C    a space.sv
+EVIDENCE | --- Recording mergeinfo for merge of r8 through r10 into '.':
+EVIDENCE |  U   .
+EVIDENCE | Summary of conflicts:
+EVIDENCE |   Text conflicts: 1
+EVIDENCE | 
+EVIDENCE product write mark working contents resolved: SvnResolve
+EVIDENCE | Merge conflicts in 'a space.sv' marked as resolved.
+EVIDENCE | 
+EVIDENCE product write rename with spaces and at sign: SvnRename
+EVIDENCE | A         moved name@.sv
+EVIDENCE | D         b.sv
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn propset svn:ignore existing.log .
+EVIDENCE | property 'svn:ignore' set on '.'
+EVIDENCE product write append svn:ignore: SvnIgnore
+EVIDENCE | property 'svn:ignore' set on '.'
+EVIDENCE | 
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn propget svn:ignore .
+EVIDENCE | existing.log
+EVIDENCE | generated.tmp
+EVIDENCE | 
+EVIDENCE product write cleanup: SvnCleanup
+EVIDENCE | 
+EVIDENCE scoped unversioned deletion refuses tracked and nested-repository paths, and deletes the selected scratch directory
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn propset svn:ignore generated.tmp
+safeguard .
+EVIDENCE | property 'svn:ignore' set on '.'
+EVIDENCE $ <checkout>/target/trace-lint-svn-evidence/native/modern-svn/svn checkout -q file:///tmp/.tmpSbaId9/repo/trunk observer
+EVIDENCE product write commit resolved merge: SvnCommit
+EVIDENCE | Sending        .
+EVIDENCE | Sending        a space.sv
+EVIDENCE | Deleting       b.sv
+EVIDENCE | Adding         moved name@.sv
+EVIDENCE | Transmitting file data .done
+EVIDENCE | Committing transaction...
+EVIDENCE | Committed revision 11.
+EVIDENCE | 
+EVIDENCE real incoming status, text search, revision search, and changed paths matched
+EVIDENCE saved remote log, search, revision path, previous content and deletion matched
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.53s
+

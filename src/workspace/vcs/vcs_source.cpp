@@ -619,6 +619,10 @@ HistoryData takeHistory(const VdVcsHistoryResult &raw)
         file.path = copyText(raw.files[index].path);
         file.additions = raw.files[index].additions;
         file.deletions = raw.files[index].deletions;
+        file.svnAction = static_cast<char>(raw.files[index].svn_action);
+        file.svnNodeKind = static_cast<SvnNodeKind>(raw.files[index].svn_node_kind);
+        file.svnCopyFromPath = copyText(raw.files[index].svn_copy_from_path);
+        file.svnCopyFromRevision = raw.files[index].svn_copy_from_revision;
         data.files.push_back(std::move(file));
     }
     data.blame.reserve(raw.blame_count);

@@ -30,7 +30,12 @@
 
 use serde_json::Value;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
 use std::path::{Component, Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
+
+use crate::LintFailure;
 
 /// The AST-JSON keys that carry a position's file. `symbol_position` reads
 /// `source_file`; expressions use the `_start` / `_end` flavours.
@@ -152,7 +157,32 @@ impl Columns {
     ///   rounding down keeps the reported identifier reachable.
     /// * **empty line** — column 0 maps to 0.
     pub(crate) fn char_column(&mut self, file: &Path, line0: u32, byte_column0: u32) -> u32 {
-        let Some(lines) = self.lines(file) else {
+        if !self.files.contains_key(file) {
+            let loaded = std::fs::read(file)
+                .ok()
+                .filter(|bytes| std::str::from_utf8(bytes).is_ok())
+                .map(|bytes| split_lines(&bytes).map(<[u8]>::to_vec).collect());
+            self.cache(file, loaded);
+        }
+        self.cached_column(file, line0, byte_column0)
+    }
+
+    pub(crate) fn char_column_cancellable(
+        &mut self,
+        file: &Path,
+        line: u32,
+        byte_column: u32,
+        cancel: &AtomicBool,
+    ) -> Result<u32, LintFailure> {
+        check_cancelled(cancel)?;
+        if !self.files.contains_key(file) {
+            self.cache(file, read_trace_lines(file, cancel)?);
+        }
+        Ok(self.cached_column(file, line, byte_column))
+    }
+
+    fn cached_column(&self, file: &Path, line0: u32, byte_column0: u32) -> u32 {
+        let Some(lines) = self.files.get(file).and_then(Option::as_ref) else {
             return byte_column0;
         };
         let Some(line) = lines.get(line0 as usize) else {
@@ -171,36 +201,64 @@ impl Columns {
         u32::try_from(text.encode_utf16().count()).unwrap_or(byte_column0)
     }
 
-    fn lines(&mut self, file: &Path) -> Option<&Vec<Vec<u8>>> {
-        if !self.files.contains_key(file) {
-            let loaded = std::fs::read(file)
-                .ok()
-                .filter(|bytes| std::str::from_utf8(bytes).is_ok())
-                .map(|bytes| split_lines(&bytes));
-            let added = loaded
-                .as_ref()
-                .map_or(0, |lines| lines.iter().map(Vec::len).sum::<usize>());
-            if self.cached_bytes + added > Self::MAX_CACHED_BYTES {
-                self.files.clear();
-                self.cached_bytes = 0;
-            }
-            self.cached_bytes += added;
-            self.files.insert(file.to_path_buf(), loaded);
+    fn cache(&mut self, file: &Path, loaded: Option<Vec<Vec<u8>>>) {
+        let added = loaded
+            .as_ref()
+            .map_or(0, |lines| lines.iter().map(Vec::len).sum::<usize>());
+        if self.cached_bytes + added > Self::MAX_CACHED_BYTES {
+            self.files.clear();
+            self.cached_bytes = 0;
         }
-        self.files.get(file).and_then(Option::as_ref)
+        self.cached_bytes += added;
+        self.files.insert(file.to_path_buf(), loaded);
     }
+}
+
+pub(crate) fn check_cancelled(cancel: &AtomicBool) -> Result<(), LintFailure> {
+    if cancel.load(Ordering::SeqCst) {
+        Err(LintFailure::Cancelled)
+    } else {
+        Ok(())
+    }
+}
+
+fn read_trace_lines(file: &Path, cancel: &AtomicBool) -> Result<Option<Vec<Vec<u8>>>, LintFailure> {
+    // Compiler paths may be invalid or refer to a special file. Keep the
+    // existing byte-column fallback without opening a pipe or a device.
+    if !file.metadata().is_ok_and(|metadata| metadata.is_file()) {
+        return Ok(None);
+    }
+    let Ok(mut input) = File::open(file) else {
+        return Ok(None);
+    };
+    let mut bytes = Vec::new();
+    loop {
+        check_cancelled(cancel)?;
+        match (&mut input).take(64 * 1024).read_to_end(&mut bytes) {
+            Ok(0) => break,
+            Ok(_) => {}
+            Err(_) => return Ok(None),
+        }
+    }
+    check_cancelled(cancel)?;
+    if std::str::from_utf8(&bytes).is_err() {
+        return Ok(None);
+    }
+    let lines = split_lines(&bytes)
+        .map(|line| {
+            check_cancelled(cancel)?;
+            Ok(line.to_vec())
+        })
+        .collect::<Result<_, _>>()?;
+    Ok(Some(lines))
 }
 
 /// Split file bytes into lines without their terminators (a trailing `\r` is
 /// stripped), exactly like the diagnostics lane's `SourceLines`.
-fn split_lines(bytes: &[u8]) -> Vec<Vec<u8>> {
+fn split_lines(bytes: &[u8]) -> impl Iterator<Item = &[u8]> {
     bytes
         .split(|byte| *byte == b'\n')
-        .map(|line| match line.split_last() {
-            Some((b'\r', rest)) => rest.to_vec(),
-            _ => line.to_vec(),
-        })
-        .collect()
+        .map(|line| line.strip_suffix(b"\r").unwrap_or(line))
 }
 
 #[cfg(test)]
@@ -258,6 +316,29 @@ mod tests {
         let (file, mut columns) = columns_for("/* 中文 */ clk\n");
         assert_eq!(columns.char_column(&file, 0, 13), 9);
         assert_eq!(columns.char_column(&file, 0, 0), 0);
+    }
+
+    #[test]
+    fn trace_column_conversion_preserves_unicode_across_read_chunks() -> std::io::Result<()> {
+        let dir = tempfile::tempdir()?;
+        let file = dir.path().join("unicode.sv");
+        let padding = 64 * 1024 - 1;
+        std::fs::write(&file, format!("{}🧪 clk\r\n", " ".repeat(padding)))?;
+        let mut columns = Columns::new();
+        let cancel = AtomicBool::new(false);
+        let byte_column = u32::try_from(padding + 5).map_err(std::io::Error::other)?;
+        let expected = columns.char_column(&file, 0, byte_column);
+        let mut cancellable = Columns::new();
+        assert!(matches!(
+            cancellable.char_column_cancellable(&file, 0, byte_column, &cancel),
+            Ok(actual) if actual == expected
+        ));
+        cancel.store(true, Ordering::SeqCst);
+        assert!(matches!(
+            cancellable.char_column_cancellable(&file, 0, byte_column, &cancel),
+            Err(LintFailure::Cancelled)
+        ));
+        Ok(())
     }
 
     #[test]

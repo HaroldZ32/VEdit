@@ -1,0 +1,83 @@
+    Start 14: vedit-signal-trace-selftest
+14: Test command: /vedit-build/target/qt6-build/src/app/vedit-signal-trace-selftest "/vedit-build/tests/fixtures/signal_trace" "/vedit-build/build/slang/out/slang"
+14: search: jump opened '<fixture>/leaf.sv' line=1 column=57 (cursor=1:57)
+14: search: jump opened '<fixture>/leaf.sv' line=1 column=57 (cursor=1:57)
+14: PASS open editor
+14: PASS trace actions and project model
+14: PASS Project menu owns the four live trace actions
+14: PASS folder alone disables trace
+14: PASS real filelist import
+14: PASS import enables trace
+14: PASS Preferences loaded
+14: PASS all four trace defaults are unique and conflict-free
+14: PASS editor menu leaves definition and references and adds trace
+14: PASS editor menu displays all four trace shortcuts
+14: PASS F7 single driver opens across files
+14: PASS driver jumps to child port declaration
+14: PASS F9 duplicate instances open direct chooser
+14: PASS chooser distinguishes both paths
+14: PASS direct chooser stays one hop
+14: PASS direct chooser reopens
+14: PASS direct column size survives reopening
+14: PASS Shift+F9 load chain across module boundary
+14: PASS load chain follows the actual signal and port sequence
+14: PASS load chain branches at the same signal
+14: PASS chain header drag enables horizontal scrolling
+14: PASS open top again
+14: PASS Shift+F7 driver chain opens
+14: PASS driver upstream walk preserves direction and both branches
+14: PASS chain column size survives reopening in the opposite direction
+14: PASS keyboard activates a tree endpoint
+14: PASS one keyboard activation delivers one jump
+14: PASS return to top
+14: PASS cycle result opens
+14: PASS cycle terminates visibly
+14: PASS inout driver tree opens
+14: PASS inout child-to-parent driver and terminal assign are explicit
+14: PASS inout load tree opens
+14: PASS inout parent-to-child load is explicit
+14: PASS external source edit invalidates displayed cache
+14: PASS non-signal cursor has explicit empty feedback
+14: PASS open cap fixture
+14: PASS capped load tree opens
+14: PASS depth cap is visible and omits deep endpoints
+14: PASS Preferences exposes the trace rebind controls
+14: PASS rebind immediately updates the live QAction
+14: PASS trace rebind persisted
+14: PASS load chain is ready after Preferences refresh
+14: PASS rebind removes the old key
+14: PASS new shortcut triggers the same chain in the live editor
+14: failures=0
+1/2 Test #14: vedit-signal-trace-selftest ............   Passed    0.99 sec
+    Start 15: vedit-signal-trace-oversize-selftest
+15: Test command: /vedit-build/target/qt6-build/src/app/vedit-signal-trace-selftest "/vedit-build/tests/fixtures/signal_trace" "/vedit-build/build/slang/out/slang" "--oversize"
+15: PASS open editor
+15: PASS trace actions and project model
+15: PASS Project menu owns the four live trace actions
+15: PASS folder alone disables trace
+15: PASS real filelist import
+15: PASS import enables trace
+15: search: jump opened '<fixture>/leaf.sv' line=1 column=57 (cursor=1:57)
+15: search: jump opened '<fixture>/top.sv' line=6 column=19 (cursor=6:19)
+15: oversize cold action elapsed_ms=2619 event_ticks=231 max_gap_ms=115
+15: PASS oversize driver jumps to child output declaration
+15: PASS oversize load jumps to the same signal's RHS occurrence
+15: oversize warm action elapsed_ms=0
+15: PASS measure the real trace AST
+15: oversize trace ast_bytes=138188283
+15: PASS compiled trace AST exceeds 96 MiB
+15: PASS driver and load reuse one elaboration
+15: PASS cached trace can show its result before invalidation
+15: PASS source edit invalidates the cached large trace
+15: oversize cached invalidation elapsed_ms=12
+15: PASS trace starts a controlled pending job
+15: PASS second edit cancels the active generation
+15: search: jump opened '<fixture>/leaf.sv' line=1 column=57 (cursor=1:57)
+15: PASS replacement trace returns the driver
+15: oversize replacement elapsed_ms=1338
+15: PASS stale compiler exited before replacement started
+15: oversize window destruction elapsed_ms=15
+2/2 Test #15: vedit-signal-trace-oversize-selftest ...   Passed    4.33 sec
+The following tests passed:
+100% tests passed, 0 tests failed out of 2
+Total Test time (real) =   5.33 sec

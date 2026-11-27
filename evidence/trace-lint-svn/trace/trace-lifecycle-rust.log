@@ -1,0 +1,180 @@
+    Checking vd-deeplint v0.5.0 (<repo>/crates/vd-deeplint)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.68s
+   Compiling vd-ffi v0.5.0 (<repo>/crates/vd-ffi)
+    Checking vd-settings v0.5.0 (<repo>/crates/vd-settings)
+    Checking vd-config v0.5.0 (<repo>/crates/vd-config)
+    Checking vd-vcs v0.5.0 (<repo>/crates/vd-vcs)
+    Checking vd-deeplint v0.5.0 (<repo>/crates/vd-deeplint)
+    Checking vd-fim v0.5.0 (<repo>/crates/vd-fim)
+    Checking vd-search v0.5.0 (<repo>/crates/vd-search)
+    Checking vd-lsp v0.5.0 (<repo>/crates/vd-lsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.38s
+   Compiling vd-deeplint v0.5.0 (<repo>/crates/vd-deeplint)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.84s
+     Running unittests src/lib.rs (.mpd/worktrees/team-20261127080202908-c350-005/trace/target/trace-probe/build/debug/deps/vd_deeplint-f52875842ac30a70)
+
+running 124 tests
+test ast_prune::tests::connections_and_expressions_are_not_retained ... ok
+test ast_prune::tests::measure_nesting_counts_containers_and_ignores_strings ... ok
+test ast_prune::tests::the_retention_budget_keeps_definitions_and_reports_partial_retention ... ok
+test batch::tests::phase_codes_and_terminals ... ok
+test ast_prune::tests::irrelevant_subtrees_are_dropped_but_catalog_nodes_survive ... ok
+test binary::tests::appdir_root_layout_is_found_relative_to_the_executable ... ok
+test binary::tests::environment_variable_is_used_when_set ... ok
+test binary::tests::appdir_root_layout_finds_verible_lint ... ok
+test ast_prune::tests::the_walk_parses_a_document_beyond_serde_json_s_default_guard ... ok
+test binary::tests::non_executable_file_is_not_chosen ... ok
+test binary::tests::attempts_are_recorded_in_product_order ... ok
+test binary::tests::imported_project_beats_imported_global_and_path ... ok
+test binary::tests::stage_labels_match_the_product_order ... ok
+test binary::tests::all_attempts_are_listed_when_nothing_is_found ... ok
+test binary::tests::path_is_consulted_when_nothing_else_has_the_tool ... ok
+test binary::tests::tool_children_request_the_packaged_loader_variables_be_removed ... ok
+test ast_prune::tests::measure_nesting_stops_early_above_the_cap ... ok
+test ast_prune::tests::malformed_documents_are_reported ... ok
+test binary::tests::bundled_payload_beats_the_environment_variable ... ok
+test dedup::tests::sources_round_trip_and_merge ... ok
+test catalog::tests::direction_spelling_round_trips ... ok
+test catalog::tests::an_empty_document_is_reported_not_silently_empty ... ok
+test dedup::tests::the_same_problem_gets_the_same_key_from_both_paths ... ok
+test dedup::tests::different_line_severity_or_message_changes_the_key ... ok
+test dedup::tests::severity_codes_map_onto_the_shared_class ... ok
+test diagnostic::tests::a_diagnostic_without_location_or_ranges_is_kept ... ok
+test binary::tests::package_layout_is_found_relative_to_the_executable ... ok
+test binary::tests::explicit_option_wins_and_is_recorded ... ok
+test diagnostic::tests::a_diagnostic_without_ranges_converts_the_location_as_a_point ... ok
+test diagnostic::tests::a_non_array_diagnostics_document_is_a_typed_error ... ok
+test diagnostic::tests::an_unparsable_location_string_is_a_note_not_a_failure ... ok
+test diagnostic::tests::location_string_with_colons_in_the_path_is_parsed_from_the_right ... ok
+test diagnostic::tests::location_falls_back_to_first_range ... ok
+test binary::tests::local_checkout_beats_path_and_environment ... ok
+test diagnostic::tests::byte_columns_convert_inside_a_tab_line ... ok
+test diagnostic::tests::malformed_json_is_rejected ... ok
+test diagnostic::tests::parses_recorded_undeclared_diagnostic ... ok
+test diagnostic::tests::parses_the_empty_clean_report ... ok
+test diagnostic::tests::parses_recorded_unicode_diagnostics_without_losing_fields ... ok
+test diagnostic::tests::severity_mapping_includes_unknown ... ok
+test diagnostic::tests::repeated_findings_collapse_with_a_repeat_count ... ok
+test engine::tests::autofix_codes_round_trip_and_unknown_codes_are_rejected ... ok
+test diagnostic::tests::the_streaming_parser_matches_the_whole_string_parse ... ok
+test diagnostic::tests::the_count_bound_keeps_the_head_and_counts_the_tail ... ok
+test engine::tests::command_line_for_echoes_the_same_argv_the_run_uses ... ok
+test engine::tests::default_lint_options_send_no_flag_on_either_engine ... ok
+test diagnostic::tests::byte_columns_convert_to_utf16_on_cjk_and_emoji ... ok
+test engine::tests::engine_codes_round_trip_and_unknown_codes_are_rejected ... ok
+test diagnostic::tests::conversion_rejects_bad_lines_columns_and_split_characters ... ok
+test diagnostic::tests::crlf_trailing_carriage_return_is_not_part_of_the_line ... ok
+test engine::tests::every_autofix_value_reaches_the_child_argv_verbatim ... ok
+test engine::tests::ruleset_codes_map_to_the_flag_values ... ok
+test diagnostic::tests::different_findings_at_one_location_stay_separate ... ok
+test engine::tests::slang_argv_carries_include_dirs_and_defines ... ok
+test diagnostic::tests::implicit_net_has_a_location_but_no_ranges_and_keeps_option_name ... ok
+test diagnostic::tests::invalid_utf8_source_is_rejected ... ok
+test engine::tests::slang_receives_its_knobs_and_ignores_the_verible_ones ... ok
+test diagnostic::tests::calibration_table_converts_byte_columns_to_utf16 ... ok
+test engine::tests::verible_argv_carries_only_what_the_tool_accepts ... ok
+test dedup::tests::whitespace_is_trimmed_and_folded ... ok
+test engine::tests::verible_lines_parse_with_and_without_ranges ... ok
+test engine::tests::verible_log_lines_are_not_findings ... ok
+test engine::tests::unsupported_knobs_name_exactly_the_no_ops ... ok
+test engine::tests::verible_positions_convert_through_source_lines ... ok
+test engine::tests::the_lint_option_validators_accept_the_documented_shapes_and_reject_the_rest ... ok
+test engine::tests::verible_receives_autofix_and_never_the_slang_waiver_file ... ok
+test engine::tests::verible_receives_its_knobs_and_ignores_the_slang_ones ... ok
+test engine::tests::slang_waiver_toml_validation_matches_the_measured_schema ... ok
+test hierarchy::tests::navigation_discards_cancelled_and_malformed_artifacts ... ok
+test rename_apply::tests::a_cancel_after_the_first_write_restores_it ... ok
+test rename_apply::tests::an_unwritable_file_rolls_back_everything ... ok
+test catalog::tests::the_streaming_prune_matches_the_whole_document_parse ... ok
+test rename_index::tests::a_missing_project_directory_is_path_io_not_a_missing_binary ... ok
+test rename_apply::tests::a_failed_write_restores_every_sha256_and_names_the_file ... ok
+test hierarchy::tests::streamed_navigation_matches_the_small_whole_document_graph ... ok
+test batch::tests::a_missing_binary_fails_the_pass_with_its_stage_and_tool ... ok
+test rename_index::tests::a_hierarchically_referenced_symbol_is_refused_wholesale ... ok
+test rename_apply::tests::a_file_that_changed_under_the_plan_is_refused ... ok
+test rename_index::tests::a_connected_port_is_refused_wholesale ... ok
+test rename_index::tests::a_package_constant_reaches_its_references_in_other_files ... ok
+test rename_apply::tests::apply_rewrites_every_occurrence_and_verifies ... ok
+test rename_index::tests::a_keyword_is_never_nameable ... ok
+test rename_index::tests::a_relative_file_path_runs_the_child_in_a_real_directory ... ok
+test rename_apply::tests::a_dry_run_writes_nothing ... ok
+test rename_index::tests::a_parameter_rename_is_refused_as_unsupported ... ok
+test rename_index::tests::an_empty_file_set_is_an_explicit_no_project ... ok
+test rename_index::tests::failure_classes_keep_binary_missing_apart_from_path_io ... ok
+test rename_index::tests::identifier_validation_matches_systemverilog ... ok
+test rename_index::tests::a_string_and_a_comment_in_an_indexed_file_are_not_occurrences ... ok
+test rename_index::tests::a_name_outside_the_project_is_not_nameable ... ok
+test rename_index::tests::a_signal_in_named_and_positional_connections_renames_by_identity ... ok
+test rename_apply::tests::a_preview_is_grouped_per_absolute_file_with_before_and_after ... ok
+test rename_index::tests::the_line_table_maps_byte_columns ... ok
+test rename_index::tests::an_illegal_new_name_is_rejected ... ok
+test rename_index::tests::a_unique_signal_resolves_to_exactly_one_declaration ... ok
+test service::tests::failure_user_messages_are_actionable ... ok
+test rename_apply::tests::a_cancel_before_the_first_write_changes_nothing ... ok
+test service::tests::std_summary_messages_are_short ... ok
+test service::tests::stream_capture_truncates_at_the_limit ... ok
+test tests::a_too_deep_design_names_the_measured_depth_and_the_cap ... ok
+test tests::an_ast_json_overflow_never_blames_lint_diagnostics ... ok
+test tests::missing_output_message_names_the_first_non_empty_stderr_line ... ok
+test tests::missing_output_message_names_the_signal_that_killed_the_tool ... ok
+test tests::missing_output_message_without_stderr_keeps_the_short_form ... ok
+test tests::the_lint_output_cap_keeps_its_diagnostic_wording ... ok
+test tool_paths::tests::boundary_rules_are_total ... ok
+test tool_paths::tests::byte_columns_convert_to_utf16_units ... ok
+test tool_paths::tests::multi_directory_file_sets_resolve_each_file_correctly ... ok
+test tool_paths::tests::relative_paths_resolve_against_the_tool_directory ... ok
+test tool_paths::tests::trace_column_conversion_preserves_unicode_across_read_chunks ... ok
+test rename_index::tests::same_name_globals_in_other_modules_are_ambiguous_never_renamed ... ok
+test rename_index::tests::same_name_is_an_explicit_noop ... ok
+test rename_index::tests::an_instance_rename_is_refused_wholesale ... ok
+test rename_apply::tests::negative_controls_keep_their_sha256_after_apply ... ok
+test rename_apply::tests::the_renamed_project_still_parses_after_apply ... ok
+test rename_index::tests::a_conflicting_new_name_names_the_declaration ... ok
+test rename_index::tests::a_unique_parameter_and_instance_resolve ... ok
+test rename_index::tests::the_plan_counts_every_occurrence_and_renders_before_after ... ok
+test rename_apply::tests::a_cancel_leaves_every_file_sha256_unchanged ... ok
+test rename_index::tests::comments_and_strings_are_not_occurrences ... ok
+test rename_index::tests::the_fixture_indexes_the_three_symbol_classes ... ok
+test rename_index::tests::spike_print_hit_lists ... ok
+test rename_index::tests::every_measured_unresolvable_category_is_refused_whole ... ok
+test rename_index::tests::two_hundred_files_index_and_plan_within_budget ... ok
+
+test result: ok. 124 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+   Compiling vd-deeplint v0.5.0 (<repo>/crates/vd-deeplint)
+   Compiling vd-ffi v0.5.0 (<repo>/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.20s
+     Running unittests src/lib.rs (.mpd/worktrees/team-20261127080202908-c350-005/trace/target/trace-probe/build/debug/deps/vd_ffi-d7867091f909edff)
+
+running 10 tests
+test deeplint::tests::the_dedup_key_is_identical_for_an_lsp_and_a_cli_row ... ok
+test deeplint::tests::the_engine_option_name_is_lifted_into_a_typed_field ... ok
+test deeplint::tests::the_verible_command_line_states_that_it_takes_no_include_dirs ... ok
+test deeplint::tests::frozen_autofix_and_waiver_knobs_are_refused_not_ignored ... ok
+test deeplint::tests::the_slang_command_line_shows_the_project_settings ... ok
+test deeplint::trace_jobs::tests::stale_work_is_retired_before_the_latest_request_and_never_fills_the_queue ... ok
+test deeplint::tests::a_batch_reports_progress_and_delivers_its_result_once ... ok
+test deeplint::tests::a_batch_cancel_really_stops_it_and_delivers_no_results ... ok
+test deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name ... ok
+test deeplint::tests::the_elaboration_job_returns_the_hierarchy_and_the_driver_load_positions ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 78 filtered out; finished in 0.06s
+
+   Compiling vd-ffi v0.5.0 (<repo>/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.57s
+     Running unittests src/lib.rs (.mpd/worktrees/team-20261127080202908-c350-005/trace/target/trace-probe/build/debug/deps/vd_ffi-d7867091f909edff)
+
+running 1 test
+test deeplint::trace_jobs::tests::stale_work_is_retired_before_the_latest_request_and_never_fills_the_queue ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 87 filtered out; finished in 0.00s
+
+   Compiling vd-ffi v0.5.0 (<repo>/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.68s
+     Running unittests src/lib.rs (.mpd/worktrees/team-20261127080202908-c350-005/trace/target/trace-probe/build/debug/deps/vd_ffi-d7867091f909edff)
+
+running 1 test
+test deeplint::trace_jobs::tests::stale_work_is_retired_before_the_latest_request_and_never_fills_the_queue ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 87 filtered out; finished in 0.00s
+

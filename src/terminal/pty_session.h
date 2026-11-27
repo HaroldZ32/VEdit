@@ -74,6 +74,8 @@ private slots:
     void flushWrites();
 
 private:
+    friend struct PtyReadLimitProbe;
+
     void stopNotifier();
     void closeMaster();
     void finalize(int status);

@@ -149,7 +149,7 @@ impl List {
 /// The frozen surface must keep every signature: renaming an export or changing a
 /// parameter type is a compile error here, before the Qt build can break.
 #[test]
-fn the_frozen_surface_is_linked_and_still_abi_version_two() {
+fn the_frozen_surface_is_linked_at_abi_version_three() {
     // SAFETY: these are function-item bindings; none of them is called.
     let _: unsafe extern "C" fn(*mut VdService, *const VdEnvCaptureOptions) -> u64 =
         vd_env_capture_start;
@@ -231,8 +231,8 @@ fn the_frozen_surface_is_linked_and_still_abi_version_two() {
 
     assert_eq!(
         vd_abi_version(),
-        2,
-        "AC: the ABI version is 2 (VdModuleCatalog grew)"
+        3,
+        "AC: the ABI version is 3 (VdVcsFileStat grew)"
     );
 }
 

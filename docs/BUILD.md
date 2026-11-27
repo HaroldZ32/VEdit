@@ -265,7 +265,7 @@ bash packaging/tarball/build.sh           # 旧 vd-app 的 tar.gz + 自解压 .r
 - `VD_ABI_VERSION` 在**已导出签名的含义变化**时增加，**也**在**由提供方填充的结构体增长**时增加：
   追加字段保住的是每个既有**偏移**，不是 `sizeof`，而 `vd_*_poll` 写的是整个当前结构体
   （G1-c 的 `vd_catalog_poll` 写 112 字节；旧头消费者只分配 88 字节 → 越界写 24 字节）。
-  `VdModuleCatalog` 的扩展因此把版本从 1 升到 **2**；
+  `VdModuleCatalog` 的扩展因此把版本从 1 升到 **2**。版本 **3** 为 `VdVcsFileStat` 增加了 SVN 路径操作、节点类型和复制来源。数组中相邻条目之间的字节数随之改变，读取修订详情的 C/C++ 调用方需要使用新版头文件重新编译。
 - 结构体**按指针传递**且 Rust 端**无条件读取**追加字段（`crates/vd-ffi/src/rename.rs` 的
   `read_options`），所以用**旧 header** 编译过的下游 C 调用方**必须重编**，否则会读到旧结构体
   末尾之外；

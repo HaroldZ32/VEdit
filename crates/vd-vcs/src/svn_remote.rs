@@ -1,7 +1,7 @@
 //! Read-only history for a saved SVN repository URL.
 
 use crate::svn_compare::{encode_path_segment, missing};
-use crate::svn_read::{self, LogEntry};
+use crate::svn_read::{self, LogEntry, RevisionDetail};
 use crate::svn_write::{checkout_url, literal_target};
 use std::path::Path;
 
@@ -31,15 +31,23 @@ impl<'a> Remote<'a> {
     /// # Errors
     /// Returns the SVN log failure.
     pub fn log(&self, query: &str, limit: usize) -> Result<Vec<LogEntry>, String> {
-        svn_read::log_at(self.directory, &literal_target(self.url), query, limit)
+        svn_read::log_at(
+            self.directory,
+            &literal_target(self.url),
+            query,
+            limit,
+            false,
+        )
     }
 
-    /// Fetch one revision and its changed paths.
+    /// Fetch one revision and its changed paths within the saved URL.
     ///
     /// # Errors
     /// Returns the SVN log failure or an invalid revision error.
-    pub fn detail(&self, revision: &str) -> Result<(LogEntry, Vec<String>), String> {
-        svn_read::detail_at(self.directory, &literal_target(self.url), revision)
+    pub fn detail(&self, revision: &str) -> Result<RevisionDetail, String> {
+        let target = literal_target(self.url);
+        let info = svn_read::info(self.directory, &target)?;
+        svn_read::detail_at(self.directory, &target, revision, info, false)
     }
 
     fn target(&self, path: &str) -> Result<String, String> {
@@ -51,18 +59,7 @@ impl<'a> Remote<'a> {
         }) {
             return Err("Invalid repository file path.".into());
         }
-        let root = svn_read::svn(
-            self.directory,
-            "info",
-            &[
-                "--show-item",
-                "repos-root-url",
-                "--no-newline",
-                "--",
-                &literal_target(self.url),
-            ],
-        )?;
-        let root = checkout_url(&root).map_err(|error| error.message().to_owned())?;
+        let root = svn_read::info(self.directory, &literal_target(self.url))?.repository_root;
         let path = path
             .split('/')
             .map(encode_path_segment)
@@ -80,23 +77,12 @@ impl<'a> Remote<'a> {
             return Ok(None);
         }
         let target = self.target(path)?;
-        let number = revision.to_string();
-        let result = svn_read::svn(
+        match svn_read::cat(
             self.directory,
-            "cat",
-            &[
-                "--ignore-keywords",
-                "-r",
-                &number,
-                "--",
-                &format!("{target}@{peg}"),
-            ],
-        );
-        match result {
+            &revision.to_string(),
+            &format!("{target}@{peg}"),
+        ) {
             Err(error) if missing(&error) => Ok(None),
-            Ok(text) if text.contains('\0') => {
-                Err("The SVN result is binary. Comparison requires UTF-8 text.".into())
-            }
             result => result.map(Some),
         }
     }

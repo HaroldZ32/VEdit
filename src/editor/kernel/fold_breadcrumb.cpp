@@ -1,5 +1,6 @@
 #include "fold_breadcrumb.h"
 
+#include "editor_analysis_pool.h"
 #include "syntax_breadcrumb_source.h"
 #include "syntax_service.h"
 
@@ -7,11 +8,19 @@
 #include <KTextEditor/View>
 
 #include <QEvent>
+#include <QPromise>
 #include <QTimer>
 #include <QVariantList>
 #include <QVariantMap>
 
 namespace vedit::editor {
+namespace {
+
+constexpr int kLargeDocumentLines = 2000;
+constexpr int kLargeDocumentChars = 65536;
+constexpr int kWorkerRetryMs = 40;
+
+} // namespace
 
 FoldBreadcrumbBinding::FoldBreadcrumbBinding(KTextEditor::View *view, QObject *parent)
     : QObject(parent)
@@ -23,7 +32,8 @@ FoldBreadcrumbBinding::FoldBreadcrumbBinding(KTextEditor::View *view, QObject *p
     breadcrumbDebounce_->setObjectName(QStringLiteral("breadcrumbDebounce"));
     breadcrumbDebounce_->setSingleShot(true);
     breadcrumbDebounce_->setInterval(150);
-    connect(breadcrumbDebounce_, &QTimer::timeout, this, [this]() { refreshBreadcrumb(); });
+    connect(breadcrumbDebounce_, &QTimer::timeout, this, &FoldBreadcrumbBinding::refreshBreadcrumb);
+    connect(&breadcrumbWorker_, &QFutureWatcherBase::finished, this, &FoldBreadcrumbBinding::finishBreadcrumb);
 
     if (view_ == nullptr) {
         return;
@@ -74,7 +84,7 @@ void FoldBreadcrumbBinding::ensureSources()
         return;
     }
     sourcesReady_ = true;
-    breadcrumbSource_ = std::make_unique<vedit::breadcrumb::SyntaxBreadcrumbSource>(grammarId());
+    breadcrumbSource_ = std::make_shared<vedit::breadcrumb::SyntaxBreadcrumbSource>(grammarId());
 }
 
 void FoldBreadcrumbBinding::onDocumentOpened()
@@ -88,15 +98,8 @@ void FoldBreadcrumbBinding::onDocumentOpened()
     textCached_ = false;
     textDirty_ = true;
     forceNextRefresh_ = true;
-    // batch-20261115 AC-5.4: the seed refresh copies the whole document and runs
-    // the full semantic scan (measured 192 ms at 10k lines,
-    // evidence/large-file/REPORT.md). Inside openFile() that blocks the first
-    // paint for a path the user cannot read yet. Small documents keep the
-    // synchronous seed (no visible breadcrumb flash); above the threshold the
-    // SAME work runs from the existing debounce timer, i.e. after the open has
-    // returned to the caller.
-    constexpr int kMaxSynchronousSeedLines = 2000;
-    if (view_->document()->lines() <= kMaxSynchronousSeedLines) {
+    ++sourceGeneration_;
+    if (view_->document()->lines() <= kLargeDocumentLines) {
         refreshBreadcrumb();
         return;
     }
@@ -117,7 +120,8 @@ void FoldBreadcrumbBinding::onDocumentOpened()
 void FoldBreadcrumbBinding::setTreeSitterEnabled(bool enabled)
 {
     vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(enabled);
-    forceNextRefresh_ = true; // the semantic source changed, the text did not
+    ++sourceGeneration_;
+    forceNextRefresh_ = true;
     refreshBreadcrumb();
 }
 
@@ -128,7 +132,8 @@ bool FoldBreadcrumbBinding::treeSitterEnabled() const
 
 void FoldBreadcrumbBinding::notifyReparsed()
 {
-    forceNextRefresh_ = true; // a reparse can change the path with the same text
+    ++sourceGeneration_;
+    forceNextRefresh_ = true;
     refreshBreadcrumb();
 }
 
@@ -140,7 +145,19 @@ void FoldBreadcrumbBinding::refreshBreadcrumb()
         publishEntries();
         return;
     }
+    if (!breadcrumbSource_->semanticActive()) {
+        applyPath({}, view_->cursorPosition().line());
+        return;
+    }
+    if (workerRunning_) {
+        return;
+    }
     KTextEditor::Document *document = view_->document();
+    const bool manyLines = document->lines() > kLargeDocumentLines;
+    if (manyLines && editorAnalysisPool().activeThreadCount() != 0) {
+        breadcrumbDebounce_->start(kWorkerRetryMs);
+        return;
+    }
     // T9: copy the document ONCE per revision, never per cursor step. The
     // revision is the document's own change counter, so a signal we missed
     // cannot leave a stale cache behind.
@@ -160,12 +177,46 @@ void FoldBreadcrumbBinding::refreshBreadcrumb()
         // Same text, same line: the semantic path cannot have moved.
         return;
     }
+    if (!manyLines && textCache_.size() <= kLargeDocumentChars) {
+        applyPath(breadcrumbSource_->pathAt(textCache_, line), line);
+        return;
+    }
+    QPromise<std::vector<vedit::breadcrumb::Entry>> promise;
+    const auto future = promise.future();
+    if (!editorAnalysisPool().tryStart([source = breadcrumbSource_, text = textCache_, line,
+                                        promise = std::move(promise)]() mutable {
+            promise.start();
+            promise.addResult(source->pathAt(text, line));
+            promise.finish();
+        })) {
+        // A busy worker has no queued snapshots. The retry gets the latest revision.
+        forceNextRefresh_ = true;
+        breadcrumbDebounce_->start(kWorkerRetryMs);
+        return;
+    }
+    workerRunning_ = true;
+    workerGeneration_ = sourceGeneration_;
+    workerRevision_ = revision;
+    workerLine_ = line;
+    breadcrumbWorker_.setFuture(future);
+}
+
+void FoldBreadcrumbBinding::finishBreadcrumb()
+{
+    workerRunning_ = false;
+    if (view_ != nullptr && view_->document() != nullptr && workerGeneration_ == sourceGeneration_
+        && view_->document()->revision() == workerRevision_ && view_->cursorPosition().line() == workerLine_
+        && semanticActive()) {
+        applyPath(breadcrumbWorker_.result(), workerLine_);
+    } else if (!breadcrumbDebounce_->isActive()) {
+        refreshBreadcrumb();
+    }
+}
+
+void FoldBreadcrumbBinding::applyPath(std::vector<vedit::breadcrumb::Entry> path, int line)
+{
     forceNextRefresh_ = false;
     lastLine_ = line;
-    std::vector<vedit::breadcrumb::Entry> path;
-    if (breadcrumbSource_->semanticActive()) {
-        path = breadcrumbSource_->pathAt(textCache_, line);
-    }
     const bool changed = !breadcrumbModel_.matches(path);
     breadcrumbModel_.setPath(std::move(path));
     // The pane bar reads this property, so it must follow every update (not

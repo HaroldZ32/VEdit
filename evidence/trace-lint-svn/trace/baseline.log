@@ -1,0 +1,4 @@
+sources=1176 dependencies=0 signals=0 elapsed_ms=1497 slang_peak_rss_kib=521820
+failure=the elaborated AST JSON exceeded the 100663296 byte limit (the hierarchy view holds the whole document in memory; the module catalog streams it)
+Command exited with non-zero status 1
+baseline elapsed_s=1.51 peak_rss_kib=520764 exit=1

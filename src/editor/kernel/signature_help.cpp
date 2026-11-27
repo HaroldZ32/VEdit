@@ -1,5 +1,6 @@
 #include "signature_help.h"
 
+#include "editor_analysis_pool.h"
 #include "multi_cursor.h" // installEditorEventFilter / isEditorOwnedWidget
 
 #include <KTextEditor/Document>
@@ -14,6 +15,7 @@
 #include <QFrame>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QPromise>
 #include <QRegularExpression>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -36,6 +38,9 @@ namespace {
 constexpr int kMaxIndexFiles = 400;
 constexpr qint64 kMaxIndexFileBytes = 2 * 1024 * 1024;
 constexpr int kMaxDocumentChars = 1200000;
+constexpr int kAsyncDocumentLines = 2000;
+constexpr int kAsyncDocumentChars = 65536;
+constexpr int kWorkerRetryMs = 40;
 
 bool isIdentStart(QChar character)
 {
@@ -260,11 +265,10 @@ bool containsByte(TSNode node, uint32_t byte)
 
 struct SignatureHelp::TreeState {
 #if VEDIT_SIGNATURE_HELP_TREESITTER
-    TSParser *parser = nullptr;
-    TSTree *tree = nullptr;
+    std::unique_ptr<TSTree, decltype(&ts_tree_delete)> tree{nullptr, ts_tree_delete};
     QByteArray text;
-    QString parsed;
 #endif
+    QList<SignatureInfo> signatures;
 };
 
 // --- declaration scanner ---------------------------------------------------
@@ -405,23 +409,11 @@ SignatureHelp::SignatureHelp(KTextEditor::View *view)
     refreshTimer_->setObjectName(QStringLiteral("signatureRefreshDebounce"));
     refreshTimer_->setSingleShot(true);
     refreshTimer_->setInterval(150);
-    connect(refreshTimer_, &QTimer::timeout, this, [this]() { refresh(); });
+    connect(refreshTimer_, &QTimer::timeout, this, &SignatureHelp::refresh);
+    connect(&documentWorker_, &QFutureWatcherBase::finished, this, &SignatureHelp::finishDocumentAnalysis);
 }
 
-SignatureHelp::~SignatureHelp()
-{
-#if VEDIT_SIGNATURE_HELP_TREESITTER
-    if (tree_ != nullptr) {
-        if (tree_->tree != nullptr) {
-            ts_tree_delete(tree_->tree);
-        }
-        if (tree_->parser != nullptr) {
-            ts_parser_delete(tree_->parser);
-        }
-        delete tree_;
-    }
-#endif
-}
+SignatureHelp::~SignatureHelp() = default;
 
 SignatureHelp *SignatureHelp::install(KTextEditor::View *view)
 {
@@ -557,30 +549,33 @@ void SignatureHelp::rebuildIndex()
     }
 }
 
-void SignatureHelp::refreshDocumentScan(const QString &text)
+std::shared_ptr<SignatureHelp::TreeState> SignatureHelp::analyzeDocument(const QString &text)
 {
-    KTextEditor::Document *document = view_ != nullptr ? view_->document() : nullptr;
-    if (document == nullptr) {
-        documentSignatures_.clear();
-        scannedDocumentText_.clear();
-        return;
+    auto result = std::make_shared<TreeState>();
+#if VEDIT_SIGNATURE_HELP_TREESITTER
+    const std::unique_ptr<TSParser, decltype(&ts_parser_delete)> parser(ts_parser_new(), ts_parser_delete);
+    if (parser && ts_parser_set_language(parser.get(), tree_sitter_verilog())) {
+        result->text = text.toUtf8();
+        result->tree.reset(ts_parser_parse_string(parser.get(), nullptr, result->text.constData(),
+                                                 static_cast<uint32_t>(result->text.size())));
+        result->signatures = scanDeclarations(text, QStringLiteral("current file"));
     }
-    if (connectedDocument_ != document) {
-        if (textConnection_) {
-            QObject::disconnect(textConnection_);
-        }
-        connectedDocument_ = document;
-        textConnection_ =
-            QObject::connect(document, &KTextEditor::Document::textChanged, this,
-                             [this](KTextEditor::Document *) { scheduleRefresh(); });
+#else
+    Q_UNUSED(text);
+#endif
+    return result;
+}
+
+void SignatureHelp::finishDocumentAnalysis()
+{
+    workerRunning_ = false;
+    const auto *document = view_ != nullptr ? view_->document() : nullptr;
+    if (document != nullptr && document == cachedDocument_ && workerRevision_ == document->revision()) {
+        tree_ = documentWorker_.result();
     }
-    // The caller copied the document ONCE (T9); this compares that copy instead
-    // of taking a second one.
-    if (text == scannedDocumentText_) {
-        return;
+    if (!refreshTimer_->isActive()) {
+        refresh();
     }
-    scannedDocumentText_ = text;
-    documentSignatures_ = scanDeclarations(text, QStringLiteral("current file"));
 }
 
 QList<SignatureInfo> SignatureHelp::candidatesFor(const QString &callee, const QString &kind,
@@ -601,7 +596,7 @@ QList<SignatureInfo> SignatureHelp::candidatesFor(const QString &callee, const Q
         return info.kind == QLatin1String("function") || info.kind == QLatin1String("task");
     };
     QList<SignatureInfo> current;
-    for (const SignatureInfo &info : documentSignatures_) {
+    for (const SignatureInfo &info : tree_->signatures) {
         if (matches(info)) {
             current.append(info);
         }
@@ -638,7 +633,8 @@ CallContext SignatureHelp::contextAtCursor() const
 {
     CallContext context;
 #if VEDIT_SIGNATURE_HELP_TREESITTER
-    if (tree_ == nullptr || tree_->tree == nullptr || view_ == nullptr || view_->document() == nullptr) {
+    if (tree_ == nullptr || tree_->tree == nullptr || view_ == nullptr || view_->document() == nullptr
+        || view_->document() != cachedDocument_ || view_->document()->revision() != cachedRevision_) {
         return context;
     }
     const int offset = byteOffsetAt(view_->cursorPosition());
@@ -646,7 +642,7 @@ CallContext SignatureHelp::contextAtCursor() const
         return context;
     }
     const uint32_t byte = static_cast<uint32_t>(offset);
-    TSNode node = ts_node_named_descendant_for_byte_range(ts_tree_root_node(tree_->tree), byte, byte);
+    TSNode node = ts_node_named_descendant_for_byte_range(ts_tree_root_node(tree_->tree.get()), byte, byte);
     // Inside a comment or a string literal there is no call to complete.
     for (TSNode walk = node; !ts_node_is_null(walk); walk = ts_node_parent(walk)) {
         if (nodeTypeIs(walk, "comment") || nodeTypeIs(walk, "string_literal")) {
@@ -873,8 +869,10 @@ void SignatureHelp::refresh()
         hidePopup(QStringLiteral("no document"));
         return;
     }
-    // T9: ONE copy per document REVISION, not three copies per call. A cursor
-    // move (revision unchanged) reuses the cached text and the parsed tree.
+    if (workerRunning_) {
+        return;
+    }
+    // A cursor move reuses the snapshot and the tree for the current revision.
     const qint64 revision = document->revision();
     const bool textChanged =
         !textCached_ || cachedDocument_ != document || cachedRevision_ != revision;
@@ -883,42 +881,35 @@ void SignatureHelp::refresh()
         cachedDocument_ = document;
         cachedRevision_ = revision;
         textCached_ = true;
+        tree_.reset();
         ++textCopies_;
     }
-    const QString &text = cachedText_;
-    if (text.size() > kMaxDocumentChars) {
+    if (cachedText_.size() > kMaxDocumentChars) {
         hidePopup(QStringLiteral("document too large for local signature help"));
         return;
     }
-    if (textChanged) {
-        // ONE scan per document revision. A pure cursor move reuses it, so it
-        // never compares (let alone copies) the whole document.
-        refreshDocumentScan(text);
-    }
-
-#if VEDIT_SIGNATURE_HELP_TREESITTER
-    if (tree_ == nullptr) {
-        tree_ = new TreeState;
-    }
-    if (textChanged && (tree_->tree == nullptr || tree_->parsed != text)) {
-        if (tree_->parser == nullptr) {
-            tree_->parser = ts_parser_new();
-            ts_parser_set_language(tree_->parser, tree_sitter_verilog());
-        }
-        if (tree_->parser == nullptr) {
-            hidePopup(QStringLiteral("tree-sitter parser unavailable"));
+    if (!tree_) {
+        if (document->lines() > kAsyncDocumentLines || cachedText_.size() > kAsyncDocumentChars) {
+            hidePopup(QStringLiteral("waiting for current signature analysis"));
+            QPromise<std::shared_ptr<TreeState>> promise;
+            const auto future = promise.future();
+            if (!editorAnalysisPool().tryStart([text = cachedText_, promise = std::move(promise)]() mutable {
+                    promise.start();
+                    promise.addResult(analyzeDocument(text));
+                    promise.finish();
+                })) {
+                refreshTimer_->start(kWorkerRetryMs);
+                return;
+            }
+            workerRunning_ = true;
+            workerRevision_ = revision;
+            documentWorker_.setFuture(future);
             return;
         }
-        if (tree_->tree != nullptr) {
-            ts_tree_delete(tree_->tree);
-            tree_->tree = nullptr;
-        }
-        tree_->text = text.toUtf8();
-        tree_->parsed = text;
-        tree_->tree = ts_parser_parse_string(tree_->parser, nullptr, tree_->text.constData(),
-                                             static_cast<uint32_t>(tree_->text.size()));
+        tree_ = analyzeDocument(cachedText_);
     }
-    if (tree_->tree == nullptr) {
+#if VEDIT_SIGNATURE_HELP_TREESITTER
+    if (!tree_->tree) {
         hidePopup(QStringLiteral("tree-sitter parse failed"));
         return;
     }

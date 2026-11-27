@@ -217,6 +217,7 @@ public:
     /// the byte cap, an empty buffer). The watcher publishes the reason BEFORE
     /// it returns, so the panel can name it instead of showing a blank
     /// "no diagnostics". `available = true` clears the reason.
+    void invalidateBufferAnalysis(const QString &path);
     void setDocumentAnalysisAvailability(const QString &path, bool available,
                                          const QString &reason);
     const QString &documentAnalysisPath() const { return documentPath_; }
@@ -503,6 +504,7 @@ private:
         quint64 id = 0;
         QString file;
         quint64 analysis = 0;
+        quint64 edit = 0;
     };
 
     void startLsp();
@@ -538,6 +540,7 @@ private:
     QString analysisFile_;
     QString analysisText_;
     bool analysisDirty_ = false;
+    bool analysisInvalidated_ = false;
     bool bufferApplied_ = false;
     qint64 bufferAppliedMs_ = 0;
     quint64 bufferGenerationAtApply_ = 0;
@@ -598,6 +601,7 @@ private:
     quint64 generation_ = 0;
     quint64 navigation_ = 0;
     quint64 outlineRequest_ = 0;
+    quint64 outlineAnalysis_ = 0;
     bool lspStarted_ = false;
     bool lspDiagnosticsRequested_ = false;
 

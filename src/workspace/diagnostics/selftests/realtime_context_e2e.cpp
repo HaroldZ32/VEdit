@@ -23,6 +23,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QInputDialog>
+#include <QKeyEvent>
 #include <QListWidget>
 #include <QPushButton>
 #include <QTemporaryDir>
@@ -94,6 +95,118 @@ bool removeDefine(QWidget &shell, const QString &define)
     button->click();
     return true;
 }
+int stressRealtimeEdits()
+{
+    QTemporaryDir temp;
+    const QString root = temp.filePath(u"project"_s);
+    const QString state = temp.filePath(u"state"_s);
+    const QString large = root + u"/large.sv"_s;
+    const QString other = root + u"/other.sv"_s;
+    const QByteArray body = QByteArray("module stress_top;\n  missing_ u_missing ();\n")
+        + QByteArray("  // synthetic RTL fixture padding\n").repeated(45000) + "endmodule\n";
+    if (!temp.isValid() || !writeFile(large, body)
+        || !writeFile(other, "module other; unconnected_other u(); endmodule\n")
+        || !writeFile(state + u"/settings.toml"_s, "\"tools.lsp_backend\" = \"slang\"\n")) {
+        return 1;
+    }
+
+    vedit::app::ShellOptions options;
+    options.projectRoot = root;
+    options.stateDir = state;
+    options.restoreSession = false;
+    vedit::app::ApplicationShell shell(options);
+    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+    auto *pane = shell.editorArea()->ensurePane();
+    workspace::IntegrationOptions integration;
+    integration.projectRoot = root;
+    integration.stateDir = state;
+    workspace::installProject(shell, integration);
+    workspace::installDiagnostics(shell, integration);
+    auto *controller = workspace::diagnosticsControllerForShell(shell);
+    shell.resize(1050, 700);
+    shell.show();
+    QString error;
+    QElapsedTimer elapsed;
+    elapsed.start();
+    if (controller == nullptr || !pane->openFile(large, &error)) {
+        return 1;
+    }
+    const qint64 openMs = elapsed.elapsed();
+    auto *view = vedit::editor::viewFor(pane->editorWidget());
+    if (view == nullptr) {
+        return 1;
+    }
+    auto *document = view->document();
+    const auto send = [&view](const QString &text) {
+        auto *target = view->focusProxy() != nullptr ? view->focusProxy() : view;
+        QKeyEvent event(QEvent::KeyPress, 0, Qt::NoModifier, text);
+        QApplication::sendEvent(target, &event);
+    };
+    const auto hasDiagnostic = [&](const QString &path, QStringView word) {
+        const auto rows = controller->lowerRowsForFile(path);
+        return std::any_of(rows.cbegin(), rows.cend(), [&](const auto &row) { return row.message.contains(word); });
+    };
+    qint64 previous = elapsed.elapsed();
+    qint64 maxGap = 0;
+    qint64 slowestInput = 0;
+    QTimer heartbeat;
+    heartbeat.setTimerType(Qt::PreciseTimer);
+    QObject::connect(&heartbeat, &QTimer::timeout, &shell, [&] {
+        const qint64 now = elapsed.elapsed();
+        maxGap = std::max(maxGap, now - previous);
+        previous = now;
+    });
+    heartbeat.start(10);
+    view->setCursorPosition(KTextEditor::Cursor(1, 10));
+    const auto type = [&](const QString &text) {
+        const qint64 start = elapsed.elapsed();
+        send(text);
+        slowestInput = std::max(slowestInput, elapsed.elapsed() - start);
+    };
+    type(u"first"_s);
+    const bool immediate = document->line(1).contains(u"missing_first");
+    const bool starting = waitFor([&] { return controller->analyzeFileName() == large; });
+    const bool workerBusy = controller->session().state == diagnostics::BackendState::Reparsing;
+    const quint64 before = controller->analysisCount();
+    for (const QString &suffix : {u"_a"_s, u"_b"_s, u"_c"_s, u"_latest"_s}) {
+        type(suffix);
+        const qint64 until = elapsed.elapsed() + 35;
+        waitFor([&] { return elapsed.elapsed() >= until; }, 120);
+    }
+    const bool typed = document->line(1).contains(u"missing_first_a_b_c_latest");
+    const qint64 lastInput = elapsed.elapsed();
+    bool stale = false;
+    const bool latest = waitFor([&] {
+        const auto rows = controller->lowerRowsForFile(large);
+        stale = stale || std::any_of(rows.cbegin(), rows.cend(), [](const auto &row) {
+            return row.message.contains(u"missing_") && !row.message.contains(u"missing_first_a_b_c_latest");
+        });
+        return hasDiagnostic(large, u"missing_first_a_b_c_latest");
+    }, 15000);
+    const qint64 diagnosticMs = elapsed.elapsed() - lastInput;
+    const quint64 burstAnalyses = controller->analysisCount() - before;
+    const bool editedAgain = document->line(1).contains(u"_latest");
+    type(u"_closed"_s);
+    const bool invalidated = controller->lowerRowsForFile(large).isEmpty();
+    const int index = pane->activeTabIndex();
+    pane->setOnTabCloseRequested([](auto *, int) { return vedit::app::SaveDecision::Discard; });
+    const bool switched = pane->openFile(other, &error) && pane->closeTab(index);
+    const bool newTab = switched && waitFor([&] {
+        return controller->analyzeFileName() == other && hasDiagnostic(other, u"unconnected_other");
+    }, 15000) && controller->lowerRowsForFile(large).isEmpty();
+    QFile disk(large);
+    const bool unchanged = disk.open(QIODevice::ReadOnly) && disk.readAll() == body;
+    const bool manual = controller->projectPassSerial() == 0;
+    std::printf("REALTIME-STRESS lines=45003 open_ms=%lld largest_key_ms=%lld gui_gap_ms=%lld "
+                "latest_diagnostic_ms=%lld burst_analyses=%llu immediate=%d worker_busy=%d typed=%d latest=%d "
+                "stale=%d cleared=%d switched=%d unsaved=%d manual_only=%d\n",
+                static_cast<long long>(openMs), static_cast<long long>(slowestInput),
+                static_cast<long long>(maxGap), static_cast<long long>(diagnosticMs),
+                static_cast<unsigned long long>(burstAnalyses), immediate, workerBusy, typed, latest,
+                stale, invalidated, newTab, unchanged, manual);
+    return immediate && starting && workerBusy && typed && latest && !stale && burstAnalyses == 1 && editedAgain
+        && invalidated && newTab && unchanged && manual ? 0 : 1;
+}
 } // namespace
 
 int main(int argc, char **argv)
@@ -104,6 +217,9 @@ int main(int argc, char **argv)
     if (!tools.slang.found() || !tools.slangServer.found()) {
         std::puts("SKIP: requires slang and slang-server");
         return 77;
+    }
+    if (qt.arguments().contains(u"--stress"_s)) {
+        return stressRealtimeEdits();
     }
     QTemporaryDir temp;
     const QString root = temp.filePath(u"project"_s);

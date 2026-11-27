@@ -473,6 +473,7 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
     analysisFile_ = file;
     analysisText_ = bufferText;
     analysisDirty_ = bufferDirty;
+    analysisInvalidated_ = false;
     lspDiagnosticsRequested_ = false;
     bufferApplied_ = false;
     bufferAppliedMs_ = 0;
@@ -582,9 +583,14 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
         state_ = BackendState::Reparsing;
         refresh();
         if (session_.state == BackendState::Failed) {
-            // Rust starts a replacement on demand. An explicit analysis can
-            // wake it with the current buffer while idle polling stays passive.
-            lsp_->changeBuffer(file, bufferText, nullptr);
+            // Retry a live Slang server's context before applying the buffer.
+            // A dead server instead restarts on the buffer change, then takes
+            // its context in refresh(). Idle polling sends neither command.
+            if (session_.serverPid != 0 && lsp_->backendKind() == LspBackendKind::Slang) {
+                buildContextPushed_ = lsp_->pushBuildContext(nullptr);
+            } else {
+                lsp_->changeBuffer(file, bufferText, nullptr);
+            }
         }
     }
     return lspStarted_;
@@ -635,6 +641,17 @@ void DiagnosticsController::setRealtimeRequestFiles(const QStringList &files)
         lastDiagnosticsRequestFiles_.clear();
     }
     realtimeRequestFiles_ = normalized;
+}
+
+void DiagnosticsController::invalidateBufferAnalysis(const QString &path)
+{
+    if (path.isEmpty() || path != analysisFile_ || analysisInvalidated_) {
+        return;
+    }
+    analysisInvalidated_ = true;
+    analysisText_.clear();
+    outline_.clear();
+    invalidateFile(path);
 }
 
 void DiagnosticsController::setDocumentAnalysisAvailability(const QString &path, bool available,
@@ -805,7 +822,7 @@ void DiagnosticsController::clearLspResults()
     diagnostics_.removeIf([this](const DiagnosticEntry &entry) {
         return publishedDiagnosticsFiles_.contains(entry.file);
     });
-    if (!isScopeExcluded(analysisFile_)) {
+    if (!analysisInvalidated_ && !isScopeExcluded(analysisFile_)) {
         markNotAnalyzed(analysisFile_, QStringLiteral("pending"));
     }
     publishedDiagnosticsFiles_.clear();
@@ -835,15 +852,19 @@ void DiagnosticsController::sampleLspSession()
     const bool healthChanged = stateChanged || restarted || (failed &&
         (next.message != session_.message || next.restarts != session_.restarts));
     if (!healthChanged && state_ != BackendState::Reparsing) {
+        // The silence re-ask still checks the buffer's publication floor.
+        session_.generation = next.generation;
         return;
     }
     if ((failed && stateChanged) || restarted || recovered) {
         clearLspResults();
         state_ = BackendState::Reparsing;
     }
+    if ((failed && stateChanged) || restarted) {
+        buildContextPushed_ = false;
+    }
     if (restarted) {
         lastRestartsSeen_ = next.restarts;
-        buildContextPushed_ = false;
     }
     if (restarted || recovered) {
         lastError_.clear();
@@ -869,11 +890,12 @@ void DiagnosticsController::refresh()
     // a single-file diagnostic must never wait for the pass (AC-2.6).
     pollProjectPass();
     sampleLspSession();
-    if (lsp_ && outlineRequest_ != 0 && !symbolsRequested_
+    if (lsp_ && outlineRequest_ != 0
+        && (analysisInvalidated_ || !symbolsRequested_ || outlineAnalysis_ != analysisCount_)
         && !lsp_->poll(outlineRequest_).pending) {
         outlineRequest_ = 0;
     }
-    if (state_ != BackendState::Reparsing) {
+    if (analysisInvalidated_ || state_ != BackendState::Reparsing) {
         // R2 / one count: a finished project pass (or an edited file falling
         // back) changes the merged view while the LSP is not reparsing. The
         // user-visible session count must follow it, not stay at the lower
@@ -887,7 +909,7 @@ void DiagnosticsController::refresh()
         // published nothing for. It runs OUTSIDE the analysis round, so the
         // "not analysed" state is visible immediately (a late publish - e.g.
         // right after the AC-1 build context - is still picked up).
-        if (session_.state == BackendState::Ready) {
+        if (!analysisInvalidated_ && session_.state == BackendState::Ready) {
             pollServerSilence();
         } else {
             collectLspDiagnostics();
@@ -917,7 +939,8 @@ void DiagnosticsController::refresh()
             }
             // T118: push the EDITOR BUFFER into the session before asking for
             // diagnostics, so what gets linted is the text the user sees.
-            if (!analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_)) {
+            if (!analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_)
+                && lspDiagnostics_.isEmpty() && outlineRequest_ == 0) {
                 QString bufferError;
                 if (lsp_->changeBuffer(analysisFile_, analysisText_, &bufferError)) {
                     bufferApplied_ = true;
@@ -930,11 +953,13 @@ void DiagnosticsController::refresh()
                     // clear: a poll at or below it is still the pre-edit set.
                     bufferGenerationAtApply_ = lsp_->status().generation;
                     bufferDiagnosticsSeen_ = false;
+                    serverSilentSinceMs_ = 0;
                     // Re-ask on the next tick: the server publishes the new
                     // diagnostics asynchronously and the request returns the
                     // CURRENT snapshot immediately.
                     lspDiagnosticsRequested_ = false;
-                } else if (report_.lspMessage.isEmpty()) {
+                } else {
+                    lspDiagnosticsRequested_ = true;
                     report_.lspMessage = bufferError;
                 }
             }
@@ -948,7 +973,8 @@ void DiagnosticsController::refresh()
             if (bufferSettling) {
                 lspDiagnosticsRequested_ = false;
             }
-            if (!lspDiagnosticsRequested_) {
+            const bool awaitingBuffer = !analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_);
+            if (!awaitingBuffer && !lspDiagnosticsRequested_ && lspDiagnostics_.isEmpty()) {
                 lspDiagnosticsRequested_ = true;
                 // batch-20261116 L1.1: the request set is the REALTIME session
                 // set (current file + level-1 closure, bounded), never `files_`
@@ -968,7 +994,7 @@ void DiagnosticsController::refresh()
                     }
                     const quint64 id = lsp_->requestDiagnostics(file);
                     if (id != 0) {
-                        lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
+                        lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_, editSeq_.value(file)});
                         lastDiagnosticsRequestFiles_.append(file);
                     }
                 }
@@ -976,8 +1002,9 @@ void DiagnosticsController::refresh()
                     static_cast<quint64>(lastDiagnosticsRequestFiles_.size());
             }
 
-            if (!analysisFile_.isEmpty() && !symbolsRequested_ && outlineRequest_ == 0) {
+            if (!awaitingBuffer && !analysisFile_.isEmpty() && !symbolsRequested_ && outlineRequest_ == 0) {
                 outlineRequest_ = lsp_->requestSymbols(analysisFile_);
+                outlineAnalysis_ = analysisCount_;
                 symbolsRequested_ = outlineRequest_ != 0;
             }
         }
@@ -992,7 +1019,8 @@ void DiagnosticsController::refresh()
         const LspPolled polled = lsp_->poll(outlineRequest_);
         if (!polled.pending) {
             outlineRequest_ = 0;
-            if (polled.ready && polled.kind == ResponseKind::Symbols) {
+            if (outlineAnalysis_ == analysisCount_ && polled.ready
+                && polled.kind == ResponseKind::Symbols) {
                 outline_ = polled.symbols;
             }
         }
@@ -1058,15 +1086,14 @@ void DiagnosticsController::collectLspDiagnostics()
     }
     QVector<DiagnosticTicket> pending;
     for (const DiagnosticTicket &ticket : lspDiagnostics_) {
-        if (isScopeExcluded(ticket.file)) {
-            continue; // RM-17b: an excluded file keeps NO lower verdict
-        }
         LspPolled polled = lsp_->poll(ticket.id);
         if (polled.pending) {
             pending.append(ticket);
             continue;
         }
-        if (ticket.file.isEmpty() || ticket.analysis != analysisCount_) {
+        if (analysisInvalidated_ || ticket.file.isEmpty() || ticket.analysis != analysisCount_
+            || ticket.edit != editSeq_.value(ticket.file) || isScopeExcluded(ticket.file)
+            || (ticket.file != analysisFile_ && notAnalyzedReason_.value(ticket.file) == QStringLiteral("modified"))) {
             continue;
         }
         if (polled.failed) {
@@ -1086,9 +1113,8 @@ void DiagnosticsController::collectLspDiagnostics()
                 markNotAnalyzed(ticket.file, QStringLiteral("server-silent"));
             }
             if (ticket.file == analysisFile_) {
-                // The reply ends the buffer-settle wait. Only a publication
-                // can establish a verdict.
-                bufferDiagnosticsSeen_ = true;
+                // This completes only the snapshot request. Keep the buffer
+                // settle window open until the server publishes or it expires.
                 if (serverSilentSinceMs_ == 0) {
                     serverSilentSinceMs_ = QDateTime::currentMSecsSinceEpoch();
                 }
@@ -1147,7 +1173,7 @@ void DiagnosticsController::collectLspDiagnostics()
 
 void DiagnosticsController::pollServerSilence()
 {
-    if (analysisFile_.isEmpty() || !lspStarted_ || !lsp_) {
+    if (analysisInvalidated_ || analysisFile_.isEmpty() || !lspStarted_ || !lsp_) {
         return;
     }
     if (!lspDiagnostics_.isEmpty()) {
@@ -1169,7 +1195,7 @@ void DiagnosticsController::pollServerSilence()
         }
         const quint64 id = lsp_->requestDiagnostics(file);
         if (id != 0) {
-            lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
+            lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_, editSeq_.value(file)});
         }
     }
     collectLspDiagnostics();
@@ -1244,14 +1270,17 @@ void DiagnosticsController::finaliseState()
 {
     const bool lspPending = lspStarted_ && session_.state == BackendState::Reparsing;
     const bool lspFailed = lspStarted_ && session_.state == BackendState::Failed;
-    // T118: a buffer edit is not "done" until the server published the new
-    // diagnostics (bounded by the 1.5 s grace) - otherwise the state turns Ready
-    // and the panel stops polling before the edit's diagnostics exist.
+    // Keep polling for diagnostics on the edited buffer until a publication
+    // arrives or the settle window expires.
     const bool bufferPublishing =
         bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
         && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= kBufferSettleMs;
+    const bool awaitingBuffer = lspStarted_ && session_.state == BackendState::Ready
+        && !analysisFile_.isEmpty() && files_.contains(analysisFile_) && !bufferApplied_
+        && !lspDiagnosticsRequested_;
     if (lspPending || !lints_.isEmpty()
-        || (!lspFailed && (bufferPublishing || outlineRequest_ != 0 || !lspDiagnostics_.isEmpty()))) {
+        || (!lspFailed && (awaitingBuffer || bufferPublishing || outlineRequest_ != 0
+                           || !lspDiagnostics_.isEmpty()))) {
         return;
     }
 
@@ -1742,6 +1771,7 @@ void DiagnosticsController::markFileEdited(const QString &file)
         return;
     }
     editSeq_.insert(file, ++editCounter_);
+    invalidateBufferAnalysis(file);
     // T9: only a change of the FILE'S VISIBLE STATE is a view event. The first
     // keystroke of a covered file drops its upper layer and marks it modified;
     // every later keystroke changes only the edit sequence, which no surface
@@ -1761,6 +1791,8 @@ void DiagnosticsController::markFileEdited(const QString &file)
     // the next pass covers it.
     if (retainedLowerEvaluated_.contains(file) || retainedLowerRows_.contains(file)) {
         clearRetainedRows(file);
+        diagnostics_.removeIf([&file](const DiagnosticEntry &entry) { return entry.file == file; });
+        lowerAnalyzed_.remove(file);
         visibleChange = true;
     }
     if (notAnalyzedReason_.value(file) != QStringLiteral("modified")) {

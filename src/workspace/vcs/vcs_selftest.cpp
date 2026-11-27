@@ -1971,8 +1971,8 @@ void checkSvnCapabilities()
     check("vcs.svn.panel.disabled.continue-abort",
           !panel.actionEnabled(QStringLiteral("vcs-action-continue"))
               && !panel.actionEnabled(QStringLiteral("vcs-action-abort")));
-    check("vcs.svn.panel.diff", panel.diffText().contains(QStringLiteral("+module top;")),
-          panel.diffText().left(120));
+    const auto *inlineDiff = panel.findChild<QWidget *>(QStringLiteral("vcs-column-diff"));
+    check("vcs.svn.panel.no-inline-diff", inlineDiff && inlineDiff->isHidden() && panel.diffText().isEmpty());
 
     // --- the SAME request path as Git (AC-6.3) ----------------------------
     check("vcs.svn.write.add-requested", panel.stageSelected());
@@ -2068,7 +2068,7 @@ void checkSvnE2E()
                                  "vcs.svn.e2e.backend", "vcs.svn.e2e.header", "vcs.svn.e2e.changed-row",
                                  "vcs.svn.e2e.add-request", "vcs.svn.e2e.add-ok",
                                  "vcs.svn.e2e.commit-ok", "vcs.svn.e2e.revision-1",
-                                 "vcs.svn.e2e.diff", "vcs.svn.e2e.revert-ok",
+                                 "vcs.svn.e2e.no-inline-diff", "vcs.svn.e2e.revert-ok",
                                  "vcs.svn.e2e.revert-restored", "vcs.svn.e2e.update-ok",
                                  "vcs.svn.e2e.update-file", "vcs.svn.e2e.update-row",
                                  "vcs.svn.e2e.remove-ok",
@@ -2143,14 +2143,12 @@ void checkSvnE2E()
     runProcess(svn, {"log", "-q", url}, temp.path(), &log);
     check("vcs.svn.e2e.revision-1", log.contains(QStringLiteral("r1")), log.trimmed());
 
-    // A modification is visible through the SAME diff read the Git panel uses.
     writeText(wc + QStringLiteral("/a.sv"), QStringLiteral("module a;\n// svn change\nendmodule\n"));
     panel.refresh();
-    waitUntil([&panel]() { return panel.fileCount() >= 1; }, 20000);
+    const bool changeShown = waitUntil([&panel]() { return panel.fileCount() >= 1; }, 20000);
     panel.selectFile("a.sv");
-    const bool diffShown = waitUntil(
-        [&panel]() { return panel.diffText().contains(QStringLiteral("// svn change")); }, 20000);
-    check("vcs.svn.e2e.diff", diffShown, panel.diffText().left(160));
+    const auto *inlineDiff = panel.findChild<QWidget *>(QStringLiteral("vcs-column-diff"));
+    check("vcs.svn.e2e.no-inline-diff", changeShown && inlineDiff && inlineDiff->isHidden() && panel.diffText().isEmpty());
 
     // Revert (the SVN spelling of Discard) restores the committed content.
     check("vcs.svn.e2e.revert-request", panel.discardSelected());
@@ -5097,9 +5095,6 @@ int runScreenshots(const QString &directory, bool requireXcb)
                 check("vcs.screenshot.svn-real-ready", ready, panel.headerText());
                 if (ready) {
                     panel.selectFile("rtl/a.sv");
-                    waitUntil([&panel]() {
-                        return panel.diffText().contains(QStringLiteral("// svn change"));
-                    }, 20000);
                     shoot(&panel, QStringLiteral("61-vcs-svn-real-1500x1000.png"), QSize(1500, 1000));
                 }
                 if (previousSvn.isEmpty()) {

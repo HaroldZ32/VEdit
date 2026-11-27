@@ -19,6 +19,12 @@
 
 #if defined(VEDIT_OPEN_BENCH_HAVE_EDIT_CORE)
 #include "ktexteditor_provider.h"
+
+#include <KTextEditor/Document>
+#include <KTextEditor/View>
+#include <QKeyEvent>
+#include <QThread>
+#include <QTimer>
 #endif
 
 #include <QApplication>
@@ -194,10 +200,52 @@ int main(int argc, char **argv)
         std::printf("OPEN-BENCH sample[%d] ms=%lld\n", static_cast<int>(i),
                     static_cast<long long>(samples[i]));
     }
-    // AC-5.4: the deferral must not DROP the seed. One event-loop turn after the
-    // open (the pump() above) the debounce timer runs the SAME full scan and the
-    // pane's breadcrumb bar shows the module path, exactly as before the change.
+    // Cold-open a separate, much larger document and send editor input while
+    // the breadcrumb seed could still be running. A 10 ms GUI timer observes
+    // post-open stalls, which the openFile() stopwatch alone cannot see.
+    const QString stressPath = temp.path() + QStringLiteral("/cold-45k.sv");
+    check(QStringLiteral("open-bench.stress-file"), writeFile(stressPath, sample(1125)));
+    QElapsedTimer stress;
+    stress.start();
+    const bool stressOpened = pane->openFile(stressPath, &error);
+    const qint64 coldOpenMs = stress.elapsed();
+    check(QStringLiteral("open-bench.stress-open"), stressOpened, error);
+    auto *view = vedit::editor::viewFor(pane->editorWidget());
+    if (view == nullptr || view->document() == nullptr) {
+        return 1;
+    }
+    view->setCursorPosition(KTextEditor::Cursor(1, 0));
+    QWidget *input = view->focusProxy() != nullptr ? view->focusProxy() : view;
+    QTimer heartbeat;
+    heartbeat.setTimerType(Qt::PreciseTimer);
+    qint64 previousTick = stress.elapsed();
+    qint64 maxGap = 0;
+    QObject::connect(&heartbeat, &QTimer::timeout, view, [&] {
+        const qint64 now = stress.elapsed();
+        maxGap = std::max(maxGap, now - previousTick);
+        previousTick = now;
+    });
+    heartbeat.start(10);
+    const QString inserted = QStringLiteral("// immediate edit");
+    const qint64 sentAt = stress.elapsed();
+    QCoreApplication::postEvent(input, new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, inserted));
+    qint64 acceptedMs = -1;
+    while (stress.elapsed() - sentAt < 30000) {
+        QCoreApplication::processEvents();
+        if (acceptedMs < 0 && view->document()->line(1).startsWith(inserted)) {
+            acceptedMs = stress.elapsed() - sentAt;
+        }
+        if (acceptedMs >= 0 && !pane->breadcrumbText().isEmpty()) {
+            break;
+        }
+        QThread::msleep(2);
+    }
     const QString seeded = pane->breadcrumbText();
+    std::printf("OPEN-BENCH stress lines=%d open_ms=%lld input_ms=%lld max_gui_gap_ms=%lld seed_ms=%lld\n",
+                view->document()->lines(), static_cast<long long>(coldOpenMs),
+                static_cast<long long>(acceptedMs), static_cast<long long>(maxGap),
+                static_cast<long long>(stress.elapsed() - sentAt));
+    check(QStringLiteral("open-bench.immediate-input"), acceptedMs >= 0 && acceptedMs < 1000);
     check(QStringLiteral("open-bench.deferred-seed"), !seeded.isEmpty(), seeded);
 
     // Absolute floor only: the batch acceptance compares with the recorded

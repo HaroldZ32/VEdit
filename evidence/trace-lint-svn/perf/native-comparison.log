@@ -1,0 +1,168 @@
+BENCH phase=baseline trial=1
+2011b7907be181da42e2c54d7ca6c38b2357ec0801ba15fdd517632f1ea1b436
+CHECK open-bench.temp-dir PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK open-bench.pane PASS
+CHECK open-bench.warmup-file PASS
+CHECK open-bench.warmup-open PASS
+CHECK open-bench.warmup-10k-file PASS
+OPEN-BENCH warmup-10k ms=10 opened=1
+CHECK open-bench.warmup-10k-open PASS
+CHECK open-bench.all-opened PASS
+CHECK open-bench.samples PASS  7
+OPEN-BENCH open-10k lines=10240 samples=7 p50=9 p95=10 min=9 max=10
+OPEN-BENCH sample[0] ms=10
+OPEN-BENCH sample[1] ms=9
+OPEN-BENCH sample[2] ms=9
+OPEN-BENCH sample[3] ms=10
+OPEN-BENCH sample[4] ms=9
+OPEN-BENCH sample[5] ms=9
+OPEN-BENCH sample[6] ms=10
+CHECK open-bench.stress-file PASS
+CHECK open-bench.stress-open PASS
+OPEN-BENCH stress lines=46126 open_ms=21 input_ms=234 max_gui_gap_ms=234 seed_ms=234
+CHECK open-bench.immediate-input PASS
+CHECK open-bench.deferred-seed PASS  m0
+CHECK open-bench.p95-under-2s PASS  10
+OPEN-BENCH PASS checks=13 failures=0
+BENCH exit=0
+BENCH phase=baseline trial=2
+2011b7907be181da42e2c54d7ca6c38b2357ec0801ba15fdd517632f1ea1b436
+CHECK open-bench.temp-dir PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK open-bench.pane PASS
+CHECK open-bench.warmup-file PASS
+CHECK open-bench.warmup-open PASS
+CHECK open-bench.warmup-10k-file PASS
+OPEN-BENCH warmup-10k ms=14 opened=1
+CHECK open-bench.warmup-10k-open PASS
+CHECK open-bench.all-opened PASS
+CHECK open-bench.samples PASS  7
+OPEN-BENCH open-10k lines=10240 samples=7 p50=13 p95=16 min=9 max=16
+OPEN-BENCH sample[0] ms=14
+OPEN-BENCH sample[1] ms=9
+OPEN-BENCH sample[2] ms=13
+OPEN-BENCH sample[3] ms=16
+OPEN-BENCH sample[4] ms=11
+OPEN-BENCH sample[5] ms=15
+OPEN-BENCH sample[6] ms=10
+CHECK open-bench.stress-file PASS
+CHECK open-bench.stress-open PASS
+OPEN-BENCH stress lines=46126 open_ms=20 input_ms=255 max_gui_gap_ms=255 seed_ms=255
+CHECK open-bench.immediate-input PASS
+CHECK open-bench.deferred-seed PASS  m0
+CHECK open-bench.p95-under-2s PASS  16
+OPEN-BENCH PASS checks=13 failures=0
+BENCH exit=0
+BENCH phase=baseline trial=3
+2011b7907be181da42e2c54d7ca6c38b2357ec0801ba15fdd517632f1ea1b436
+CHECK open-bench.temp-dir PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK open-bench.pane PASS
+CHECK open-bench.warmup-file PASS
+CHECK open-bench.warmup-open PASS
+CHECK open-bench.warmup-10k-file PASS
+OPEN-BENCH warmup-10k ms=11 opened=1
+CHECK open-bench.warmup-10k-open PASS
+CHECK open-bench.all-opened PASS
+CHECK open-bench.samples PASS  7
+OPEN-BENCH open-10k lines=10240 samples=7 p50=12 p95=15 min=10 max=15
+OPEN-BENCH sample[0] ms=13
+OPEN-BENCH sample[1] ms=10
+OPEN-BENCH sample[2] ms=13
+OPEN-BENCH sample[3] ms=11
+OPEN-BENCH sample[4] ms=15
+OPEN-BENCH sample[5] ms=10
+OPEN-BENCH sample[6] ms=12
+CHECK open-bench.stress-file PASS
+CHECK open-bench.stress-open PASS
+OPEN-BENCH stress lines=46126 open_ms=19 input_ms=226 max_gui_gap_ms=198 seed_ms=226
+CHECK open-bench.immediate-input PASS
+CHECK open-bench.deferred-seed PASS  m0
+CHECK open-bench.p95-under-2s PASS  15
+OPEN-BENCH PASS checks=13 failures=0
+BENCH exit=0
+BENCH phase=candidate trial=1
+73ce5a80f8914bc366d84fafde6f2445d48bce70a0eca031246c354a546e674a
+CHECK open-bench.temp-dir PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK open-bench.pane PASS
+CHECK open-bench.warmup-file PASS
+CHECK open-bench.warmup-open PASS
+CHECK open-bench.warmup-10k-file PASS
+OPEN-BENCH warmup-10k ms=8 opened=1
+CHECK open-bench.warmup-10k-open PASS
+CHECK open-bench.all-opened PASS
+CHECK open-bench.samples PASS  7
+OPEN-BENCH open-10k lines=10240 samples=7 p50=9 p95=11 min=8 max=11
+OPEN-BENCH sample[0] ms=8
+OPEN-BENCH sample[1] ms=9
+OPEN-BENCH sample[2] ms=8
+OPEN-BENCH sample[3] ms=9
+OPEN-BENCH sample[4] ms=9
+OPEN-BENCH sample[5] ms=11
+OPEN-BENCH sample[6] ms=10
+CHECK open-bench.stress-file PASS
+CHECK open-bench.stress-open PASS
+OPEN-BENCH stress lines=46126 open_ms=19 input_ms=14 max_gui_gap_ms=32 seed_ms=693
+CHECK open-bench.immediate-input PASS
+CHECK open-bench.deferred-seed PASS  m0
+CHECK open-bench.p95-under-2s PASS  11
+OPEN-BENCH PASS checks=13 failures=0
+BENCH exit=0
+BENCH phase=candidate trial=2
+73ce5a80f8914bc366d84fafde6f2445d48bce70a0eca031246c354a546e674a
+CHECK open-bench.temp-dir PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK open-bench.pane PASS
+CHECK open-bench.warmup-file PASS
+CHECK open-bench.warmup-open PASS
+CHECK open-bench.warmup-10k-file PASS
+OPEN-BENCH warmup-10k ms=8 opened=1
+CHECK open-bench.warmup-10k-open PASS
+CHECK open-bench.all-opened PASS
+CHECK open-bench.samples PASS  7
+OPEN-BENCH open-10k lines=10240 samples=7 p50=9 p95=14 min=9 max=14
+OPEN-BENCH sample[0] ms=9
+OPEN-BENCH sample[1] ms=10
+OPEN-BENCH sample[2] ms=9
+OPEN-BENCH sample[3] ms=9
+OPEN-BENCH sample[4] ms=14
+OPEN-BENCH sample[5] ms=9
+OPEN-BENCH sample[6] ms=9
+CHECK open-bench.stress-file PASS
+CHECK open-bench.stress-open PASS
+OPEN-BENCH stress lines=46126 open_ms=25 input_ms=14 max_gui_gap_ms=22 seed_ms=543
+CHECK open-bench.immediate-input PASS
+CHECK open-bench.deferred-seed PASS  m0
+CHECK open-bench.p95-under-2s PASS  14
+OPEN-BENCH PASS checks=13 failures=0
+BENCH exit=0
+BENCH phase=candidate trial=3
+73ce5a80f8914bc366d84fafde6f2445d48bce70a0eca031246c354a546e674a
+CHECK open-bench.temp-dir PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK open-bench.pane PASS
+CHECK open-bench.warmup-file PASS
+CHECK open-bench.warmup-open PASS
+CHECK open-bench.warmup-10k-file PASS
+OPEN-BENCH warmup-10k ms=12 opened=1
+CHECK open-bench.warmup-10k-open PASS
+CHECK open-bench.all-opened PASS
+CHECK open-bench.samples PASS  7
+OPEN-BENCH open-10k lines=10240 samples=7 p50=11 p95=12 min=9 max=12
+OPEN-BENCH sample[0] ms=11
+OPEN-BENCH sample[1] ms=10
+OPEN-BENCH sample[2] ms=9
+OPEN-BENCH sample[3] ms=12
+OPEN-BENCH sample[4] ms=11
+OPEN-BENCH sample[5] ms=9
+OPEN-BENCH sample[6] ms=11
+CHECK open-bench.stress-file PASS
+CHECK open-bench.stress-open PASS
+OPEN-BENCH stress lines=46126 open_ms=24 input_ms=22 max_gui_gap_ms=19 seed_ms=922
+CHECK open-bench.immediate-input PASS
+CHECK open-bench.deferred-seed PASS  m0
+CHECK open-bench.p95-under-2s PASS  12
+OPEN-BENCH PASS checks=13 failures=0
+BENCH exit=0

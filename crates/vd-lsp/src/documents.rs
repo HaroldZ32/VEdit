@@ -75,6 +75,10 @@ impl DocumentStore {
             .is_some_and(|document| document.text == text))
     }
 
+    pub(crate) fn version(&self, uri: &Url) -> Result<Option<i32>> {
+        Ok(self.lock()?.get(uri).map(|document| document.version))
+    }
+
     pub(crate) fn get(&self, uri: &Url) -> Result<Option<OpenDocument>> {
         Ok(self.lock()?.get(uri).cloned())
     }

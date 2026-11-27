@@ -963,6 +963,11 @@ void VcsPanel::buildUi()
             [onCurrent](QListWidgetItem *current, QListWidgetItem *previous) {
                 onCurrent(current, previous);
             });
+    connect(changes_, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem *item) {
+        if (backend_ == Backend::Subversion) {
+            compareSvnFile(item->data(Qt::UserRole).toString(), {SvnRevisionKind::Base, 0});
+        }
+    });
 
     updateActions();
 }
@@ -1214,6 +1219,7 @@ void VcsPanel::renderChanges()
             }
         }
         if (!restored) {
+            if (backend_ == Backend::Subversion) { ++svnSelectionEpoch_; }
             selected_path_.clear();
             diff_->clear();
         }
@@ -1516,6 +1522,9 @@ void VcsPanel::showErrorState(const Status &status)
 
 void VcsPanel::showDiff(const std::string &path)
 {
+    if (backend_ == Backend::Subversion) {
+        return;
+    }
     if (!source_) {
         diff_->setPlainText(QCoreApplication::translate("VEdit", "No VCS backend available."));
         return;
@@ -1595,6 +1604,7 @@ void VcsPanel::updateActions()
     svnCompare_->setEnabled(svn && hasSource && selection && svnChangeKind(selected_path_) != 7);
     updateSvnActions();
     refs_->parentWidget()->setVisible(!svn);
+    diff_->parentWidget()->setVisible(!svn);
     for (auto *button : {unstage_button_, fetch_button_, push_button_, branch_button_, tag_button_,
                          remote_button_, workspace_button_, continue_button_, abort_button_}) {
         button->setVisible(!svn);

@@ -30,7 +30,7 @@
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread::JoinHandle;
@@ -543,7 +543,7 @@ impl SessionHandle {
         let worker = std::thread::Builder::new()
             .name("vd-lsp-session".to_string())
             .spawn(move || {
-                match tokio::runtime::Builder::new_multi_thread()
+                match tokio::runtime::Builder::new_current_thread()
                     .enable_all()
                     .build()
                 {
@@ -601,21 +601,15 @@ impl SessionHandle {
         let id = self.inner.next_request.fetch_add(1, Ordering::Relaxed);
         // A session that already failed answers every request with its failure
         // reason (A3d: the UI always observes a terminal state, never a hang).
-        let failed = {
+        {
             let status = self.inner.lock_status();
+            let mut requests = self.inner.lock_requests();
             if status.phase == SessionPhase::Failed {
-                Some(status.message.clone())
-            } else {
-                None
+                requests.insert(id, RequestState::Failed(status.message.clone()));
+                return Ok(id);
             }
-        };
-        if let Some(message) = failed {
-            self.inner
-                .lock_requests()
-                .insert(id, RequestState::Failed(message));
-            return Ok(id);
+            requests.insert(id, RequestState::Pending);
         }
-        self.inner.lock_requests().insert(id, RequestState::Pending);
         if self
             .inner
             .commands
@@ -751,7 +745,6 @@ async fn session_loop(
     diagnostics_budget: Duration,
     mut commands: mpsc::UnboundedReceiver<Command>,
 ) {
-    let has_slang_project_index = config.pending_slang_index.is_some();
     if let Some(index) = config.pending_slang_index.take() {
         if let Err(error) = config.prepare_project_index(&index) {
             inner.fail(format!("cannot prepare the project index: {error}"), None);
@@ -773,12 +766,12 @@ async fn session_loop(
                 continue;
             }
         };
-        let uri = match Url::from_file_path(path) {
+        let uri = match document_uri(path) {
             Ok(uri) => uri,
-            Err(()) => {
+            Err(error) => {
                 skipped.push(SkippedFile {
                     path: path.clone(),
-                    reason: "not an absolute file path".to_string(),
+                    reason: error.to_string(),
                 });
                 continue;
             }
@@ -887,6 +880,10 @@ async fn session_loop(
         match command {
             Command::Stop => break,
             Command::Request { id, request } => {
+                // A failure already completed requests waiting behind it.
+                if !matches!(inner.lock_requests().get(&id), Some(RequestState::Pending)) {
+                    continue;
+                }
                 let outcome = serve(&mut client, request).await;
                 let error = outcome.as_ref().err().map(|error| format!("{error:#}"));
                 inner.finish_request(id, outcome);
@@ -911,13 +908,11 @@ async fn session_loop(
                 inner.refresh_from(&client);
             }
             Command::Change { path, text } => {
-                let outcome = apply_buffer_change(
-                    &mut client,
-                    &path,
-                    text,
-                    has_slang_project_index && build_context.applied.is_some(),
-                )
-                .await;
+                // The bounded Slang reparse needs a context acknowledged by
+                // this transport, including in a standalone file session.
+                let refresh_slang = client.is_running()
+                    && build_context.confirmed_restart == Some(client.restart_count());
+                let outcome = apply_buffer_change(&mut client, &path, text, refresh_slang).await;
                 match outcome {
                     Ok(bytes) => {
                         child_exit_noted = false;
@@ -1385,8 +1380,7 @@ async fn apply_buffer_change(
     text: String,
     refresh_slang: bool,
 ) -> Result<usize> {
-    let uri =
-        Url::from_file_path(path).map_err(|()| anyhow!("{} is not a file path", path.display()))?;
+    let uri = document_uri(path)?;
     let bytes = text.len();
     if refresh_slang && client.is_running() && client.document_matches(&uri, &text)? {
         return Ok(bytes);
@@ -1490,12 +1484,13 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
             Ok(SessionResponse::Edits(edits))
         }
         SessionRequest::Diagnostics { .. } => {
-            let snapshot = client.diagnostics().borrow().clone();
-            // "No entry" and "an empty published set" are different answers:
-            // only the second one is a clean verdict (AC-2). The server's
-            // silence is never manufactured into "0 problems".
-            let published = snapshot.for_uri(&uri);
-            let rows = published.map(normalise_diagnostics).unwrap_or_default();
+            // A stale or absent publication is no verdict. An empty current
+            // publication, in contrast, is a valid clean result.
+            let published = client.current_diagnostics(&uri)?;
+            let rows = published
+                .as_ref()
+                .map(normalise_diagnostics)
+                .unwrap_or_default();
             Ok(SessionResponse::Diagnostics {
                 rows,
                 published: published.is_some(),
@@ -1586,9 +1581,30 @@ fn parameter_label_text(signature_label: &str, label: ParameterLabel) -> String 
     }
 }
 
+fn document_uri(path: &Path) -> Result<Url> {
+    let to_uri = |file: &Path| {
+        Url::from_file_path(file)
+            .map_err(|()| anyhow!("{} is not an absolute file path", file.display()))
+    };
+    let mut uri = to_uri(path)?;
+    if !path.components().any(|part| part == Component::ParentDir) {
+        return Ok(uri);
+    }
+
+    // Resolve symlinks and `..` through the deepest existing ancestor, even
+    // when an unsaved document's immediate parent is missing. The URL parser
+    // then normalizes any `..` in the unresolved suffix.
+    for ancestor in path.ancestors().skip(1) {
+        if let Ok(resolved) = ancestor.canonicalize() {
+            uri = to_uri(&resolved.join(path.strip_prefix(ancestor)?))?;
+            break;
+        }
+    }
+    Ok(Url::parse(uri.as_str())?)
+}
+
 async fn ensure_open(client: &mut LspClient, file: &Path) -> Result<Url> {
-    let uri =
-        Url::from_file_path(file).map_err(|()| anyhow!("not a file path: {}", file.display()))?;
+    let uri = document_uri(file)?;
     if client.document(&uri)?.is_some() {
         return Ok(uri);
     }

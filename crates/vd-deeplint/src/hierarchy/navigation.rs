@@ -2,13 +2,50 @@ use super::{
     collect_assignments, endpoint, expr_position, node_kind, EndpointKind, HierarchyReport,
     SignalInfo,
 };
-use crate::tool_paths::Columns;
+use crate::{tool_paths::Columns, LintFailure};
 use serde_json::{json, Value};
+use std::cell::Cell;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 
+mod ast;
 mod trace;
+pub(super) use ast::read_ast;
 pub use trace::TraceIndex;
+
+const GRAPH_BUDGET: usize = 256 * 1024 * 1024;
+
+pub(super) struct GraphBudget<'a> {
+    remaining: Cell<usize>,
+    cancel: &'a AtomicBool,
+}
+
+impl<'a> GraphBudget<'a> {
+    pub(super) fn new(cancel: &'a AtomicBool) -> Self {
+        Self {
+            remaining: Cell::new(GRAPH_BUDGET),
+            cancel,
+        }
+    }
+
+    // An AST may reference one body from many instances. Bound the expanded
+    // graph separately, including the storage for its path and cursor indices.
+    pub(super) fn charge(&self, size: usize) -> Result<(), LintFailure> {
+        if self.cancel.load(Ordering::Relaxed) {
+            return Err(LintFailure::Cancelled);
+        }
+        let remaining =
+            self.remaining
+                .get()
+                .checked_sub(size)
+                .ok_or_else(|| LintFailure::InvalidAstJson {
+                    message: "the design exceeds the signal trace graph budget".to_string(),
+                })?;
+        self.remaining.set(remaining);
+        Ok(())
+    }
+}
 
 fn collect_reads<'a>(value: &'a Value, reads: &mut Vec<&'a Value>, skip_assignments: bool) {
     match value {
@@ -47,6 +84,7 @@ fn writes<'a>(expr: &'a Value, out: &mut Vec<&'a Value>) {
 struct Scope<'a> {
     ids: HashMap<u64, usize>,
     nets: &'a mut [SignalInfo],
+    budget: &'a GraphBudget<'a>,
 }
 
 impl Scope<'_> {
@@ -63,11 +101,15 @@ impl Scope<'_> {
         kind: EndpointKind,
         label: &str,
         driver: bool,
-    ) {
+    ) -> Result<(), LintFailure> {
         let signal = &mut self.nets[net];
         let Some(site) = expr_position(at) else {
-            return;
+            // Still bound the cross-product work when no location can be emitted.
+            return self.budget.charge(1);
         };
+        let peer_len = peer.as_ref().map_or(signal.path.len(), String::len);
+        self.budget
+            .charge(384 + 2 * (peer_len + site.0.as_os_str().len()) + label.len())?;
         signal.occurrences.push(site.clone());
         let mut edge = endpoint(
             peer.clone().unwrap_or_else(|| signal.path.clone()),
@@ -82,9 +124,16 @@ impl Scope<'_> {
             &mut signal.loads
         }
         .push(edge);
+        Ok(())
     }
 
-    fn assignment(&mut self, left: &Value, right: &Value, kind: EndpointKind, label: &str) {
+    fn assignment(
+        &mut self,
+        left: &Value,
+        right: &Value,
+        kind: EndpointKind,
+        label: &str,
+    ) -> Result<(), LintFailure> {
         let mut targets = Vec::new();
         writes(left, &mut targets);
         let destinations: Vec<_> = targets
@@ -93,16 +142,26 @@ impl Scope<'_> {
             .collect();
         let mut reads = Vec::new();
         collect_reads(right, &mut reads, false);
-        // A select's index is read, even when its base is written.
-        collect_reads(left, &mut reads, false);
+        // A select's index is read, even when its base is written. Compare
+        // node identity so another occurrence with an identical span survives.
+        let mut left_reads = Vec::new();
+        collect_reads(left, &mut left_reads, false);
+        let target_nodes: HashSet<_> = targets
+            .iter()
+            .map(|&node| std::ptr::from_ref(node))
+            .collect();
+        reads.extend(
+            left_reads
+                .into_iter()
+                .filter(|&node| !target_nodes.contains(&std::ptr::from_ref(node))),
+        );
         let sources: Vec<_> = reads
             .into_iter()
-            .filter(|value| !targets.contains(value))
             .filter_map(|value| Some((self.index(value)?, value)))
             .collect();
         for &(destination, site) in &destinations {
             if sources.is_empty() {
-                self.edge(destination, None, site, kind, label, true);
+                self.edge(destination, None, site, kind, label, true)?;
             }
             for &(source, _) in &sources {
                 self.edge(
@@ -112,12 +171,12 @@ impl Scope<'_> {
                     kind,
                     label,
                     true,
-                );
+                )?;
             }
         }
         for (source, site) in sources {
             if destinations.is_empty() {
-                self.edge(source, None, site, kind, label, false);
+                self.edge(source, None, site, kind, label, false)?;
             }
             for &(destination, _) in &destinations {
                 self.edge(
@@ -127,15 +186,16 @@ impl Scope<'_> {
                     kind,
                     label,
                     false,
-                );
+                )?;
             }
         }
+        Ok(())
     }
 
-    fn port(&mut self, connection: &Value, child: &str) {
+    fn port(&mut self, connection: &Value, child: &str) -> Result<(), LintFailure> {
         let port = &connection["port"];
         let Some(name) = port["name"].as_str() else {
-            return;
+            return Ok(());
         };
         let direction = port["direction"].as_str().unwrap_or_default();
         let expr = &connection["expr"];
@@ -153,7 +213,7 @@ impl Scope<'_> {
                         EndpointKind::InstanceOutputPort,
                         &label,
                         true,
-                    );
+                    )?;
                 }
             }
         }
@@ -169,10 +229,11 @@ impl Scope<'_> {
                         EndpointKind::InstanceInputPort,
                         &label,
                         false,
-                    );
+                    )?;
                 }
             }
         }
+        Ok(())
     }
 }
 
@@ -180,7 +241,8 @@ pub(super) fn record_scope(
     members: &[&Value],
     children: &[(&Value, String)],
     nets: &mut [SignalInfo],
-) {
+    budget: &GraphBudget<'_>,
+) -> Result<(), LintFailure> {
     let by_name: HashMap<_, _> = nets
         .iter()
         .enumerate()
@@ -196,15 +258,17 @@ pub(super) fn record_scope(
             ))
         })
         .collect();
-    let mut scope = Scope { ids, nets };
+    let mut scope = Scope { ids, nets, budget };
     for (child, path) in children {
+        budget.charge(0)?;
         if let Some(connections) = child["connections"].as_array() {
             for connection in connections {
-                scope.port(connection, path);
+                scope.port(connection, path)?;
             }
         }
     }
     for member in members {
+        budget.charge(0)?;
         match node_kind(member) {
             "ContinuousAssign" => {
                 let assignment = &member["assignment"];
@@ -213,7 +277,7 @@ pub(super) fn record_scope(
                     &assignment["right"],
                     EndpointKind::ContinuousAssign,
                     "assign",
-                );
+                )?;
             }
             "ProceduralBlock" => {
                 let label = member["procedureKind"].as_str().unwrap_or("procedural");
@@ -225,22 +289,26 @@ pub(super) fn record_scope(
                         &assignment["right"],
                         EndpointKind::Procedural,
                         label,
-                    );
+                    )?;
                 }
                 let mut reads = Vec::new();
                 collect_reads(&member["body"], &mut reads, true);
                 for site in reads {
                     if let Some(net) = scope.index(site) {
-                        scope.edge(net, None, site, EndpointKind::Procedural, label, false);
+                        scope.edge(net, None, site, EndpointKind::Procedural, label, false)?;
                     }
                 }
             }
             _ => {}
         }
     }
+    Ok(())
 }
 
-pub(super) fn connect_parent_ports(nets: &mut [SignalInfo]) {
+pub(super) fn connect_parent_ports(
+    nets: &mut [SignalInfo],
+    budget: &GraphBudget<'_>,
+) -> Result<(), LintFailure> {
     let indices: HashMap<_, _> = nets
         .iter()
         .enumerate()
@@ -249,6 +317,7 @@ pub(super) fn connect_parent_ports(nets: &mut [SignalInfo]) {
     let mut opposite = Vec::new();
     let declarations: Vec<_> = nets.iter().map(|net| net.declaration.clone()).collect();
     for net in &mut *nets {
+        budget.charge(0)?;
         for (edges, driver) in [(&mut net.drivers, true), (&mut net.loads, false)] {
             for edge in edges {
                 if !matches!(
@@ -258,6 +327,14 @@ pub(super) fn connect_parent_ports(nets: &mut [SignalInfo]) {
                     continue;
                 }
                 if let Some(&child) = indices.get(&edge.path) {
+                    let destination_len = declarations[child]
+                        .as_ref()
+                        .map_or(0, |site| site.0.as_os_str().len());
+                    budget.charge(
+                        384 + 2 * (net.path.len() + edge.file.as_os_str().len())
+                            + edge.detail.len()
+                            + destination_len,
+                    )?;
                     let mut reverse = edge.clone();
                     reverse.path.clone_from(&net.path);
                     reverse.source = Some(net.path.clone());
@@ -280,4 +357,5 @@ pub(super) fn connect_parent_ports(nets: &mut [SignalInfo]) {
         }
         .push(edge);
     }
+    Ok(())
 }
