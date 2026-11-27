@@ -852,6 +852,8 @@ void DiagnosticsController::sampleLspSession()
     const bool healthChanged = stateChanged || restarted || (failed &&
         (next.message != session_.message || next.restarts != session_.restarts));
     if (!healthChanged && state_ != BackendState::Reparsing) {
+        // The silence re-ask still checks the buffer's publication floor.
+        session_.generation = next.generation;
         return;
     }
     if ((failed && stateChanged) || restarted || recovered) {

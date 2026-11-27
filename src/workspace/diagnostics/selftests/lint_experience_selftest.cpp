@@ -33,10 +33,12 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QHash>
 #include <QImage>
 #include <QLabel>
 #include <QPainter>
 #include <QPushButton>
+#include <QSet>
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleOptionViewItem>
@@ -145,6 +147,7 @@ public:
     /// AC-2 (batch-20261118): model a server that answers the request but never
     /// PUBLISHES a diagnostics set for the document.
     bool neverPublishes = false;
+    bool rejectBufferChanges = false;
     /// AC-1 (batch-20261118): how often the controller pushed the project build
     /// context to this backend once the session was Ready.
     int buildContextPushes = 0;
@@ -159,18 +162,40 @@ public:
         ++startCount;
         startedFiles = files;
         started = true;
+        pendingPublications_ = QSet<QString>(files.begin(), files.end());
         snapshot.filesExpected = files.size();
         snapshot.filesOpened = files.size();
         snapshot.state = BackendState::Ready;
         return true;
     }
-    void stop() override { started = false; }
+    void stop() override
+    {
+        started = false;
+        pendingPublications_.clear();
+        diagnosticsRequests_.clear();
+    }
     SessionSnapshot status() const override { return snapshot; }
     void setHealth(BackendState state, int restarts, const QString &message = {})
     {
+        if (state == BackendState::Ready && snapshot.state != BackendState::Ready) {
+            pendingPublications_ = QSet<QString>(startedFiles.begin(), startedFiles.end());
+        }
         snapshot.state = state;
         snapshot.restarts = restarts;
         snapshot.message = message;
+    }
+
+    bool changeBuffer(const QString &file, const QString &, QString *error) override
+    {
+        if (rejectBufferChanges || !started || snapshot.state != BackendState::Ready
+            || !startedFiles.contains(file)) {
+            if (error != nullptr) {
+                *error = QStringLiteral("fake LSP rejected the editor buffer");
+            }
+            return false;
+        }
+        pendingPublications_.insert(file);
+        return true;
     }
 
     quint64 requestDefinition(const QString &, int, int) override { return ++last_; }
@@ -182,20 +207,43 @@ public:
         return ++last_;
     }
     quint64 requestFormat(const QString &) override { return ++last_; }
-    quint64 requestDiagnostics(const QString &) override { return ++last_; }
+    quint64 requestDiagnostics(const QString &file) override
+    {
+        const quint64 id = ++last_;
+        diagnosticsRequests_.insert(id, file);
+        return id;
+    }
     quint64 requestHover(const QString &, int, int) override { return ++last_; }
 
     LspPolled poll(quint64 requestId) override
     {
-        LspPolled polled;
-        if (requestId == 0) {
+        if (requestId == 0 || requestId > last_) {
             return LspPolled::failure(QStringLiteral("unknown request"));
         }
+        LspPolled polled;
         polled.pending = false;
         polled.ready = true;
+        const auto request = diagnosticsRequests_.find(requestId);
+        if (request == diagnosticsRequests_.end()) {
+            return polled;
+        }
+        const QString file = request.value();
+        if (!neverPublishes && pendingPublications_.remove(file)) {
+            // The controller records the old generation after didChange. Make
+            // the publication visible in status() before returning its rows.
+            ++snapshot.generation;
+            return LspPolled::pendingResult();
+        }
+        diagnosticsRequests_.erase(request);
         polled.kind = ResponseKind::Diagnostics;
         polled.published = !neverPublishes;
-        polled.diagnostics = neverPublishes ? QVector<DiagnosticEntry>{} : rowsForFile;
+        if (polled.published) {
+            for (const DiagnosticEntry &entry : rowsForFile) {
+                if (entry.file == file) {
+                    polled.diagnostics.append(entry);
+                }
+            }
+        }
         return polled;
     }
 
@@ -210,6 +258,8 @@ public:
 
 private:
     SessionSnapshot snapshot;
+    QSet<QString> pendingPublications_;
+    QHash<quint64, QString> diagnosticsRequests_;
     quint64 last_ = 0;
 };
 
@@ -682,11 +732,21 @@ int main(int argc, char **argv)
         found.slang.path = QStringLiteral("/fake/slang");
         found.slang.source = ToolSource::Bundled;
         controller.setToolchainReport(found);
-        check("ac2.analyze",
-              controller.analyzeFile(a, QStringLiteral("module a;\n  logic x;\nendmodule\n"),
-                                     false));
+        const QString source = QStringLiteral("module a;\n  logic x;\nendmodule\n");
+        lspRaw->rejectBufferChanges = true;
+        const bool started = controller.analyzeFile(a, source, false);
+        controller.refresh();
+        check("ac2.rejected-buffer-blocks-requests",
+              started && controller.diagnosticsRequestCount() == 0
+                  && !controller.lowerLayerAnalyzed(a));
+        lspRaw->rejectBufferChanges = false;
+        check("ac2.analyze", controller.analyzeFile(a, source, false));
+        const quint64 beforePublish = lspRaw->status().generation;
         waitForRefresh(controller, [&controller]() { return controller.serverSilent(); }, 5000);
         check("ac2.server-silent", controller.serverSilent());
+        check("ac2.silent-reply-without-publication",
+              controller.diagnosticsRequestCount() > 0
+                  && lspRaw->status().generation == beforePublish);
         // AC-1: the controller pushes the build context EXACTLY once the session
         // is Ready (the fake counts the calls).
         check("ac1.context-pushed-after-ready", lspRaw->buildContextPushes >= 1,
@@ -724,6 +784,8 @@ int main(int argc, char **argv)
         };
         const bool publishedClean = waitFor(clean, 2000);
         check("recovery.published-empty-is-clean", publishedClean, panel.statusText());
+        check("recovery.empty-publication-advances-generation",
+              lspRaw->status().generation > beforePublish);
         check("recovery.initial-context-once", lspRaw->buildContextPushes == 1,
               QString::number(lspRaw->buildContextPushes));
 
