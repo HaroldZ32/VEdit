@@ -113,7 +113,7 @@ pub struct SessionStatus {
     pub generation: u64,
     /// PID of the server process, when one is running.
     pub server_pid: Option<u32>,
-    /// How many times a crashed server was restarted.
+    /// How many restart attempts followed a server failure.
     pub restarts: u32,
     /// Human-readable state line for the UI.
     pub message: String,
@@ -394,9 +394,11 @@ impl Inner {
         );
     }
 
-    fn fail(&self, message: String) {
+    fn fail(&self, message: String, client: Option<&LspClient>) {
         let mut status = self.lock_status();
         status.phase = SessionPhase::Failed;
+        status.server_pid = client.and_then(LspClient::pid);
+        status.restarts = client.map_or(0, LspClient::restart_count);
         status.message = message.clone();
         let mut requests = self.lock_requests();
         for state in requests.values_mut() {
@@ -406,8 +408,23 @@ impl Inner {
         }
     }
 
+    async fn fail_server(&self, client: &mut LspClient, reason: String) {
+        if client.session_ended() {
+            client.drain_stderr().await;
+        }
+        self.fail(
+            format!(
+                "{reason} ({}/{MAX_RESTARTS} restart(s)){}",
+                client.restart_count(),
+                stderr_tail_text(client)
+            ),
+            Some(client),
+        );
+    }
+
     fn stopped(&self) {
         let mut status = self.lock_status();
+        status.server_pid = None;
         if status.phase != SessionPhase::Failed {
             status.phase = SessionPhase::Stopped;
             status.message = "stopped".to_string();
@@ -435,12 +452,11 @@ impl Inner {
         status.diagnostics = diagnostics;
     }
 
-    /// A command succeeded: a session that had been marked `Failed` is answering
-    /// again, so it leaves the failed state (batch-20261118 AC-3). The restart
-    /// count stays visible; the message keeps the reason it had failed for.
-    fn note_success(&self, message: String, restarts: u32) {
+    /// Publish the process that answered the command and mark a failed session recovered.
+    fn note_success(&self, message: String, client: &LspClient) {
         let mut status = self.lock_status();
-        status.restarts = restarts;
+        status.server_pid = client.pid();
+        status.restarts = client.restart_count();
         if status.phase == SessionPhase::Failed {
             status.phase = SessionPhase::Ready;
             status.message = format!("recovered: {message}");
@@ -533,9 +549,10 @@ impl SessionHandle {
                         ));
                     }
                     Err(error) => {
-                        worker_inner.fail(format!(
-                            "cannot start the LSP runtime for the session: {error}"
-                        ));
+                        worker_inner.fail(
+                            format!("cannot start the LSP runtime for the session: {error}"),
+                            None,
+                        );
                     }
                 }
             })
@@ -729,7 +746,7 @@ async fn session_loop(
     let has_slang_project_index = config.pending_slang_index.is_some();
     if let Some(index) = config.pending_slang_index.take() {
         if let Err(error) = config.prepare_project_index(&index) {
-            inner.fail(format!("cannot prepare the project index: {error}"));
+            inner.fail(format!("cannot prepare the project index: {error}"), None);
             return;
         }
     }
@@ -762,24 +779,32 @@ async fn session_loop(
             .open_document(uri.clone(), language_id(path), text)
             .await
         {
-            inner.fail(format!(
-                "cannot open {} on the server: {error}",
-                path.display()
-            ));
+            client.drain_stderr().await;
+            inner.fail(
+                format!(
+                    "cannot open {} on the server: {error}{}",
+                    path.display(),
+                    stderr_tail_text(&client)
+                ),
+                None,
+            );
             return;
         }
         opened.push((uri, path.clone()));
     }
 
     if opened.is_empty() {
-        inner.fail(if skipped.is_empty() {
-            "the effective file set is empty: there is nothing to open".to_string()
-        } else {
-            format!(
-                "none of the {} file(s) in the effective set could be opened",
-                files.len()
-            )
-        });
+        inner.fail(
+            if skipped.is_empty() {
+                "the effective file set is empty: there is nothing to open".to_string()
+            } else {
+                format!(
+                    "none of the {} file(s) in the effective set could be opened",
+                    files.len()
+                )
+            },
+            None,
+        );
         return;
     }
 
@@ -828,13 +853,9 @@ async fn session_loop(
             () = tokio::time::sleep(Duration::from_millis(250)) => {
                 if !child_exit_noted && client.session_ended() {
                     child_exit_noted = true;
-                    let message = format!(
-                        "the language server exited after Ready ({}/{} restart(s)){}",
-                        client.restart_count(),
-                        MAX_RESTARTS,
-                        stderr_tail_text(&client)
-                    );
-                    inner.fail(message);
+                    inner
+                        .fail_server(&mut client, "the language server exited after Ready".into())
+                        .await;
                 }
                 continue;
             }
@@ -851,23 +872,20 @@ async fn session_loop(
                 match error {
                     Some(error) => {
                         child_exit_noted = client.session_ended();
-                        inner.fail(format!(
-                            "request failed: {error} ({}/{} restart(s)){}",
-                            client.restart_count(),
-                            MAX_RESTARTS,
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(&mut client, format!("request failed: {error}"))
+                            .await;
                     }
                     None if client.session_ended() => {
                         child_exit_noted = true;
-                        inner.fail(format!(
-                            "the language server exited after Ready ({}/{} restart(s)){}",
-                            client.restart_count(),
-                            MAX_RESTARTS,
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(
+                                &mut client,
+                                "the language server exited after Ready".into(),
+                            )
+                            .await;
                     }
-                    None => inner.note_success(String::new(), client.restart_count()),
+                    None => inner.note_success(String::new(), &client),
                 }
                 let snapshot_generation = client.diagnostics_generation();
                 let count = client.diagnostics().borrow().diagnostic_count();
@@ -886,17 +904,14 @@ async fn session_loop(
                         child_exit_noted = false;
                         inner.note_success(
                             format!("buffer changed ({} bytes): {}", bytes, path.display()),
-                            client.restart_count(),
+                            &client,
                         );
                     }
                     Err(error) => {
                         child_exit_noted = client.session_ended();
-                        inner.fail(format!(
-                            "buffer change failed: {error} ({}/{} restart(s)){}",
-                            client.restart_count(),
-                            MAX_RESTARTS,
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(&mut client, format!("buffer change failed: {error}"))
+                            .await;
                     }
                 }
                 let snapshot_generation = client.diagnostics_generation();
@@ -920,15 +935,17 @@ async fn session_loop(
                     Ok(note) => {
                         child_exit_noted = false;
                         if !note.is_empty() {
-                            inner.note_success(note, client.restart_count());
+                            inner.note_success(note, &client);
                         }
                     }
                     Err(error) => {
                         child_exit_noted = client.session_ended();
-                        inner.fail(format!(
-                            "build context was not accepted: {error}{}",
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(
+                                &mut client,
+                                format!("build context was not accepted: {error}"),
+                            )
+                            .await;
                     }
                 }
             }

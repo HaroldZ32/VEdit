@@ -84,6 +84,7 @@ struct Session {
     server: ServerSocket,
     child: Child,
     mainloop: JoinHandle<Result<(), async_lsp::Error>>,
+    stderr_reader: Option<JoinHandle<()>>,
     pid: u32,
 }
 
@@ -160,10 +161,13 @@ impl LspClient {
 
     /// PID of the running server, for lifecycle evidence.
     pub fn pid(&self) -> Option<u32> {
-        self.session.as_ref().map(|session| session.pid)
+        self.session
+            .as_ref()
+            .filter(|session| !session.mainloop.is_finished())
+            .map(|session| session.pid)
     }
 
-    /// How many times a crashed server has been restarted.
+    /// How many restart attempts followed a server failure.
     pub fn restart_count(&self) -> u32 {
         self.restarts
     }
@@ -189,6 +193,19 @@ impl LspClient {
             .iter()
             .cloned()
             .collect()
+    }
+
+    /// Give the stderr reader a bounded chance to finish after a startup or
+    /// transport failure. A child or descendant can keep the pipe open.
+    pub(crate) async fn drain_stderr(&mut self) {
+        if let Some(mut reader) = self.session.as_mut().and_then(|s| s.stderr_reader.take()) {
+            if tokio::time::timeout(Duration::from_millis(100), &mut reader)
+                .await
+                .is_err()
+            {
+                reader.abort();
+            }
+        }
     }
 
     /// Last `window/logMessage` / `window/showMessage` lines (bounded).
@@ -546,14 +563,18 @@ impl LspClient {
 
     /// Ensure a live, initialised session and return its socket.
     async fn ensure_session(&mut self) -> Result<ServerSocket> {
-        if self
-            .session
-            .as_ref()
-            .is_some_and(|session| session.mainloop.is_finished())
-        {
+        let restarting = self.session_ended();
+        if restarting {
+            self.drain_stderr().await;
             self.reap_dead_session();
         }
         if self.session.is_none() {
+            if restarting || self.restarts > 0 {
+                if self.restarts >= MAX_RESTARTS {
+                    bail!("language server failed after {MAX_RESTARTS} restart attempts; refusing to restart again");
+                }
+                self.restarts += 1;
+            }
             self.start_session().await?;
         }
         let session = self
@@ -565,7 +586,6 @@ impl LspClient {
 
     fn reap_dead_session(&mut self) {
         if let Some(session) = self.session.take() {
-            self.restarts += 1;
             if !session.mainloop.is_finished() {
                 session.mainloop.abort();
             }
@@ -576,17 +596,10 @@ impl LspClient {
                 let mut child = child;
                 let _ = child.wait().await;
             });
-            self.record_stderr_line("language server exited; it will be restarted lazily");
         }
     }
 
     async fn start_session(&mut self) -> Result<()> {
-        if self.restarts > MAX_RESTARTS {
-            bail!(
-                "language server crashed {} times; refusing to restart again",
-                self.restarts
-            );
-        }
         let mut command = Command::new(&self.config.ls_path);
         command
             .args(self.config.command_args())
@@ -618,7 +631,8 @@ impl LspClient {
             .stdin
             .take()
             .ok_or_else(|| anyhow!("language server has no stdin pipe"))?;
-        if let Some(stderr) = child.stderr.take() {
+        self.stderr_tail = Arc::new(Mutex::new(VecDeque::new()));
+        let stderr_reader = child.stderr.take().map(|stderr| {
             let tail = self.stderr_tail.clone();
             tokio::spawn(async move {
                 use tokio::io::AsyncBufReadExt;
@@ -630,8 +644,8 @@ impl LspClient {
                     }
                     tail.push_back(line);
                 }
-            });
-        }
+            })
+        });
 
         let state = self.state.clone();
         let (mainloop, server) = MainLoop::new_client(move |_socket| {
@@ -705,6 +719,7 @@ impl LspClient {
             server: server.clone(),
             child,
             mainloop,
+            stderr_reader,
             pid,
         });
 
