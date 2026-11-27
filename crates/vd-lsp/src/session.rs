@@ -36,7 +36,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use lsp_types::{
     Diagnostic, DocumentSymbol, DocumentSymbolResponse, HoverContents, Location, MarkedString,
     ParameterLabel, Position, Range, SignatureHelp, TextDocumentContentChangeEvent, TextEdit, Url,
@@ -113,7 +113,7 @@ pub struct SessionStatus {
     pub generation: u64,
     /// PID of the server process, when one is running.
     pub server_pid: Option<u32>,
-    /// How many times a crashed server was restarted.
+    /// How many restart attempts followed a server failure.
     pub restarts: u32,
     /// Human-readable state line for the UI.
     pub message: String,
@@ -371,7 +371,7 @@ impl Inner {
         skipped: Vec<SkippedFile>,
         diagnostics: usize,
         generation: u64,
-        pid: Option<u32>,
+        pid: u32,
         restarts: u32,
         capabilities: Option<BackendCapabilities>,
     ) {
@@ -384,7 +384,7 @@ impl Inner {
         status.skipped = skipped;
         status.diagnostics = diagnostics;
         status.generation = generation;
-        status.server_pid = pid;
+        status.server_pid = Some(pid);
         status.restarts = restarts;
         status.message = format!(
             "ready: backend={} {opened}/{} file(s) open, {diagnostics} diagnostic(s), {} skipped",
@@ -394,9 +394,11 @@ impl Inner {
         );
     }
 
-    fn fail(&self, message: String) {
+    fn fail(&self, message: String, client: Option<&LspClient>) {
         let mut status = self.lock_status();
         status.phase = SessionPhase::Failed;
+        status.server_pid = client.and_then(LspClient::pid);
+        status.restarts = client.map_or(0, LspClient::restart_count);
         status.message = message.clone();
         let mut requests = self.lock_requests();
         for state in requests.values_mut() {
@@ -406,8 +408,26 @@ impl Inner {
         }
     }
 
+    async fn fail_server(&self, client: &mut LspClient, mut reason: String) {
+        if client.session_ended() {
+            if let Err(error) = client.retire_failed_session().await {
+                reason.push_str(&format!(" — cleanup failed: {error:#}"));
+            }
+        }
+        self.refresh_from(client);
+        self.fail(
+            format!(
+                "{reason} ({}/{MAX_RESTARTS} restart(s)){}",
+                client.restart_count(),
+                stderr_tail_text(client)
+            ),
+            Some(client),
+        );
+    }
+
     fn stopped(&self) {
         let mut status = self.lock_status();
+        status.server_pid = None;
         if status.phase != SessionPhase::Failed {
             status.phase = SessionPhase::Stopped;
             status.message = "stopped".to_string();
@@ -429,18 +449,22 @@ impl Inner {
         requests.insert(id, state);
     }
 
-    fn refresh_from(&self, generation: u64, diagnostics: usize) {
+    fn refresh_from(&self, client: &LspClient) {
+        let rx = client.diagnostics();
+        let snapshot = rx.borrow();
         let mut status = self.lock_status();
-        status.generation = generation;
-        status.diagnostics = diagnostics;
+        status.generation = snapshot.generation();
+        status.diagnostics = snapshot.diagnostic_count();
     }
 
-    /// A command succeeded: a session that had been marked `Failed` is answering
-    /// again, so it leaves the failed state (batch-20261118 AC-3). The restart
-    /// count stays visible; the message keeps the reason it had failed for.
-    fn note_success(&self, message: String, restarts: u32) {
+    /// Publish the process that answered the command and mark a failed session recovered.
+    fn note_success(&self, message: String, client: &LspClient) {
+        let Some(pid) = client.pid() else {
+            return;
+        };
         let mut status = self.lock_status();
-        status.restarts = restarts;
+        status.server_pid = Some(pid);
+        status.restarts = client.restart_count();
         if status.phase == SessionPhase::Failed {
             status.phase = SessionPhase::Ready;
             status.message = format!("recovered: {message}");
@@ -533,9 +557,10 @@ impl SessionHandle {
                         ));
                     }
                     Err(error) => {
-                        worker_inner.fail(format!(
-                            "cannot start the LSP runtime for the session: {error}"
-                        ));
+                        worker_inner.fail(
+                            format!("cannot start the LSP runtime for the session: {error}"),
+                            None,
+                        );
                     }
                 }
             })
@@ -729,7 +754,7 @@ async fn session_loop(
     let has_slang_project_index = config.pending_slang_index.is_some();
     if let Some(index) = config.pending_slang_index.take() {
         if let Err(error) = config.prepare_project_index(&index) {
-            inner.fail(format!("cannot prepare the project index: {error}"));
+            inner.fail(format!("cannot prepare the project index: {error}"), None);
             return;
         }
     }
@@ -762,24 +787,29 @@ async fn session_loop(
             .open_document(uri.clone(), language_id(path), text)
             .await
         {
-            inner.fail(format!(
-                "cannot open {} on the server: {error}",
-                path.display()
-            ));
+            let mut reason = format!("cannot open {} on the server: {error:#}", path.display());
+            if let Err(error) = client.shutdown().await {
+                reason.push_str(&format!(" — cleanup failed: {error:#}"));
+            }
+            reason.push_str(&stderr_tail_text(&client));
+            inner.fail(reason, None);
             return;
         }
         opened.push((uri, path.clone()));
     }
 
     if opened.is_empty() {
-        inner.fail(if skipped.is_empty() {
-            "the effective file set is empty: there is nothing to open".to_string()
-        } else {
-            format!(
-                "none of the {} file(s) in the effective set could be opened",
-                files.len()
-            )
-        });
+        inner.fail(
+            if skipped.is_empty() {
+                "the effective file set is empty: there is nothing to open".to_string()
+            } else {
+                format!(
+                    "none of the {} file(s) in the effective set could be opened",
+                    files.len()
+                )
+            },
+            None,
+        );
         return;
     }
 
@@ -796,12 +826,28 @@ async fn session_loop(
                 .filter(|(uri, _)| snapshot.for_uri(uri).is_some())
                 .count()
         };
-        if covered >= opened.len() || std::time::Instant::now() >= deadline {
+        if covered >= opened.len()
+            || client.session_ended()
+            || std::time::Instant::now() >= deadline
+        {
             break;
         }
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
-    let diagnostics = client.diagnostics().borrow().diagnostic_count();
+    let Some(pid) = client.pid() else {
+        inner
+            .fail_server(
+                &mut client,
+                "the language server exited before Ready".into(),
+            )
+            .await;
+        return;
+    };
+    let diagnostics = client.diagnostics();
+    let (generation, count) = {
+        let snapshot = diagnostics.borrow();
+        (snapshot.generation(), snapshot.diagnostic_count())
+    };
 
     let capabilities = client
         .server_capabilities()
@@ -809,9 +855,9 @@ async fn session_loop(
     inner.set_ready(
         opened.len(),
         skipped,
-        diagnostics,
-        client.diagnostics_generation(),
-        client.pid(),
+        count,
+        generation,
+        pid,
         client.restart_count(),
         capabilities,
     );
@@ -821,20 +867,16 @@ async fn session_loop(
     // flag keeps the periodic check from re-reporting the same death.
     let backend = inner.lock_status().backend;
     let mut child_exit_noted = false;
-    let mut context_file: Option<ContextFile> = None;
+    let mut build_context = BuildContextState::default();
     loop {
         let command = tokio::select! {
             command = commands.recv() => command,
             () = tokio::time::sleep(Duration::from_millis(250)) => {
                 if !child_exit_noted && client.session_ended() {
                     child_exit_noted = true;
-                    let message = format!(
-                        "the language server exited after Ready ({}/{} restart(s)){}",
-                        client.restart_count(),
-                        MAX_RESTARTS,
-                        stderr_tail_text(&client)
-                    );
-                    inner.fail(message);
+                    inner
+                        .fail_server(&mut client, "the language server exited after Ready".into())
+                        .await;
                 }
                 continue;
             }
@@ -846,39 +888,34 @@ async fn session_loop(
             Command::Stop => break,
             Command::Request { id, request } => {
                 let outcome = serve(&mut client, request).await;
-                let error = outcome.as_ref().err().map(ToString::to_string);
+                let error = outcome.as_ref().err().map(|error| format!("{error:#}"));
                 inner.finish_request(id, outcome);
                 match error {
                     Some(error) => {
                         child_exit_noted = client.session_ended();
-                        inner.fail(format!(
-                            "request failed: {error} ({}/{} restart(s)){}",
-                            client.restart_count(),
-                            MAX_RESTARTS,
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(&mut client, format!("request failed: {error}"))
+                            .await;
                     }
                     None if client.session_ended() => {
                         child_exit_noted = true;
-                        inner.fail(format!(
-                            "the language server exited after Ready ({}/{} restart(s)){}",
-                            client.restart_count(),
-                            MAX_RESTARTS,
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(
+                                &mut client,
+                                "the language server exited after Ready".into(),
+                            )
+                            .await;
                     }
-                    None => inner.note_success(String::new(), client.restart_count()),
+                    None => inner.note_success(String::new(), &client),
                 }
-                let snapshot_generation = client.diagnostics_generation();
-                let count = client.diagnostics().borrow().diagnostic_count();
-                inner.refresh_from(snapshot_generation, count);
+                inner.refresh_from(&client);
             }
             Command::Change { path, text } => {
                 let outcome = apply_buffer_change(
                     &mut client,
                     &path,
                     text,
-                    has_slang_project_index && context_file.is_some(),
+                    has_slang_project_index && build_context.applied.is_some(),
                 )
                 .await;
                 match outcome {
@@ -886,22 +923,17 @@ async fn session_loop(
                         child_exit_noted = false;
                         inner.note_success(
                             format!("buffer changed ({} bytes): {}", bytes, path.display()),
-                            client.restart_count(),
+                            &client,
                         );
                     }
                     Err(error) => {
                         child_exit_noted = client.session_ended();
-                        inner.fail(format!(
-                            "buffer change failed: {error} ({}/{} restart(s)){}",
-                            client.restart_count(),
-                            MAX_RESTARTS,
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(&mut client, format!("buffer change failed: {error:#}"))
+                            .await;
                     }
                 }
-                let snapshot_generation = client.diagnostics_generation();
-                let count = client.diagnostics().borrow().diagnostic_count();
-                inner.refresh_from(snapshot_generation, count);
+                inner.refresh_from(&client);
             }
             Command::BuildContext {
                 include_dirs,
@@ -913,22 +945,24 @@ async fn session_loop(
                     &include_dirs,
                     &defines,
                     &files,
-                    &mut context_file,
+                    &mut build_context,
                 )
                 .await;
                 match outcome {
                     Ok(note) => {
                         child_exit_noted = false;
                         if !note.is_empty() {
-                            inner.note_success(note, client.restart_count());
+                            inner.note_success(note, &client);
                         }
                     }
                     Err(error) => {
                         child_exit_noted = client.session_ended();
-                        inner.fail(format!(
-                            "build context was not accepted: {error}{}",
-                            stderr_tail_text(&client)
-                        ));
+                        inner
+                            .fail_server(
+                                &mut client,
+                                format!("build context was not accepted: {error:#}"),
+                            )
+                            .await;
                     }
                 }
             }
@@ -938,12 +972,23 @@ async fn session_loop(
     // every exit path this loop can take - a normal stop, a closed command
     // channel, or an unwinding panic. A `SIGKILL` cannot run it; under
     // `XDG_RUNTIME_DIR` the session manager removes the directory then.
-    drop(context_file);
-
     if let Err(error) = client.shutdown().await {
         inner.lock_status().message = format!("shutdown reported: {error}");
     }
+    drop(build_context);
     inner.stopped();
+}
+
+#[derive(Default)]
+struct BuildContextState {
+    applied: Option<BuildContext>,
+    candidate: Option<BuildContext>,
+    confirmed_restart: Option<u32>,
+}
+
+struct BuildContext {
+    file: ContextFile,
+    text: String,
 }
 
 /// The generated slang build file and the private directory holding it.
@@ -1240,16 +1285,10 @@ pub fn build_context_text(
 /// creates `<workspace>/.slang/local/server.json` inside the user's project and
 /// merges into it on every call (batch-20261118 AC-1 forbids touching the
 /// project), and the accumulated flags outlive the session.
-fn write_context_file(
-    include_dirs: &[PathBuf],
-    defines: &[String],
-    files: &[PathBuf],
-) -> Result<ContextFile> {
-    let text = build_context_text(include_dirs, defines, files)?;
-
+fn write_context_file(text: &str) -> Result<ContextFile> {
     let mut last_error = None;
     for base in context_base_dirs() {
-        match create_context_file(&base, &text) {
+        match create_context_file(&base, text) {
             Ok(context) => return Ok(context),
             Err(error) => last_error = Some(error),
         }
@@ -1274,7 +1313,7 @@ async fn apply_build_context(
     include_dirs: &[PathBuf],
     defines: &[String],
     files: &[PathBuf],
-    context_file: &mut Option<ContextFile>,
+    state: &mut BuildContextState,
 ) -> Result<String> {
     if backend != LspBackend::Slang {
         // Verible's build context already reaches it as a file list on its
@@ -1284,17 +1323,50 @@ async fn apply_build_context(
     if include_dirs.is_empty() && defines.is_empty() && files.is_empty() {
         return Ok(String::new());
     }
-    let context = write_context_file(include_dirs, defines, files)?;
-    let argument = Value::String(context.path.display().to_string());
-    // A rejected push returns here; `context` drops with it, so the generated
-    // file and its private directory are removed on that path too.
-    client
-        .execute_command("slang.setBuildFile", vec![argument])
-        .await?;
-    if let Some(previous) = context_file.replace(context) {
-        // A later push REPLACES the driver; the previous generated file (and
-        // its private directory) is removed by the guard.
-        drop(previous);
+    let text = build_context_text(include_dirs, defines, files)?;
+    let applied = state
+        .applied
+        .as_ref()
+        .filter(|previous| previous.text == text);
+    let already_applied = applied.is_some()
+        && client.is_running()
+        && state.confirmed_restart == Some(client.restart_count());
+    if !already_applied {
+        let path = match applied {
+            Some(previous) => &previous.file.path,
+            None => {
+                let candidate = match &mut state.candidate {
+                    Some(candidate) => {
+                        if candidate.text != text {
+                            // The server may still read this path after a timeout.
+                            // Stage in its private directory and replace atomically.
+                            let staged = create_context_file(&candidate.file.directory, &text)?;
+                            std::fs::rename(&staged.path, &candidate.file.path)
+                                .context("cannot replace the unconfirmed build-context file")?;
+                            candidate.text = text;
+                        }
+                        candidate
+                    }
+                    None => state.candidate.insert(BuildContext {
+                        file: write_context_file(&text)?,
+                        text,
+                    }),
+                };
+                &candidate.file.path
+            }
+        };
+        let argument = Value::String(path.display().to_string());
+        // Keep both file guards, but trust neither configuration until a reply.
+        state.confirmed_restart = None;
+        client
+            .execute_command("slang.setBuildFile", vec![argument])
+            .await?;
+        if applied.is_none() {
+            state.applied = state.candidate.take();
+        } else {
+            state.candidate = None;
+        }
+        state.confirmed_restart = Some(client.restart_count());
     }
     Ok(format!(
         "build context: {} include dir(s), {} define(s), {} session file(s)",
@@ -1316,7 +1388,7 @@ async fn apply_buffer_change(
     let uri =
         Url::from_file_path(path).map_err(|()| anyhow!("{} is not a file path", path.display()))?;
     let bytes = text.len();
-    if refresh_slang && !client.session_ended() && client.document_matches(&uri, &text)? {
+    if refresh_slang && client.is_running() && client.document_matches(&uri, &text)? {
         return Ok(bytes);
     }
     if client.is_open(&uri) {
@@ -1676,9 +1748,9 @@ pub const fn range_parts(range: Range) -> (u32, u32, u32, u32) {
 #[cfg(test)]
 mod tests {
     use super::{
-        context_base_dirs, context_base_dirs_from, create_context_file_with, create_private_file,
-        flatten_symbols, flatten_workspace_edit, hover_text, language_id, parameter_label_text,
-        severity_code, signature_help_result, write_context_file,
+        build_context_text, context_base_dirs, context_base_dirs_from, create_context_file_with,
+        create_private_file, flatten_symbols, flatten_workspace_edit, hover_text, language_id,
+        parameter_label_text, severity_code, signature_help_result, write_context_file,
     };
     use anyhow::Result;
     use lsp_types::{
@@ -1860,7 +1932,7 @@ mod tests {
 
     #[test]
     fn the_context_file_carries_incdirs_defines_and_the_session_files() -> Result<()> {
-        let context = write_context_file(
+        let text = build_context_text(
             &[PathBuf::from("/project/inc")],
             &["WIDTH=8".to_string(), "SIM".to_string()],
             &[
@@ -1868,6 +1940,7 @@ mod tests {
                 PathBuf::from("/project/rtl/uart.v"),
             ],
         )?;
+        let context = write_context_file(&text)?;
         let text = std::fs::read_to_string(&context.path)?;
         assert_eq!(
             text,
@@ -1889,7 +1962,7 @@ mod tests {
     /// so the file-list parser cannot split or terminate it early.
     #[test]
     fn the_context_file_quotes_and_escapes_every_argument() -> Result<()> {
-        let context = write_context_file(
+        let text = build_context_text(
             &[
                 PathBuf::from("/project/inc dir"),
                 PathBuf::from("/project/q\"uote\\dir"),
@@ -1897,6 +1970,7 @@ mod tests {
             &["WIDTH=8 + 4".to_string(), "MSG=\"hi\"".to_string()],
             &[PathBuf::from("/project/build dir/top file.sv")],
         )?;
+        let context = write_context_file(&text)?;
         let text = std::fs::read_to_string(&context.path)?;
         assert_eq!(
             text.lines().collect::<Vec<_>>(),
@@ -1913,12 +1987,12 @@ mod tests {
 
     #[test]
     fn a_path_with_a_line_break_is_refused() {
-        let error = match write_context_file(&[PathBuf::from("/project/a\nb")], &[], &[]) {
+        let error = match build_context_text(&[PathBuf::from("/project/a\nb")], &[], &[]) {
             Ok(_) => panic!("a line break inside an include directory must be refused"),
             Err(error) => error,
         };
         assert!(error.to_string().contains("line break"), "{error}");
-        let error = match write_context_file(&[], &[], &[PathBuf::from("/project/a\rb")]) {
+        let error = match build_context_text(&[], &[], &[PathBuf::from("/project/a\rb")]) {
             Ok(_) => panic!("a line break inside a session file must be refused"),
             Err(error) => error,
         };
@@ -1927,7 +2001,7 @@ mod tests {
 
     #[test]
     fn a_define_with_a_line_break_is_refused() {
-        let error = match write_context_file(&[], &["A=1\n-DEVIL".to_string()], &[]) {
+        let error = match build_context_text(&[], &["A=1\n-DEVIL".to_string()], &[]) {
             Ok(_) => panic!("a line break inside a define must be refused"),
             Err(error) => error,
         };
@@ -2017,7 +2091,7 @@ mod tests {
 
     #[test]
     fn the_context_directory_and_file_are_private_and_removed_by_the_guard() -> Result<()> {
-        let context = write_context_file(&[], &["WIDTH=8".to_string()], &[])?;
+        let context = write_context_file("-D\"WIDTH=8\"\n")?;
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;

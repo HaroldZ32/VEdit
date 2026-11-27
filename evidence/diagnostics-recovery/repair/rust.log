@@ -1,0 +1,65 @@
+CARGO_HOME=$PWD/target/cargo-home
+VEDIT_VERIBLE_BIN_DIR=$PWD/.mpd/recon/verible/bin
+VEDIT_SLANG_SERVER=$PWD/packaging/runtime/out/AppDir/usr/lib/lsp/slang-server
+
+$ cargo +stable test --locked --offline -p vd-lsp --test verible_ls initialize_timeout_is_enforced_and_the_child_is_reaped -- --nocapture
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.74s
+running 1 test
+test initialize_timeout_is_enforced_and_the_child_is_reaped ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.30s
+exit=0
+
+$ cargo +stable test --locked --offline -p vd-lsp -- --nocapture
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.21s
+running 40 tests
+test diagnostics::tests::retired_publisher_cannot_record_or_clear_replacement_diagnostics ... ok
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+running 3 tests
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+running 2 tests
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+running 1 test
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+running 1 test
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+running 2 tests
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.08s
+running 7 tests
+startup failure: cannot open /tmp/vd-lsp-health-startup-1657-1795757492619469842/top.sv on the server: initialize failed: service stopped — server stderr: fixture rejected initialization
+indexed healthy: same text sent once to PID 1771
+pid: original=1773 failed=None replacement=1806 public=Some(1806)
+idle failure: the language server exited after Ready (0/3 restart(s)) — server stderr: fixture idle exit
+transport closed: old PID 1772 reaped, replacement PID 1807 answered
+test failed_transport_reaps_its_old_child_before_replacement ... ok
+context: initial=1 replacement_before_caller_push=0 replacement_after_caller_push=1; unsaved didOpen replayed
+test restart_reopens_the_buffer_and_the_caller_reapplies_build_context_once ... ok
+silent-replacement: generations 1 -> 2 -> 3, silent=(false, []), first new=(true, [])
+silent-replacement-empty: generations 1 -> 2 -> 3, silent=(false, []), first new=(true, [])
+restart limit: launches=4 public=3 message=buffer change failed: language server failed after 3 restart attempts; refusing to restart again (3/3 restart(s)) — server stderr: fixture idle exit
+indexed exhausted: launches=4, buffer change failed: language server failed after 3 restart attempts; refusing to restart again (3/3 restart(s)) — server stderr: fixture idle exit
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+running 8 tests
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+running 8 tests
+test lazy_start_crash_restart_and_shutdown_leave_no_zombie ... ok
+test initialize_timeout_is_enforced_and_the_child_is_reaped ... ok
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit=0
+
+$ cargo +stable check --locked --offline -p vd-lsp --all-targets
+    Checking vd-lsp v0.5.0 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-lsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.57s
+exit=0
+
+$ cargo +stable clippy --locked --offline -p vd-lsp --all-targets -- -D warnings
+    Checking vd-lsp v0.5.0 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-lsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.67s
+exit=0
+
+$ cargo +stable fmt -p vd-lsp -- --check
+exit=0
+
+$ git diff --check
+exit=0

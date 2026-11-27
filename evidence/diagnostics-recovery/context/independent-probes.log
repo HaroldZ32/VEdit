@@ -1,0 +1,60 @@
+Both audit probe files matched byte-for-byte (cmp exit 0).
+$ cargo +stable test --locked --offline -j 4 -p vd-lsp --test review_context_interleave -- --nocapture
+   Compiling vd-lsp v0.5.0 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.50s
+     Running tests/review_context_interleave.rs (target/debug/deps/review_context_interleave-45a7793b768294f4)
+
+running 8 tests
+startup failure: cannot open /tmp/vd-lsp-health-startup-168-1795758895497202484/top.sv on the server: initialize failed: service stopped — server stderr: fixture rejected initialization
+test startup_failure_includes_child_stderr ... ok
+pid: original=270 failed=None replacement=342 public=Some(342)
+idle failure: the language server exited after Ready (0/3 restart(s)) — server stderr: fixture idle exit
+old supervisor PID=283, new supervisor PID=338, old process name=None
+spawn 308
+spawn 341
+change 341 unsaved
+
+test idle_exit_and_recovery_publish_the_current_pid ... ok
+test failed_transport_does_not_leave_old_child_alive_after_replacement ... ok
+old=330 new=340 restarts=1 published=false rows=[]
+spawn 330
+first-publication 330
+spawn 340
+no-publication 340
+change 340 unsaved
+
+context: initial=1 replacement_before_caller_push=0 replacement_after_caller_push=1; unsaved didOpen replayed
+test replacement_cannot_publish_the_first_process_diagnostics ... ok
+test restart_reopens_the_buffer_and_the_caller_reapplies_build_context_once ... ok
+sampled restart=1 PID=357; next restart=2 PID=366; context count=1
+spawn 335
+context 335
+spawn 357
+change 357 unsaved
+spawn 366
+open 366 unsaved
+context 366
+
+test context_enqueued_after_a_ready_sample_can_reach_a_later_generation_twice ... ok
+restart limit: launches=4 public=3 message=buffer change failed: language server failed after 3 restart attempts; refusing to restart again (3/3 restart(s)) — server stderr: fixture idle exit
+test idle_exit_stops_after_three_restarts ... ok
+refusal phase=Failed pid=None restarts=3 message=buffer change failed: language server failed after 3 restart attempts; refusing to restart again (3/3 restart(s)) — server stderr: fixture idle exit
+resubmit phase=Failed pid=None restarts=3 message=buffer change failed: language server failed after 3 restart attempts; refusing to restart again (3/3 restart(s)) — server stderr: fixture idle exit
+spawn 265
+context 265
+change 265 unsaved
+spawn 339
+open 339 unsaved
+change 339 unsaved
+spawn 363
+open 363 unsaved
+change 363 unsaved
+spawn 372
+open 372 unsaved
+change 372 unsaved
+
+test same_buffer_cannot_revive_an_exhausted_indexed_session ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.40s
+
+[exit code: 0]

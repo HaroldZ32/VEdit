@@ -1,0 +1,24 @@
+$ cargo +stable test --locked --offline -j 4 -p vd-lsp --test session_health recovery_coalesces_only_successful_identical_build_contexts -- --exact --nocapture
+   Compiling vd-lsp v0.5.0 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running tests/session_health.rs (target/debug/deps/session_health-2ac3201dffcf8dc9)
+
+running 1 test
+sampled PID=468, replacement PID=471, identical recovery pushes=1
+spawn 465
+context 465 "+incdir+\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/top.sv\"\n"
+spawn 468
+change 468 unsaved
+spawn 471
+open 471 unsaved
+context 471 "+incdir+\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/top.sv\"\n"
+context 471 "+incdir+\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150\"\n-D\"WIDTH=32\"\n\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/top.sv\"\n"
+context rejected 471 "+incdir+\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/new-inc\"\n-D\"WIDTH=32\"\n\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/top.sv\"\n"
+context 471 "+incdir+\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/new-inc\"\n-D\"WIDTH=32\"\n\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/top.sv\"\n"
+context 471 "+incdir+\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-interleave-446-1795758874777607150/top.sv\"\n"
+
+test recovery_coalesces_only_successful_identical_build_contexts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.63s
+
+[exit code: 0]

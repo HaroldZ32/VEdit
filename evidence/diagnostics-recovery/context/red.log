@@ -1,0 +1,37 @@
+$ cargo +stable test --locked --offline -j 4 -p vd-lsp --test session_health recovery_coalesces_only_successful_identical_build_contexts -- --exact --nocapture
+   Compiling vd-lsp v0.5.0 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s
+     Running tests/session_health.rs (target/debug/deps/session_health-2ac3201dffcf8dc9)
+
+running 1 test
+sampled PID=194, replacement PID=197, identical recovery pushes=2
+spawn 191
+context 191 "+incdir+\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/top.sv\"\n"
+spawn 194
+change 194 unsaved
+spawn 197
+open 197 unsaved
+context 197 "+incdir+\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/top.sv\"\n"
+context 197 "+incdir+\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/top.sv\"\n"
+context 197 "+incdir+\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129\"\n-D\"WIDTH=32\"\n\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/top.sv\"\n"
+context rejected 197 "+incdir+\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/new-inc\"\n-D\"WIDTH=32\"\n\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/top.sv\"\n"
+context 197 "+incdir+\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/new-inc\"\n-D\"WIDTH=32\"\n\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/top.sv\"\n"
+context 197 "+incdir+\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-interleave-172-1795758736307926129/top.sv\"\n"
+
+
+thread 'recovery_coalesces_only_successful_identical_build_contexts' (173) panicked at crates/vd-lsp/tests/session_health.rs:499:5:
+assertion `left == right` failed: the replacement received the same build context twice
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test recovery_coalesces_only_successful_identical_build_contexts ... FAILED
+
+failures:
+
+failures:
+    recovery_coalesces_only_successful_identical_build_contexts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.63s
+
+error: test failed, to rerun pass `-p vd-lsp --test session_health`
+[exit code: 101]

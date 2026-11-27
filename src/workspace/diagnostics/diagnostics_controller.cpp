@@ -580,8 +580,12 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
     } else {
         // Same file, running session: re-run the analysis on the new buffer.
         state_ = BackendState::Reparsing;
-        session_.state = BackendState::Reparsing;
         refresh();
+        if (session_.state == BackendState::Failed) {
+            // Rust starts a replacement on demand. An explicit analysis can
+            // wake it with the current buffer while idle polling stays passive.
+            lsp_->changeBuffer(file, bufferText, nullptr);
+        }
     }
     return lspStarted_;
 }
@@ -714,17 +718,16 @@ bool DiagnosticsController::serverSilent() const
     // watcher flagged it (no publishDiagnostics after the bounded settle) OR the
     // outline request came back with no symbols while no set was ever published
     // for it. Only a real publication clears the state.
-    if (analysisFile_.isEmpty()) {
+    if (analysisFile_.isEmpty() || !lspStarted_ || session_.state != BackendState::Ready) {
         return false;
     }
     if (notAnalyzedReason_.value(analysisFile_) == QStringLiteral("server-silent")) {
         return true;
     }
-    // The other half of AC-2: no documentSymbol either, and no set was ever
-    // published for the file. Both surfaces empty is "not analysed", not "a
-    // clean file with no symbols".
-    return navigation_ == 0 && outlineRequest_ == 0 && lspStarted_ && session_.state == BackendState::Ready
-        && outline_.isEmpty() && !publishedDiagnosticsFiles_.contains(analysisFile_);
+    // A completed round with neither a diagnostics publication nor symbols.
+    return state_ != BackendState::Reparsing && navigation_ == 0 && outlineRequest_ == 0
+        && lspDiagnostics_.isEmpty() && outline_.isEmpty()
+        && !publishedDiagnosticsFiles_.contains(analysisFile_);
 }
 
 void DiagnosticsController::startLsp()
@@ -750,6 +753,8 @@ void DiagnosticsController::startLsp()
     if (lsp_->start(lsPath_, workspaceRoot_, rulesPath_, files_, &error)) {
         runningProjectIndex_ = realtimeProjectIndex_;
         lspStarted_ = true;
+        lastRestartsSeen_ = 0;
+        buildContextPushed_ = false;
         ++lspStarts_;
         report_.lspMessage = QCoreApplication::translate("VEdit", "session started over %1 file(s)").arg(files_.size());
     } else {
@@ -790,11 +795,84 @@ void DiagnosticsController::startLints()
     }
 }
 
+void DiagnosticsController::clearLspResults()
+{
+    // Other sessions' retained verdicts and the independent project pass stay valid.
+    for (const QString &file : publishedDiagnosticsFiles_) {
+        clearRetainedRows(file);
+        lowerAnalyzed_.remove(file);
+    }
+    diagnostics_.removeIf([this](const DiagnosticEntry &entry) {
+        return publishedDiagnosticsFiles_.contains(entry.file);
+    });
+    if (!isScopeExcluded(analysisFile_)) {
+        markNotAnalyzed(analysisFile_, QStringLiteral("pending"));
+    }
+    publishedDiagnosticsFiles_.clear();
+    outline_.clear();
+    // Drain old replies without applying them to the new process's view.
+    for (DiagnosticTicket &ticket : lspDiagnostics_) {
+        ticket.file.clear();
+    }
+    symbolsRequested_ = false;
+    lspDiagnosticsRequested_ = false;
+    bufferApplied_ = false;
+    bufferDiagnosticsSeen_ = false;
+    serverSilentSinceMs_ = 0;
+}
+
+void DiagnosticsController::sampleLspSession()
+{
+    if (!lsp_ || !lspStarted_) {
+        return;
+    }
+    SessionSnapshot next = lsp_->status();
+    next.state = backendState(next.state);
+    const bool failed = next.state == BackendState::Failed;
+    const bool stateChanged = next.state != session_.state;
+    const bool restarted = next.state == BackendState::Ready && next.restarts != lastRestartsSeen_;
+    const bool recovered = next.state == BackendState::Ready && session_.state == BackendState::Failed;
+    const bool healthChanged = stateChanged || restarted || (failed &&
+        (next.message != session_.message || next.restarts != session_.restarts));
+    if (!healthChanged && state_ != BackendState::Reparsing) {
+        return;
+    }
+    if ((failed && stateChanged) || restarted || recovered) {
+        clearLspResults();
+        state_ = BackendState::Reparsing;
+    }
+    if (restarted) {
+        lastRestartsSeen_ = next.restarts;
+        buildContextPushed_ = false;
+    }
+    if (restarted || recovered) {
+        lastError_.clear();
+    }
+    session_ = std::move(next);
+    report_.lspFilesOpened = session_.filesOpened;
+    report_.lspReceivedWholeSet = session_.filesOpened == files_.size()
+        && session_.filesExpected == files_.size();
+    if (healthChanged || !session_.message.isEmpty()) {
+        report_.lspMessage = session_.message;
+    }
+    if (failed) {
+        lastError_ = session_.message;
+    }
+    if (healthChanged) {
+        invalidateView();
+    }
+}
+
 void DiagnosticsController::refresh()
 {
     // T8: the project pass is polled independently of the LSP reparse state -
     // a single-file diagnostic must never wait for the pass (AC-2.6).
     pollProjectPass();
+    sampleLspSession();
+    if (lsp_ && outlineRequest_ != 0 && !symbolsRequested_
+        && !lsp_->poll(outlineRequest_).pending) {
+        outlineRequest_ = 0;
+    }
     if (state_ != BackendState::Reparsing) {
         // R2 / one count: a finished project pass (or an edited file falling
         // back) changes the merged view while the LSP is not reparsing. The
@@ -809,30 +887,17 @@ void DiagnosticsController::refresh()
         // published nothing for. It runs OUTSIDE the analysis round, so the
         // "not analysed" state is visible immediately (a late publish - e.g.
         // right after the AC-1 build context - is still picked up).
-        pollServerSilence();
+        if (session_.state == BackendState::Ready) {
+            pollServerSilence();
+        } else {
+            collectLspDiagnostics();
+        }
         return;
     }
 
     if (lsp_ && lspStarted_) {
-        session_ = lsp_->status();
-        session_.state = backendState(session_.state);
-        report_.lspFilesOpened = session_.filesOpened;
-        report_.lspReceivedWholeSet =
-            session_.filesOpened == files_.size() && session_.filesExpected == files_.size();
-        if (!session_.message.isEmpty()) {
-            report_.lspMessage = session_.message;
-        }
         if (session_.state == BackendState::Ready) {
             const qint64 now = QDateTime::currentMSecsSinceEpoch();
-            // batch-20261118 AC-3: a lazily restarted server is a NEW process
-            // with NO build context and no published sets. The restart count is
-            // the observable that says so.
-            if (session_.restarts != lastRestartsSeen_) {
-                lastRestartsSeen_ = session_.restarts;
-                buildContextPushed_ = false;
-                publishedDiagnosticsFiles_.clear();
-                serverSilentSinceMs_ = 0;
-            }
             // batch-20261118 AC-1: the project's include dirs / defines / build
             // files reach slang-server through `workspace/executeCommand` once
             // the session is Ready (and again after every re-selection, which
@@ -863,9 +928,7 @@ void DiagnosticsController::refresh()
                     // rows may already have moved it). Re-read AFTER the command
                     // and only then record the floor the settle window must
                     // clear: a poll at or below it is still the pre-edit set.
-                    session_ = lsp_->status();
-                    session_.state = backendState(session_.state);
-                    bufferGenerationAtApply_ = session_.generation;
+                    bufferGenerationAtApply_ = lsp_->status().generation;
                     bufferDiagnosticsSeen_ = false;
                     // Re-ask on the next tick: the server publishes the new
                     // diagnostics asynchronously and the request returns the
@@ -925,11 +988,11 @@ void DiagnosticsController::refresh()
 
     // The timer that requested a user action owns its reply. Automatic outline
     // polling must never consume definition, references, or formatting results.
-    if (lsp_ && outlineRequest_ != 0) {
+    if (lsp_ && symbolsRequested_ && outlineRequest_ != 0) {
         const LspPolled polled = lsp_->poll(outlineRequest_);
         if (!polled.pending) {
             outlineRequest_ = 0;
-            if (symbolsRequested_ && polled.ready && polled.kind == ResponseKind::Symbols) {
+            if (polled.ready && polled.kind == ResponseKind::Symbols) {
                 outline_ = polled.symbols;
             }
         }
@@ -1003,7 +1066,7 @@ void DiagnosticsController::collectLspDiagnostics()
             pending.append(ticket);
             continue;
         }
-        if (ticket.analysis != analysisCount_) {
+        if (ticket.file.isEmpty() || ticket.analysis != analysisCount_) {
             continue;
         }
         if (polled.failed) {
@@ -1019,26 +1082,19 @@ void DiagnosticsController::collectLspDiagnostics()
             // Keep the explicit not-analysed state and re-ask inside a bounded
             // window, so a publish that lands just after the build context was
             // accepted (AC-1) is still picked up.
-            markNotAnalyzed(ticket.file, QStringLiteral("server-silent"));
+            if (notAnalyzedReason_.value(ticket.file) != QStringLiteral("server-silent")) {
+                markNotAnalyzed(ticket.file, QStringLiteral("server-silent"));
+            }
             if (ticket.file == analysisFile_) {
-                // The server ANSWERED for the post-edit text (with "no entry"),
-                // so the buffer-settle wait is over. This does NOT read as
-                // "0 problems": the file keeps the not-analysed state until a
-                // set is really published.
+                // The reply ends the buffer-settle wait. Only a publication
+                // can establish a verdict.
                 bufferDiagnosticsSeen_ = true;
+                if (serverSilentSinceMs_ == 0) {
+                    serverSilentSinceMs_ = QDateTime::currentMSecsSinceEpoch();
+                }
             }
-            if (serverSilentSinceMs_ == 0) {
-                serverSilentSinceMs_ = QDateTime::currentMSecsSinceEpoch();
-            }
-            // The round is NOT kept open here: the terminal state must land
-            // immediately (a server that never publishes cannot leave the panel
-            // "analyzing" forever). The bounded re-ask continues outside the
-            // round (pollServerSilence), so a late publish is still picked up.
-            invalidateView();
             continue;
         }
-        publishedDiagnosticsFiles_.insert(ticket.file);
-        serverSilentSinceMs_ = 0;
         if (bufferApplied_ && ticket.file == analysisFile_) {
             // batch-20261117 (AC-4): a poll answers the CURRENT server snapshot,
             // so the first completed poll after didChange may still carry the
@@ -1055,6 +1111,10 @@ void DiagnosticsController::collectLspDiagnostics()
                 continue;
             }
             bufferDiagnosticsSeen_ = true;
+        }
+        publishedDiagnosticsFiles_.insert(ticket.file);
+        if (ticket.file == analysisFile_) {
+            serverSilentSinceMs_ = 0;
         }
         // One analysis = one truth per file: replace the previous entries of
         // this file instead of appending, so re-requesting diagnostics after a
@@ -1090,6 +1150,10 @@ void DiagnosticsController::pollServerSilence()
     if (analysisFile_.isEmpty() || !lspStarted_ || !lsp_) {
         return;
     }
+    if (!lspDiagnostics_.isEmpty()) {
+        collectLspDiagnostics();
+        return;
+    }
     if (notAnalyzedReason_.value(analysisFile_) != QStringLiteral("server-silent")) {
         return;
     }
@@ -1097,17 +1161,15 @@ void DiagnosticsController::pollServerSilence()
     if (serverSilentSinceMs_ == 0 || now - serverSilentSinceMs_ > kServerSilentReaskMs) {
         return; // the window is over: the not-analysed state stands
     }
-    if (lspDiagnostics_.isEmpty()) {
-        const QStringList &scope = realtimeRequestFiles_.isEmpty() ? files_
-                                                                   : realtimeRequestFiles_;
-        for (const QString &file : scope) {
-            if (isScopeExcluded(file)) {
-                continue;
-            }
-            const quint64 id = lsp_->requestDiagnostics(file);
-            if (id != 0) {
-                lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
-            }
+    const QStringList &scope = realtimeRequestFiles_.isEmpty() ? files_
+                                                               : realtimeRequestFiles_;
+    for (const QString &file : scope) {
+        if (isScopeExcluded(file)) {
+            continue;
+        }
+        const quint64 id = lsp_->requestDiagnostics(file);
+        if (id != 0) {
+            lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
         }
     }
     collectLspDiagnostics();
@@ -1188,8 +1250,8 @@ void DiagnosticsController::finaliseState()
     const bool bufferPublishing =
         bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
         && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= kBufferSettleMs;
-    if (lspPending || bufferPublishing || (!lspFailed && outlineRequest_ != 0)
-        || !lints_.isEmpty() || !lspDiagnostics_.isEmpty()) {
+    if (lspPending || !lints_.isEmpty()
+        || (!lspFailed && (bufferPublishing || outlineRequest_ != 0 || !lspDiagnostics_.isEmpty()))) {
         return;
     }
 
@@ -1230,6 +1292,10 @@ void DiagnosticsController::composeSessionMessage()
         ? mergedDiagnosticCount()
         : static_cast<int>(mergedDiagnosticsForFile(analysisFile_).size());
     session_.diagnostics = mergedCount;
+    lastSessionMessageRevision_ = changeSerial_;
+    if (lspStarted_ && session_.state == BackendState::Failed) {
+        return;
+    }
     session_.message = QStringLiteral("%1: lsp %2/%3 file(s), diagnostics %4")
                            .arg(describeState(state_))
                            .arg(report_.lspFilesOpened)
@@ -1239,7 +1305,6 @@ void DiagnosticsController::composeSessionMessage()
     // rows cannot carry one through the C ABI. Name that side (never a silent
     // disagreement between the pass and the server rows).
     session_.message += waiverScopeNote();
-    lastSessionMessageRevision_ = changeSerial_;
 }
 
 quint64 DiagnosticsController::requestDefinition(const QString &file, int line, int character)
