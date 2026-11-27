@@ -25,12 +25,11 @@
 //!
 //! # Bounds (AC-3.5)
 //!
-//! The run is bounded by [`HierarchyOptions::timeout`] and
-//! [`HierarchyOptions::max_json_bytes`]. A project above the declared size limits
-//! still runs, but the report carries a [`HierarchyReport::warning`] the UI must
-//! show, so an oversized project is never silently slow.
+//! [`HierarchyOptions::timeout`] bounds the compiler run. The legacy hierarchy
+//! limits the raw JSON size. Editor navigation streams its input and bounds the
+//! retained AST and the expanded graph separately.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
 use std::path::{Path, PathBuf};
@@ -77,7 +76,8 @@ pub struct HierarchyOptions {
     pub defines: Vec<String>,
     /// Wall-clock budget for the run.
     pub timeout: Duration,
-    /// Cap for the AST JSON file.
+    /// Raw AST JSON limit for the legacy hierarchy report. Editor navigation
+    /// uses independent retention limits.
     pub max_json_bytes: usize,
     /// Oversize threshold for the file set (AC-3.5).
     pub max_files: usize,
@@ -475,24 +475,21 @@ fn elaborate_impl(
         report.elapsed = started.elapsed();
         return report;
     }
-    if metadata.len() > options.max_json_bytes as u64 {
-        report.failure = Some(LintFailure::AstJsonTooLarge {
-            limit: options.max_json_bytes,
-        });
-        report.elapsed = started.elapsed();
-        return report;
-    }
-    let text = match std::fs::read_to_string(&json_path) {
-        Ok(text) => text,
-        Err(error) => {
-            report.failure = Some(LintFailure::Io {
-                message: format!("reading {} failed: {error}", json_path.display()),
-            });
-            report.elapsed = started.elapsed();
-            return report;
-        }
+    let parsed = if let (Some(_), Some(cancel)) = (&navigation, cancel) {
+        navigation::read_ast(&json_path, &root, cancel).and_then(|document| {
+            build_design(&document, Some(&navigation::GraphBudget::new(cancel)))
+        })
+    } else {
+        read_hierarchy(
+            &json_path,
+            metadata.len(),
+            options,
+            &root,
+            exit_code,
+            &stderr,
+        )
     };
-    match parse_design_at(&text, Some(&root), navigation.is_some()) {
+    match parsed {
         Ok(design) => {
             report.instances = design.instances;
             report.signals = design.signals;
@@ -522,20 +519,40 @@ fn elaborate_impl(
                 ));
             }
         }
-        Err(message) => {
-            report.failure = Some(if message.contains("recursion limit exceeded") {
-                // Valid JSON whose hierarchy is deeper than the reader supports;
-                // never reported as a malformed document.
-                LintFailure::AstJsonNestedTooDeep { measured: None }
-            } else if exit_code != Some(0) && text.trim().is_empty() {
-                missing_output(exit_code, &stderr)
-            } else {
-                LintFailure::InvalidJson { message, stderr }
-            });
-        }
+        Err(failure) => report.failure = Some(failure),
     }
     report.elapsed = started.elapsed();
     report
+}
+
+fn read_hierarchy(
+    path: &Path,
+    len: u64,
+    options: &HierarchyOptions,
+    root: &Path,
+    exit_code: Option<i32>,
+    stderr: &str,
+) -> Result<Design, LintFailure> {
+    if len > options.max_json_bytes as u64 {
+        return Err(LintFailure::AstJsonTooLarge {
+            limit: options.max_json_bytes,
+        });
+    }
+    let text = std::fs::read_to_string(path).map_err(|error| LintFailure::Io {
+        message: format!("reading {} failed: {error}", path.display()),
+    })?;
+    parse_design_at(&text, Some(root)).map_err(|message| {
+        if message.contains("recursion limit exceeded") {
+            LintFailure::AstJsonNestedTooDeep { measured: None }
+        } else if exit_code != Some(0) && text.trim().is_empty() {
+            missing_output(exit_code, stderr)
+        } else {
+            LintFailure::InvalidJson {
+                message,
+                stderr: stderr.to_owned(),
+            }
+        }
+    })
 }
 
 /// The outcome of one whole-project tool invocation.
@@ -1065,24 +1082,32 @@ fn push_generate_blocks<'a>(
 
 /// Parse the `--ast-json` document into the report's two lists.
 fn parse_design(text: &str) -> Result<Design, String> {
-    parse_design_at(text, None, false)
+    parse_design_at(text, None)
 }
 
 /// Parse with the directory the tool ran in, so every reported path becomes
 /// absolute (see [`crate::tool_paths`]).
-fn parse_design_at(
-    text: &str,
-    tool_dir: Option<&Path>,
-    navigation: bool,
-) -> Result<Design, String> {
+fn parse_design_at(text: &str, tool_dir: Option<&Path>) -> Result<Design, String> {
     let mut document: Value = serde_json::from_str(text)
         .map_err(|error| format!("the AST JSON is malformed: {error}"))?;
     if let Some(tool_dir) = tool_dir {
         crate::tool_paths::absolutize_ast(&mut document, tool_dir);
     }
+    build_design(&document, None).map_err(|failure| match failure {
+        LintFailure::InvalidAstJson { message } => message,
+        failure => failure.user_message(),
+    })
+}
+
+fn build_design(
+    document: &Value,
+    navigation: Option<&navigation::GraphBudget<'_>>,
+) -> Result<Design, LintFailure> {
     let design = document
         .get("design")
-        .ok_or_else(|| "the AST JSON has no `design` object".to_string())?;
+        .ok_or_else(|| LintFailure::InvalidAstJson {
+            message: "the AST JSON has no `design` object".to_string(),
+        })?;
     // A whole-project elaboration (no `--top`) serialises EVERY design root as an
     // `Instance` member of `design`; taking only the first one answers for one
     // root out of a thousand and silently truncates the report.
@@ -1097,10 +1122,12 @@ fn parse_design_at(
         })
         .unwrap_or_default();
     if roots.is_empty() {
-        return Err("the AST JSON has no elaborated top instance".to_string());
+        return Err(LintFailure::InvalidAstJson {
+            message: "the AST JSON has no elaborated top instance".to_string(),
+        });
     }
 
-    let bodies = Bodies::index(&document);
+    let bodies = Bodies::index(document);
     let mut instances = Vec::new();
     let mut signals = Vec::new();
     for root in roots {
@@ -1112,10 +1139,11 @@ fn parse_design_at(
             &mut instances,
             &mut signals,
             navigation,
-        );
+            0,
+        )?;
     }
-    if navigation {
-        navigation::connect_parent_ports(&mut signals);
+    if let Some(budget) = navigation {
+        navigation::connect_parent_ports(&mut signals, budget)?;
     } else {
         link_chains(&mut signals);
     }
@@ -1128,13 +1156,22 @@ fn walk_instance<'a>(
     bodies: &Bodies<'a>,
     instances: &mut Vec<InstanceNode>,
     signals: &mut Vec<SignalInfo>,
-    navigation: bool,
-) {
+    navigation: Option<&navigation::GraphBudget<'_>>,
+    depth: usize,
+) -> Result<(), LintFailure> {
     let Some(body) = bodies.of(instance) else {
-        return;
+        return Ok(());
     };
     let module = body.get("name").and_then(Value::as_str).unwrap_or("");
     let (file, line, column) = symbol_position(instance).unwrap_or_default();
+    if let Some(budget) = navigation {
+        if depth == 128 {
+            return Err(LintFailure::InvalidAstJson {
+                message: "the elaborated instance chain is too deep for signal tracing".to_string(),
+            });
+        }
+        budget.charge(128 + path.len() + module.len() + file.as_os_str().len())?;
+    }
     instances.push(InstanceNode {
         path: path.to_string(),
         module: module.to_string(),
@@ -1155,7 +1192,8 @@ fn walk_instance<'a>(
     let mut scoped: Vec<(&Value, String)> = Vec::new();
     scope_instances(&members, path, &mut scoped);
 
-    let mut local: Vec<SignalInfo> = Vec::new();
+    let mut local = Vec::new();
+    let mut names = HashSet::new();
     for member in &members {
         let kind = member.get("kind").and_then(Value::as_str).unwrap_or("");
         if !matches!(kind, "Net" | "Variable" | "Port") {
@@ -1164,17 +1202,20 @@ fn walk_instance<'a>(
         let Some(name) = member.get("name").and_then(Value::as_str) else {
             continue;
         };
-        if name.is_empty()
-            || local
-                .iter()
-                .any(|signal| signal.path == format!("{path}.{name}"))
-        {
+        if name.is_empty() || !names.insert(name) {
             continue;
+        }
+        let declaration = symbol_position(member);
+        if let Some(budget) = navigation {
+            let file_len = declaration
+                .as_ref()
+                .map_or(0, |site| site.0.as_os_str().len());
+            budget.charge(384 + 3 * (path.len() + name.len() + file_len))?;
         }
         local.push(SignalInfo {
             path: format!("{path}.{name}"),
             kind: kind.to_string(),
-            declaration: symbol_position(member),
+            declaration,
             drivers: Vec::new(),
             loads: Vec::new(),
             chain: Vec::new(),
@@ -1182,15 +1223,24 @@ fn walk_instance<'a>(
         });
     }
 
-    if navigation {
-        navigation::record_scope(&members, &scoped, &mut local);
+    if let Some(budget) = navigation {
+        navigation::record_scope(&members, &scoped, &mut local, budget)?;
     } else {
         record_legacy_endpoints(path, &members, &scoped, &mut local);
     }
     signals.extend(local);
     for (child, child_path) in &scoped {
-        walk_instance(child, child_path, bodies, instances, signals, navigation);
+        walk_instance(
+            child,
+            child_path,
+            bodies,
+            instances,
+            signals,
+            navigation,
+            depth + 1,
+        )?;
     }
+    Ok(())
 }
 
 fn record_legacy_endpoints(
@@ -1432,4 +1482,47 @@ pub fn is_empty(report: &HierarchyReport) -> bool {
 #[must_use]
 pub fn resolution(options: &HierarchyOptions) -> BinaryResolution {
     resolve_binary_for_current_process(options.slang_binary.as_deref())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn streamed_navigation_matches_the_small_whole_document_graph() -> anyhow::Result<()> {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/hierarchy");
+        let path = root.join("ast.json");
+        let cancel = AtomicBool::new(false);
+        let projected = navigation::read_ast(&path, &root, &cancel)
+            .map_err(|failure| anyhow::anyhow!(failure.user_message()))?;
+        let mut complete: Value = serde_json::from_reader(File::open(path)?)?;
+        crate::tool_paths::absolutize_ast(&mut complete, &root);
+        let budget = navigation::GraphBudget::new(&cancel);
+        let streamed = build_design(&projected, Some(&budget))
+            .map_err(|failure| anyhow::anyhow!(failure.user_message()))?;
+        let budget = navigation::GraphBudget::new(&cancel);
+        let whole = build_design(&complete, Some(&budget))
+            .map_err(|failure| anyhow::anyhow!(failure.user_message()))?;
+        assert_eq!(streamed.instances, whole.instances);
+        assert_eq!(streamed.signals, whole.signals);
+        Ok(())
+    }
+
+    #[test]
+    fn navigation_discards_cancelled_and_malformed_artifacts() -> std::io::Result<()> {
+        let artifact = tempfile::NamedTempFile::new()?;
+        std::fs::write(artifact.path(), b"{\"design\":{\"kind\":\"Root\"}} {}")?;
+        let cancel = AtomicBool::new(false);
+        let root = Path::new(".");
+        assert!(matches!(
+            navigation::read_ast(artifact.path(), root, &cancel),
+            Err(LintFailure::InvalidAstJson { .. })
+        ));
+        cancel.store(true, Ordering::Relaxed);
+        assert!(matches!(
+            navigation::read_ast(artifact.path(), root, &cancel),
+            Err(LintFailure::Cancelled)
+        ));
+        Ok(())
+    }
 }

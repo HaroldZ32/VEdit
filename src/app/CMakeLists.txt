@@ -267,7 +267,9 @@ if(TARGET vedit_workspace_signal_trace AND TARGET vedit_editor_core AND TARGET Q
   target_include_directories(vedit-signal-trace-selftest PRIVATE "../editor/kernel")
   add_test(NAME vedit-signal-trace-selftest COMMAND vedit-signal-trace-selftest
     "${trace_fixture}" "${CMAKE_SOURCE_DIR}/build/slang/out/slang")
-  set_tests_properties(vedit-signal-trace-selftest PROPERTIES
+  add_test(NAME vedit-signal-trace-oversize-selftest COMMAND vedit-signal-trace-selftest
+    "${trace_fixture}" "${CMAKE_SOURCE_DIR}/build/slang/out/slang" --oversize)
+  set_tests_properties(vedit-signal-trace-selftest vedit-signal-trace-oversize-selftest PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;VEDIT_NO_ENV_AUTOCAPTURE=1" SKIP_RETURN_CODE 77 TIMEOUT 40)
 endif()
 

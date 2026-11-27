@@ -1271,22 +1271,19 @@ unsafe fn start_hierarchy(
         return 0;
     }
     // SAFETY: the option pointers are null or valid strings per the contract.
-    let mut hierarchy = match unsafe { build_hierarchy_options(&options) } {
+    let hierarchy = match unsafe { build_hierarchy_options(&options) } {
         Ok(built) => built,
         Err(message) => {
             state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
             return 0;
         }
     };
-    if root.is_some() {
-        if file_set.len() > 2000 {
-            state.record_error(VdError::new(
-                VD_ERR_INVALID_ARGUMENT,
-                "signal tracing supports up to 2000 source files",
-            ));
-            return 0;
-        }
-        hierarchy.max_json_bytes = 96 * 1024 * 1024;
+    if root.is_some() && file_set.len() > 2000 {
+        state.record_error(VdError::new(
+            VD_ERR_INVALID_ARGUMENT,
+            "signal tracing supports up to 2000 source files",
+        ));
+        return 0;
     }
     let id = FIRST_HIER_ID + NEXT_HIERARCHY.fetch_add(1, Ordering::Relaxed);
     let slot = Arc::new(HierarchySlot {
