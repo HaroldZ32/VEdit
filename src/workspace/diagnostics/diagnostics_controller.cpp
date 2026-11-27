@@ -953,6 +953,7 @@ void DiagnosticsController::refresh()
                     // clear: a poll at or below it is still the pre-edit set.
                     bufferGenerationAtApply_ = lsp_->status().generation;
                     bufferDiagnosticsSeen_ = false;
+                    serverSilentSinceMs_ = 0;
                     // Re-ask on the next tick: the server publishes the new
                     // diagnostics asynchronously and the request returns the
                     // CURRENT snapshot immediately.
@@ -1112,9 +1113,8 @@ void DiagnosticsController::collectLspDiagnostics()
                 markNotAnalyzed(ticket.file, QStringLiteral("server-silent"));
             }
             if (ticket.file == analysisFile_) {
-                // The reply ends the buffer-settle wait. Only a publication
-                // can establish a verdict.
-                bufferDiagnosticsSeen_ = true;
+                // This completes only the snapshot request. Keep the buffer
+                // settle window open until the server publishes or it expires.
                 if (serverSilentSinceMs_ == 0) {
                     serverSilentSinceMs_ = QDateTime::currentMSecsSinceEpoch();
                 }
@@ -1270,9 +1270,8 @@ void DiagnosticsController::finaliseState()
 {
     const bool lspPending = lspStarted_ && session_.state == BackendState::Reparsing;
     const bool lspFailed = lspStarted_ && session_.state == BackendState::Failed;
-    // T118: a buffer edit is not "done" until the server published the new
-    // diagnostics (bounded by the 1.5 s grace) - otherwise the state turns Ready
-    // and the panel stops polling before the edit's diagnostics exist.
+    // Keep polling for diagnostics on the edited buffer until a publication
+    // arrives or the settle window expires.
     const bool bufferPublishing =
         bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
         && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= kBufferSettleMs;
