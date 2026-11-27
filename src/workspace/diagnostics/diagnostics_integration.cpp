@@ -58,11 +58,9 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFrame>
-#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
 #include <QFutureWatcher>
 #include <QPromise>
 #include <QThreadPool>
-#endif
 #include <QHash>
 #include <QInputDialog>
 #include <QKeySequence>
@@ -90,6 +88,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -235,9 +234,7 @@ public:
         debounce_->setInterval(700);
         connect(debounce_, &QTimer::timeout, this, [this]() { analyze(); });
         connect(tick_, &QTimer::timeout, this, [this]() { poll(); });
-#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-        connect(&closureWorker_, &QFutureWatcherBase::finished, this, [this]() { finishBufferClosure(); });
-#endif
+        connect(&analysisWorker_, &QFutureWatcherBase::finished, this, [this]() { finishAnalysis(); });
         tick_->start(400);
         // N2-r: subscribe on the ONE open seam (ApplicationShell::fileOpened), so
         // the document is already tracked when the user's FIRST keystroke lands.
@@ -247,19 +244,10 @@ public:
                          [this](const QString &path) { trackOpenedPath(path); });
     }
 
-    /// T11: a backend switch re-runs the analysis of the SAME active buffer
-    /// immediately (no application restart, no panel rebuild).
-    ///
-    /// It also invalidates the watcher's change baseline for that buffer: the
-    /// verdict on screen was produced by the OLD engine, so the next 400 ms tick
-    /// must treat the buffer as CHANGED (`markFileEdited` + the debounce). The
-    /// pre-cap code did that by clearing `lastText_`, which made the next poll's
-    /// text comparison differ and take the edit branch; this flag keeps the same
-    /// one-shot contract without copying the document to express it.
     void reanalyzeNow()
     {
+        ++analysisScopeVersion_;
         analyze();
-        invalidateNextChange_ = true;
     }
 
 private:
@@ -513,7 +501,9 @@ private:
             connect(text, &QTextDocument::contentsChanged, this, edited);
         }
         connect(document, &QObject::destroyed, this, [this, document]() {
-            if (discardBufferClosure(documents_.take(document))) {
+            const QString closed = documents_.take(document);
+            controller_->invalidateBufferAnalysis(closed);
+            if (discardBufferClosure(closed)) {
                 debounce_->start();
             }
         });
@@ -538,13 +528,14 @@ private:
                                            ? shell_->editorArea()->activePane()
                                            : nullptr;
         const bool active = pane != nullptr && pane->currentFilePath() == file;
-#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
         if (active) {
-            closureWaiting_ = false; // respect the active edit's debounce
+            if (lastDocument_ == document) {
+                lastRevision_ = documentRevision(document);
+            }
         }
-#endif
         if (active || closureRemoved) {
-            debounce_->start(); // a removed background closure also changes the session union
+            debouncedDocument_ = active ? document : bufferDocument(pane ? pane->editorWidget() : nullptr);
+            debounce_->start();
         }
     }
 
@@ -571,7 +562,9 @@ private:
         const QString path = pane->currentFilePath();
         QWidget *widget = pane->editorWidget();
         if (path.isEmpty() || widget == nullptr) {
+            controller_->invalidateBufferAnalysis(lastPath_);
             lastPath_.clear();
+            lastDocument_.clear();
             lastRevision_ = -1;
             return;
         }
@@ -586,36 +579,21 @@ private:
         // idle (import a `.f`, switch the root) re-scopes the running session on
         // THIS tick - otherwise a document opened before the import would keep
         // its place in the compile set until the next keystroke.
-        if (refreshProjectScope()) {
-            lastRevision_ = bufferRevision(widget);
-            analyze();
-            return;
-        }
-        if (path != lastPath_) {
+        const bool scopeChanged = refreshProjectScope();
+        QObject *document = bufferDocument(widget);
+        if (path != lastPath_ || document != lastDocument_) {
+            controller_->invalidateBufferAnalysis(lastPath_);
             lastPath_ = path;
-            lastRevision_ = bufferRevision(widget);
-            invalidateNextChange_ = false; // a path switch supersedes the forced edit
-            // N2: the first edit of a newly opened file can land before this
-            // poll subscribed to its document (the tab is enumerated only here).
-            // That edit emitted no signal we could hear, so the buffer's dirty
-            // flag is the only evidence left - and it must invalidate the old
-            // project verdict now, or the upper layer suppresses the fresh
-            // file-scope analysis until some later keystroke.
+            lastDocument_ = document;
+            lastRevision_ = documentRevision(document);
             if (bufferModified(widget)) {
                 controller_->markFileEdited(path);
             }
             analyze();
             return;
         }
-        if (invalidateNextChange_) {
-            // `reanalyzeNow()`'s one-shot contract (see its comment): the backend
-            // switch already re-analysed the buffer, but the verdict from the old
-            // engine must be invalidated by the same edit path a real change
-            // takes. No text is copied to decide this.
-            invalidateNextChange_ = false;
-            lastRevision_ = bufferRevision(widget);
-            controller_->markFileEdited(path);
-            debounce_->start();
+        if (scopeChanged) {
+            analyze();
             return;
         }
         const qint64 revision = bufferRevision(widget);
@@ -627,9 +605,7 @@ private:
             if (bufferModified(widget)) {
                 discardBufferClosure(path);
                 controller_->markFileEdited(path);
-#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-                closureWaiting_ = false;
-#endif
+                debouncedDocument_ = document;
                 debounce_->start();
             }
         }
@@ -662,9 +638,9 @@ private:
         catalogCutoff_ = catalogCutoff;
         hasFilelist_ = project;
         bufferClosures_.clear();
+        ++analysisScopeVersion_;
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
         bufferClosureKeys_.clear();
-        ++closureScopeVersion_;
 #endif
         shadowedFiles_ = shadowed;
         shadowedFileSet_ = diagnostics::realtime_scope::shadowedFileSetFrom(shadowed);
@@ -684,22 +660,38 @@ private:
     {
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
         bufferClosureKeys_.remove(path);
-        if (path == closureWorkerPath_) {
-            closureWorkerKey_.document.clear();
-        }
 #endif
         return bufferClosures_.remove(path);
     }
+
+    struct DiskStamp {
+        QDateTime time;
+        qint64 size = 0;
+        size_t contentHash = 0;
+        bool modified = false;
+        bool operator==(const DiskStamp &) const = default;
+    };
+
+    struct AnalysisSnapshot {
+        QString text;
+        DiskStamp disk;
+        std::optional<QStringList> closure;
+    };
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
     struct BufferClosureKey {
         QPointer<QObject> document;
         qint64 revision = -1;
-        QDateTime diskTime;
-        qint64 diskSize = 0;
-        size_t diskHash = 0;
-        bool modified = false;
-        bool operator==(const BufferClosureKey &) const = default;
+        DiskStamp disk;
+    };
+
+    struct ClosureInputs {
+        QVariantMap owners;
+        QStringList children;
+        QList<diagnostics::realtime_scope::CatalogDependencySite> sites;
+        qint64 catalogCutoff = 0;
+        std::optional<DiskStamp> cachedDisk;
+        QStringList cachedChildren;
     };
 
     static QStringList collectBufferClosure(const QString &text, const QString &catalogDisk,
@@ -752,79 +744,52 @@ private:
         return children;
     }
 
-    bool prepareBufferClosure(const QFileInfo &source, QObject *document, const QString &disk,
-                              const QString &text, bool modified)
+    ClosureInputs closureInputs(const QString &path, QObject *document, qint64 revision) const
     {
         namespace scope = diagnostics::realtime_scope;
-        const QString path = source.filePath();
-        const QVariantMap owners = shell_->property("vedit.moduleTree.owners").toMap();
         if (document == nullptr || !hasFilelist_ || !scope::isGoldenFile(goldenFiles_, path)
-            || scope::isShadowedFile(shadowedFileSet_, path) || owners.isEmpty()) {
-            discardBufferClosure(path);
-            return true;
+            || scope::isShadowedFile(shadowedFileSet_, path)) {
+            return {};
         }
-        const QDateTime diskTime = source.lastModified();
-        const bool catalogSawDisk = catalogCutoff_ > 0 && diskTime.isValid()
-            && diskTime.toMSecsSinceEpoch() < catalogCutoff_;
-        const bool compareSites = modified && catalogSawDisk;
-        const BufferClosureKey key{document, documentRevision(document), diskTime, source.size(),
-                                   compareSites ? qHash(disk) : 0, modified};
+        ClosureInputs input;
+        input.owners = shell_->property("vedit.moduleTree.owners").toMap();
+        if (input.owners.isEmpty()) {
+            return input;
+        }
+        input.catalogCutoff = catalogCutoff_;
+        input.children = scope::closureFilesFor(moduleClosure(), path);
+        const auto allSites = shell_->property("vedit.moduleTree.closureSites").value<scope::CatalogDependencySites>();
+        auto fileSites = allSites.constFind(scope::normalizeFileKey(path));
+        if (fileSites == allSites.cend()) {
+            fileSites = allSites.constFind(scope::canonicalDirectoryVariant(path));
+        }
+        if (fileSites != allSites.cend()) {
+            input.sites = *fileSites;
+        }
         const auto cached = bufferClosureKeys_.constFind(path);
-        if (cached != bufferClosureKeys_.cend() && *cached == key) {
-            return true;
+        if (cached != bufferClosureKeys_.cend() && cached->document == document && cached->revision == revision) {
+            input.cachedDisk = cached->disk;
+            input.cachedChildren = bufferClosures_.value(path);
         }
-        bufferClosureKeys_.remove(path);
-        bufferClosures_.remove(path);
-        closureWaiting_ = true;
-        if (!closureWorkerPath_.isEmpty()) {
-            return false; // the completion retries the active tab, with fresh inputs
-        }
-
-        const QStringList catalogChildren = scope::closureFilesFor(moduleClosure(), path);
-        QList<scope::CatalogDependencySite> sites;
-        if (compareSites) {
-            const auto allSites = shell_->property("vedit.moduleTree.closureSites")
-                .value<scope::CatalogDependencySites>();
-            auto fileSites = allSites.constFind(scope::normalizeFileKey(path));
-            if (fileSites == allSites.cend()) {
-                fileSites = allSites.constFind(scope::canonicalDirectoryVariant(path));
-            }
-            if (fileSites != allSites.cend()) {
-                sites = *fileSites;
-            }
-        }
-        closureWorkerPath_ = path;
-        closureWorkerKey_ = key;
-        closureWorkerScopeVersion_ = closureScopeVersion_;
-        const QString catalogDisk = sites.isEmpty() ? QString() : disk;
-        QPromise<QStringList> promise;
-        closureWorker_.setFuture(promise.future());
-        QThreadPool::globalInstance()->start([text, catalogDisk, owners, catalogChildren, sites,
-                                             unchanged = !modified && catalogSawDisk,
-                                             promise = std::move(promise)]() mutable {
-            promise.start();
-            promise.addResult(collectBufferClosure(text, catalogDisk, owners, catalogChildren, sites, unchanged));
-            promise.finish();
-        });
-        return false;
+        return input;
     }
 
-    void finishBufferClosure()
+    static void completeClosure(AnalysisSnapshot &snapshot, const QString &disk, const ClosureInputs &input)
     {
-        const QString path = std::exchange(closureWorkerPath_, QString());
-        const auto &key = closureWorkerKey_;
-        const bool scopeChanged = refreshProjectScope();
-        if (closureWorkerScopeVersion_ == closureScopeVersion_ && key.document
-            && documents_.value(key.document) == path && documentRevision(key.document) == key.revision) {
-            const QFileInfo source(path);
-            if (source.lastModified() == key.diskTime && source.size() == key.diskSize) {
-                bufferClosureKeys_.insert(path, key);
-                bufferClosures_.insert(path, closureWorker_.result());
-            }
+        if (input.owners.isEmpty()) {
+            return;
         }
-        if (std::exchange(closureWaiting_, false) || scopeChanged) {
-            analyze();
+        const bool catalogSawDisk = input.catalogCutoff > 0 && snapshot.disk.time.isValid()
+            && snapshot.disk.time.toMSecsSinceEpoch() < input.catalogCutoff;
+        const bool compareSites = snapshot.disk.modified && catalogSawDisk;
+        snapshot.disk.contentHash = compareSites ? qHash(disk) : 0;
+        if (input.cachedDisk && *input.cachedDisk == snapshot.disk) {
+            snapshot.closure = input.cachedChildren;
+            return;
         }
+        snapshot.closure = collectBufferClosure(snapshot.text, compareSites ? disk : QString(), input.owners,
+                                                input.children, compareSites ? input.sites : decltype(input.sites){},
+                                                !snapshot.disk.modified && catalogSawDisk);
     }
 #endif
 
@@ -974,9 +939,6 @@ private:
 
     void analyze()
     {
-#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-        closureWaiting_ = false;
-#endif
         vedit::app::EditorPane *pane = shell_->editorArea() != nullptr
                                            ? shell_->editorArea()->activePane()
                                            : nullptr;
@@ -986,9 +948,18 @@ private:
         const QString path = pane->currentFilePath();
         QWidget *widget = pane->editorWidget();
         trackDocument(widget, path);
-        if (path.isEmpty() || widget == nullptr) {
-            discardBufferClosure(path);
+        QObject *document = bufferDocument(widget);
+        if (path.isEmpty() || document == nullptr) {
             return;
+        }
+        if ((debounce_->isActive() && debouncedDocument_ == document) || workerRunning_) {
+            return;
+        }
+        if (path != lastPath_ || document != lastDocument_) {
+            controller_->invalidateBufferAnalysis(lastPath_);
+            lastPath_ = path;
+            lastDocument_ = document;
+            lastRevision_ = documentRevision(document);
         }
         // RM-11: a document is analysed only when this build has an ANALYZER
         // for its language. A `.f` manifest, a `.md` note, a `.tcl` script has
@@ -1032,25 +1003,74 @@ private:
                 QCoreApplication::translate("VEdit", "the editor buffer is empty"));
             return;
         }
-        // A bounded read, not readAll(): even if the file GREW between the stat
-        // above and this line, the allocation cannot exceed the cap (plus one
-        // byte, which is how the growth is detected) - the guarantee does not
-        // rest on a racy stat.
-        QFile file(path);
-        QByteArray diskBytes;
-        if (file.open(QIODevice::ReadOnly)) {
-            diskBytes = file.read(kCapBytes + 1);
-        }
-        if (diskBytes.size() > kCapBytes) {
-            noteAnalysisDisabled(path, diskBytes.size());
-            return;
-        }
-        const QString disk = QString::fromUtf8(diskBytes);
-        const bool modified = disk != text;
         refreshProjectScope();
+        workerRunning_ = true;
+        workerPath_ = path;
+        workerDocument_ = document;
+        workerRevision_ = documentRevision(document);
+        workerScopeVersion_ = analysisScopeVersion_;
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-        if (!prepareBufferClosure(source, bufferDocument(widget), disk, text, modified)) {
+        const ClosureInputs inputs = closureInputs(path, document, workerRevision_);
+#endif
+        QPromise<AnalysisSnapshot> promise;
+        analysisWorker_.setFuture(promise.future());
+        QThreadPool::globalInstance()->start([path, text,
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+                                             inputs,
+#endif
+                                             promise = std::move(promise)]() mutable {
+            promise.start();
+            AnalysisSnapshot snapshot;
+            snapshot.text = text;
+            const QFileInfo source(path);
+            snapshot.disk.time = source.lastModified();
+            snapshot.disk.size = source.size();
+            if (snapshot.disk.size <= kCapBytes) {
+                QFile file(path);
+                const QByteArray bytes = source.isFile() && file.open(QIODevice::ReadOnly)
+                    ? file.read(kCapBytes + 1) : QByteArray();
+                snapshot.disk.size = qMax(snapshot.disk.size, static_cast<qint64>(bytes.size()));
+                if (snapshot.disk.size <= kCapBytes) {
+                    const QString disk = QString::fromUtf8(bytes);
+                    snapshot.disk.modified = disk != text;
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+                    completeClosure(snapshot, disk, inputs);
+#endif
+                }
+            }
+            promise.addResult(std::move(snapshot));
+            promise.finish();
+        });
+    }
+
+    void finishAnalysis()
+    {
+        workerRunning_ = false;
+        refreshProjectScope();
+        auto *pane = shell_->editorArea() != nullptr ? shell_->editorArea()->activePane() : nullptr;
+        auto *document = pane != nullptr ? bufferDocument(pane->editorWidget()) : nullptr;
+        const bool sameDocument = document != nullptr && workerDocument_ == document
+            && pane->currentFilePath() == workerPath_;
+        const bool current = sameDocument && workerScopeVersion_ == analysisScopeVersion_
+            && documentRevision(document) == workerRevision_;
+        if (!current) {
+            if (pane && (!sameDocument || !debounce_->isActive())) {
+                analyze();
+            }
             return;
+        }
+        const QString &path = workerPath_;
+        const AnalysisSnapshot snapshot = analysisWorker_.result();
+        if (snapshot.disk.size > kCapBytes) {
+            noteAnalysisDisabled(path, snapshot.disk.size);
+            return;
+        }
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        if (snapshot.closure) {
+            bufferClosureKeys_.insert(path, BufferClosureKey{document, workerRevision_, snapshot.disk});
+            bufferClosures_.insert(path, *snapshot.closure);
+        } else {
+            discardBufferClosure(path);
         }
 #endif
         QVariantMap availability;
@@ -1065,7 +1085,7 @@ private:
         // set to the controller BEFORE the analysis, so the switch that triggered
         // this call finds the session it needs already covered.
         publishRealtimeSets(path);
-        controller_->analyzeFile(path, text, modified);
+        controller_->analyzeFile(path, snapshot.text, snapshot.disk.modified);
         publishRealtimeSets(path);
     }
 
@@ -1074,11 +1094,16 @@ private:
     QTimer *tick_ = nullptr;
     QTimer *debounce_ = nullptr;
     QString lastPath_;
-    /// O(1) document change counter; -1 when the widget has no document.
+    QPointer<QObject> lastDocument_;
     qint64 lastRevision_ = -1;
-    /// Set by `reanalyzeNow()`: the next tick treats the same path as changed
-    /// once (the pre-cap `lastText_.clear()` contract), then clears this.
-    bool invalidateNextChange_ = false;
+    QPointer<QObject> debouncedDocument_;
+    QFutureWatcher<AnalysisSnapshot> analysisWorker_;
+    QPointer<QObject> workerDocument_;
+    QString workerPath_;
+    qint64 workerRevision_ = -1;
+    quint64 analysisScopeVersion_ = 0;
+    quint64 workerScopeVersion_ = 0;
+    bool workerRunning_ = false;
     /// The last file the cap skipped (the one-line notice is emitted per file).
     QString disabledPath_;
     /// G1-a: the golden project file set (cleanPath + canonical-directory
@@ -1096,15 +1121,7 @@ private:
     diagnostics::realtime_scope::ShadowedFileSet shadowedFileSet_;
     QHash<QString, QStringList> bufferClosures_;
 #if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-    // At most one snapshot is in flight. Completed entries retain only per-tab
-    // file lists and keys. The next analysis always uses the current active tab.
-    QFutureWatcher<QStringList> closureWorker_;
-    QString closureWorkerPath_;
-    BufferClosureKey closureWorkerKey_;
     QHash<QString, BufferClosureKey> bufferClosureKeys_;
-    quint64 closureScopeVersion_ = 0;
-    quint64 closureWorkerScopeVersion_ = 0;
-    bool closureWaiting_ = false;
 #endif
     /// Open documents excluded from the session by the golden rule (published).
     int outsideFileCount_ = 0;

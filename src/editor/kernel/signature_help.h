@@ -18,12 +18,15 @@
 // The tree-sitter dependency is the syntax lane already wired into this kernel
 // (VEDIT_EDIT_CORE_HAVE_FOLDING); without it the slice degrades to "no popup".
 #include <KTextEditor/Cursor>
+#include <QFutureWatcher>
 #include <QHash>
 #include <QMetaObject>
 #include <QList>
 #include <QObject>
 #include <QString>
 #include <QStringList>
+
+#include <memory>
 
 class QFrame;
 class QLabel;
@@ -121,7 +124,9 @@ private:
     // candidates in the current document (rescanned on text change) and the index
     QList<SignatureInfo> candidatesFor(const QString &callee, const QString &kind,
                                        bool parameterList, QString *origin) const;
-    void refreshDocumentScan(const QString &text);
+    struct TreeState;
+    static std::shared_ptr<TreeState> analyzeDocument(const QString &text);
+    void finishDocumentAnalysis();
     int byteOffsetAt(const KTextEditor::Cursor &cursor) const;
 
     KTextEditor::View *view_ = nullptr;
@@ -132,8 +137,10 @@ private:
     QLabel *popupLabel_ = nullptr;
     QString projectRoot_;
     QHash<QString, QList<SignatureInfo>> index_;
-    QList<SignatureInfo> documentSignatures_;
-    QString scannedDocumentText_;
+    QFutureWatcher<std::shared_ptr<TreeState>> documentWorker_;
+    bool workerRunning_ = false;
+    qint64 workerRevision_ = -1;
+    std::shared_ptr<TreeState> tree_;
     /// T9: the document text is copied ONCE per document revision, not three
     /// times per refresh. A cursor move reuses the cache.
     QString cachedText_;
@@ -149,9 +156,6 @@ private:
     bool parameterListContext_ = false;
     QString status_;
 
-    // tree-sitter state (opaque here; see the implementation)
-    struct TreeState;
-    TreeState *tree_ = nullptr;
 };
 
 } // namespace vedit::editor

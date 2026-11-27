@@ -473,6 +473,7 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
     analysisFile_ = file;
     analysisText_ = bufferText;
     analysisDirty_ = bufferDirty;
+    analysisInvalidated_ = false;
     lspDiagnosticsRequested_ = false;
     bufferApplied_ = false;
     bufferAppliedMs_ = 0;
@@ -631,6 +632,17 @@ void DiagnosticsController::setRealtimeRequestFiles(const QStringList &files)
         lastDiagnosticsRequestFiles_.clear();
     }
     realtimeRequestFiles_ = normalized;
+}
+
+void DiagnosticsController::invalidateBufferAnalysis(const QString &path)
+{
+    if (path.isEmpty() || path != analysisFile_ || analysisInvalidated_) {
+        return;
+    }
+    analysisInvalidated_ = true;
+    analysisText_.clear();
+    outline_.clear();
+    invalidateFile(path);
 }
 
 void DiagnosticsController::setDocumentAnalysisAvailability(const QString &path, bool available,
@@ -795,7 +807,10 @@ void DiagnosticsController::refresh()
     // T8: the project pass is polled independently of the LSP reparse state -
     // a single-file diagnostic must never wait for the pass (AC-2.6).
     pollProjectPass();
-    if (state_ != BackendState::Reparsing) {
+    if (analysisInvalidated_ || state_ != BackendState::Reparsing) {
+        if (analysisInvalidated_) {
+            collectLspDiagnostics(); // consume finished requests without publishing them
+        }
         // R2 / one count: a finished project pass (or an edited file falling
         // back) changes the merged view while the LSP is not reparsing. The
         // user-visible session count must follow it, not stay at the lower
@@ -852,7 +867,8 @@ void DiagnosticsController::refresh()
             }
             // T118: push the EDITOR BUFFER into the session before asking for
             // diagnostics, so what gets linted is the text the user sees.
-            if (!analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_)) {
+            if (!analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_)
+                && lspDiagnostics_.isEmpty() && outlineRequest_ == 0) {
                 QString bufferError;
                 if (lsp_->changeBuffer(analysisFile_, analysisText_, &bufferError)) {
                     bufferApplied_ = true;
@@ -871,7 +887,8 @@ void DiagnosticsController::refresh()
                     // diagnostics asynchronously and the request returns the
                     // CURRENT snapshot immediately.
                     lspDiagnosticsRequested_ = false;
-                } else if (report_.lspMessage.isEmpty()) {
+                } else {
+                    lspDiagnosticsRequested_ = true;
                     report_.lspMessage = bufferError;
                 }
             }
@@ -885,7 +902,8 @@ void DiagnosticsController::refresh()
             if (bufferSettling) {
                 lspDiagnosticsRequested_ = false;
             }
-            if (!lspDiagnosticsRequested_) {
+            const bool awaitingBuffer = !analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_);
+            if (!awaitingBuffer && !lspDiagnosticsRequested_ && lspDiagnostics_.isEmpty()) {
                 lspDiagnosticsRequested_ = true;
                 // batch-20261116 L1.1: the request set is the REALTIME session
                 // set (current file + level-1 closure, bounded), never `files_`
@@ -905,7 +923,7 @@ void DiagnosticsController::refresh()
                     }
                     const quint64 id = lsp_->requestDiagnostics(file);
                     if (id != 0) {
-                        lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
+                        lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_, editSeq_.value(file)});
                         lastDiagnosticsRequestFiles_.append(file);
                     }
                 }
@@ -913,8 +931,9 @@ void DiagnosticsController::refresh()
                     static_cast<quint64>(lastDiagnosticsRequestFiles_.size());
             }
 
-            if (!analysisFile_.isEmpty() && !symbolsRequested_ && outlineRequest_ == 0) {
+            if (!awaitingBuffer && !analysisFile_.isEmpty() && !symbolsRequested_ && outlineRequest_ == 0) {
                 outlineRequest_ = lsp_->requestSymbols(analysisFile_);
+                outlineAnalysis_ = analysisCount_;
                 symbolsRequested_ = outlineRequest_ != 0;
             }
         }
@@ -929,7 +948,8 @@ void DiagnosticsController::refresh()
         const LspPolled polled = lsp_->poll(outlineRequest_);
         if (!polled.pending) {
             outlineRequest_ = 0;
-            if (symbolsRequested_ && polled.ready && polled.kind == ResponseKind::Symbols) {
+            if (outlineAnalysis_ == analysisCount_ && symbolsRequested_ && polled.ready
+                && polled.kind == ResponseKind::Symbols) {
                 outline_ = polled.symbols;
             }
         }
@@ -995,15 +1015,14 @@ void DiagnosticsController::collectLspDiagnostics()
     }
     QVector<DiagnosticTicket> pending;
     for (const DiagnosticTicket &ticket : lspDiagnostics_) {
-        if (isScopeExcluded(ticket.file)) {
-            continue; // RM-17b: an excluded file keeps NO lower verdict
-        }
         LspPolled polled = lsp_->poll(ticket.id);
         if (polled.pending) {
             pending.append(ticket);
             continue;
         }
-        if (ticket.analysis != analysisCount_) {
+        if (analysisInvalidated_ || ticket.analysis != analysisCount_
+            || ticket.edit != editSeq_.value(ticket.file) || isScopeExcluded(ticket.file)
+            || (ticket.file != analysisFile_ && notAnalyzedReason_.value(ticket.file) == QStringLiteral("modified"))) {
             continue;
         }
         if (polled.failed) {
@@ -1087,7 +1106,7 @@ void DiagnosticsController::collectLspDiagnostics()
 
 void DiagnosticsController::pollServerSilence()
 {
-    if (analysisFile_.isEmpty() || !lspStarted_ || !lsp_) {
+    if (analysisInvalidated_ || analysisFile_.isEmpty() || !lspStarted_ || !lsp_) {
         return;
     }
     if (notAnalyzedReason_.value(analysisFile_) != QStringLiteral("server-silent")) {
@@ -1106,7 +1125,7 @@ void DiagnosticsController::pollServerSilence()
             }
             const quint64 id = lsp_->requestDiagnostics(file);
             if (id != 0) {
-                lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_});
+                lspDiagnostics_.append(DiagnosticTicket{id, file, analysisCount_, editSeq_.value(file)});
             }
         }
     }
@@ -1188,7 +1207,10 @@ void DiagnosticsController::finaliseState()
     const bool bufferPublishing =
         bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
         && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= kBufferSettleMs;
-    if (lspPending || bufferPublishing || (!lspFailed && outlineRequest_ != 0)
+    const bool awaitingBuffer = lspStarted_ && session_.state == BackendState::Ready
+        && !analysisFile_.isEmpty() && files_.contains(analysisFile_) && !bufferApplied_
+        && !lspDiagnosticsRequested_;
+    if (lspPending || awaitingBuffer || bufferPublishing || (!lspFailed && outlineRequest_ != 0)
         || !lints_.isEmpty() || !lspDiagnostics_.isEmpty()) {
         return;
     }
@@ -1677,6 +1699,7 @@ void DiagnosticsController::markFileEdited(const QString &file)
         return;
     }
     editSeq_.insert(file, ++editCounter_);
+    invalidateBufferAnalysis(file);
     // T9: only a change of the FILE'S VISIBLE STATE is a view event. The first
     // keystroke of a covered file drops its upper layer and marks it modified;
     // every later keystroke changes only the edit sequence, which no surface
@@ -1696,6 +1719,8 @@ void DiagnosticsController::markFileEdited(const QString &file)
     // the next pass covers it.
     if (retainedLowerEvaluated_.contains(file) || retainedLowerRows_.contains(file)) {
         clearRetainedRows(file);
+        diagnostics_.removeIf([&file](const DiagnosticEntry &entry) { return entry.file == file; });
+        lowerAnalyzed_.remove(file);
         visibleChange = true;
     }
     if (notAnalyzedReason_.value(file) != QStringLiteral("modified")) {

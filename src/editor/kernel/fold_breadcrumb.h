@@ -24,6 +24,7 @@
 // view object, which is the KTextEditor-free hand-off the pane reads.
 #include "breadcrumb_model.h"
 
+#include <QFutureWatcher>
 #include <QObject>
 #include <QString>
 
@@ -97,6 +98,8 @@ signals:
 private:
     void ensureSources();
     void refreshBreadcrumb();
+    void finishBreadcrumb();
+    void applyPath(std::vector<vedit::breadcrumb::Entry> path, int line);
     // Mirrors breadcrumbModel_'s path to the view's "veditBreadcrumbEntries"
     // property for the KTextEditor-free pane bar (the shell never includes this
     // header). Always called with the model state of the current document.
@@ -104,7 +107,13 @@ private:
     QString grammarId() const;
 
     KTextEditor::View *view_ = nullptr;
-    std::unique_ptr<vedit::breadcrumb::SyntaxBreadcrumbSource> breadcrumbSource_;
+    std::shared_ptr<vedit::breadcrumb::SyntaxBreadcrumbSource> breadcrumbSource_;
+    QFutureWatcher<std::vector<vedit::breadcrumb::Entry>> breadcrumbWorker_;
+    bool workerRunning_ = false;
+    quint64 sourceGeneration_ = 0;
+    quint64 workerGeneration_ = 0;
+    qint64 workerRevision_ = -1;
+    int workerLine_ = -1;
     vedit::breadcrumb::Model breadcrumbModel_;
     QTimer *breadcrumbDebounce_ = nullptr;
     std::function<void()> statusListener_;

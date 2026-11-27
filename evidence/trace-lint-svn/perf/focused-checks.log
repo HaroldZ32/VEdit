@@ -1,0 +1,17 @@
+Editor checks from the unchanged editor-input implementation:
+1/2 Test #32: vedit-editor-open-bench ..........   Passed    1.08 sec
+2/2 Test #43: vedit-signature-help-selftest ....   Passed    0.33 sec
+100% tests passed, 0 tests failed out of 2
+
+Final focused diagnostics checks:
+1/4 Test #67: vedit-workspace-diagnostics-selftest ...   Passed    4.50 sec
+2/4 Test #74: vedit-active-watcher-cap-selftest ......   Passed    6.73 sec
+78: CHECK restart.clean-reaches-backend PASS  analyses=11 state=3 errors=0
+3/4 Test #78: vedit-realtime-depth-switch-e2e ........   Passed    9.38 sec
+4/4 Test #89: vedit-realtime-context-e2e .............   Passed   26.21 sec
+100% tests passed, 0 tests failed out of 4
+
+Selected tested artifacts:
+efa5eda4a9702544d6e422115d5242d2766769d77d8508712fc6744370b652c4 vedit-realtime-context-e2e
+563ab16cf85aa903479666a8b5f06197da7c8366a1d6a3f3efddce16eb16edb7 vedit-editor-open-bench
+134f4d0b495bb271bf701b109346ee0b28a348da4388cc408e0b85c191b66459 slang-server

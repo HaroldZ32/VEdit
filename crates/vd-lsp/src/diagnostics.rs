@@ -98,7 +98,15 @@ impl DiagnosticsStore {
 
     /// Record one notification, replacing the entry for its document.
     pub(crate) fn record(&self, params: PublishDiagnosticsParams) {
-        self.tx.send_modify(|snapshot| {
+        self.tx.send_if_modified(|snapshot| {
+            if snapshot.for_uri(&params.uri).is_some_and(|previous| {
+                previous
+                    .version
+                    .zip(params.version)
+                    .is_some_and(|(old, new)| old > new)
+            }) {
+                return false;
+            }
             snapshot.generation += 1;
             snapshot.entries.retain(|entry| entry.uri != params.uri);
             snapshot.entries.push(PublishedDiagnostics {
@@ -107,6 +115,15 @@ impl DiagnosticsStore {
                 diagnostics: params.diagnostics,
                 received_at: Instant::now(),
             });
+            true
+        });
+    }
+
+    pub(crate) fn forget(&self, uri: &Url) {
+        self.tx.send_if_modified(|snapshot| {
+            let before = snapshot.entries.len();
+            snapshot.entries.retain(|entry| &entry.uri != uri);
+            snapshot.entries.len() != before
         });
     }
 }
@@ -190,6 +207,28 @@ mod tests {
         assert_eq!(entry.version, Some(2));
         assert_eq!(entry.diagnostics.len(), 2);
         assert_eq!(entry.diagnostics[1].message, "b");
+        Ok(())
+    }
+
+    #[test]
+    fn late_older_version_does_not_replace_current_diagnostics(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let (store, rx) = DiagnosticsStore::new();
+        let uri = Url::parse("file:///tmp/top.sv")?;
+        for version in [3, 2] {
+            store.record(PublishDiagnosticsParams {
+                uri: uri.clone(),
+                version: Some(version),
+                diagnostics: Vec::new(),
+            });
+        }
+        assert_eq!(rx.borrow().generation(), 1);
+        assert_eq!(
+            rx.borrow().for_uri(&uri).and_then(|entry| entry.version),
+            Some(3)
+        );
+        store.forget(&uri);
+        assert!(rx.borrow().for_uri(&uri).is_none());
         Ok(())
     }
 }

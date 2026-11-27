@@ -519,7 +519,7 @@ impl SessionHandle {
         let worker = std::thread::Builder::new()
             .name("vd-lsp-session".to_string())
             .spawn(move || {
-                match tokio::runtime::Builder::new_multi_thread()
+                match tokio::runtime::Builder::new_current_thread()
                     .enable_all()
                     .build()
                 {
@@ -726,7 +726,6 @@ async fn session_loop(
     diagnostics_budget: Duration,
     mut commands: mpsc::UnboundedReceiver<Command>,
 ) {
-    let has_slang_project_index = config.pending_slang_index.is_some();
     if let Some(index) = config.pending_slang_index.take() {
         if let Err(error) = config.prepare_project_index(&index) {
             inner.fail(format!("cannot prepare the project index: {error}"));
@@ -878,7 +877,7 @@ async fn session_loop(
                     &mut client,
                     &path,
                     text,
-                    has_slang_project_index && context_file.is_some(),
+                    backend == LspBackend::Slang && context_file.is_some(),
                 )
                 .await;
                 match outcome {
@@ -1418,12 +1417,13 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
             Ok(SessionResponse::Edits(edits))
         }
         SessionRequest::Diagnostics { .. } => {
-            let snapshot = client.diagnostics().borrow().clone();
-            // "No entry" and "an empty published set" are different answers:
-            // only the second one is a clean verdict (AC-2). The server's
-            // silence is never manufactured into "0 problems".
-            let published = snapshot.for_uri(&uri);
-            let rows = published.map(normalise_diagnostics).unwrap_or_default();
+            // A stale or absent publication is no verdict. An empty current
+            // publication, in contrast, is a valid clean result.
+            let published = client.current_diagnostics(&uri)?;
+            let rows = published
+                .as_ref()
+                .map(normalise_diagnostics)
+                .unwrap_or_default();
             Ok(SessionResponse::Diagnostics {
                 rows,
                 published: published.is_some(),
