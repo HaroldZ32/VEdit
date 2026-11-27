@@ -1,0 +1,46 @@
+$ CARGO_HOME="$PWD/target/cargo-home" cargo +stable test --locked --offline -p vd-lsp --test session_health -- --nocapture
+   Compiling vd-lsp v0.5.0 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s
+     Running tests/session_health.rs (target/debug/deps/session_health-2ac3201dffcf8dc9)
+
+running 7 tests
+startup failure: cannot open /tmp/vd-lsp-health-startup-164-1795757013956062675/top.sv on the server: initialize failed: service stopped — server stderr: fixture rejected initialization
+test startup_failure_includes_child_stderr ... ok
+indexed healthy: same text sent once to PID 296
+pid: original=298 failed=None replacement=317 public=Some(317)
+idle failure: the language server exited after Ready (0/3 restart(s)) — server stderr: fixture idle exit
+test idle_exit_and_recovery_publish_the_current_pid ... ok
+
+thread 'recovery_drops_old_publications_and_accepts_the_first_new_one' (168) panicked at crates/vd-lsp/tests/session_health.rs:241:9:
+assertion `left == right` failed: silent-replacement inherited an old publication
+  left: (true, ["diagnostic from first process"])
+ right: (false, [])
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+context: initial=1 replacement_before_caller_push=0 replacement_after_caller_push=1; unsaved didOpen replayed
+test recovery_drops_old_publications_and_accepts_the_first_new_one ... FAILED
+test restart_reopens_the_buffer_and_the_caller_reapplies_build_context_once ... ok
+
+thread 'failed_transport_reaps_its_old_child_before_replacement' (165) panicked at crates/vd-lsp/tests/session_health.rs:306:5:
+old supervised child 261 survived replacement 328
+test failed_transport_reaps_its_old_child_before_replacement ... FAILED
+restart limit: launches=4 public=3 message=buffer change failed: language server failed after 3 restart attempts; refusing to restart again (3/3 restart(s)) — server stderr: fixture idle exit
+
+thread 'same_indexed_buffer_keeps_the_healthy_fast_path_and_cannot_revive_exhaustion' (170) panicked at crates/vd-lsp/tests/session_health.rs:285:9:
+assertion `left == right` failed
+  left: (Ready, None, 3)
+ right: (Failed, None, 3)
+test idle_exit_stops_after_three_restarts ... ok
+test same_indexed_buffer_keeps_the_healthy_fast_path_and_cannot_revive_exhaustion ... FAILED
+
+failures:
+
+failures:
+    failed_transport_reaps_its_old_child_before_replacement
+    recovery_drops_old_publications_and_accepts_the_first_new_one
+    same_indexed_buffer_keeps_the_healthy_fast_path_and_cannot_revive_exhaustion
+
+test result: FAILED. 4 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.09s
+
+error: test failed, to rerun pass `-p vd-lsp --test session_health`
+
+exit=101
