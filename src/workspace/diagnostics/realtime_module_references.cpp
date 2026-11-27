@@ -23,7 +23,7 @@ LiteralModuleReferences literalModuleReferences(const QString &text)
         (hierarchical_instance (name_of_instance) @site))
     )";
     const auto *language = tree_sitter_verilog();
-    static const auto query = [] {
+    const auto query = [] {
         uint32_t errorOffset = 0;
         TSQueryError error = TSQueryErrorNone;
         return std::unique_ptr<TSQuery, decltype(&ts_query_delete)>(

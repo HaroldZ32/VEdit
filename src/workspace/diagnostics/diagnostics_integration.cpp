@@ -58,6 +58,11 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFrame>
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+#include <QFutureWatcher>
+#include <QPromise>
+#include <QThreadPool>
+#endif
 #include <QHash>
 #include <QInputDialog>
 #include <QKeySequence>
@@ -85,6 +90,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
@@ -229,6 +235,9 @@ public:
         debounce_->setInterval(700);
         connect(debounce_, &QTimer::timeout, this, [this]() { analyze(); });
         connect(tick_, &QTimer::timeout, this, [this]() { poll(); });
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        connect(&closureWorker_, &QFutureWatcherBase::finished, this, [this]() { finishBufferClosure(); });
+#endif
         tick_->start(400);
         // N2-r: subscribe on the ONE open seam (ApplicationShell::fileOpened), so
         // the document is already tracked when the user's FIRST keystroke lands.
@@ -341,20 +350,35 @@ private:
     /// through each document's own `textChanged` signal (`trackDocument`); this
     /// counter is the fallback for a change whose signal was missed, and it is
     /// only acted on while the buffer is dirty (a save invalidates no verdict).
-    static qint64 bufferRevision(QWidget *widget)
+    static QObject *bufferDocument(QWidget *widget)
     {
-        if (widget == nullptr) {
-            return -1;
-        }
 #if defined(VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR)
         if (auto *view = qobject_cast<KTextEditor::View *>(widget)) {
-            return view->document() != nullptr ? view->document()->revision() : -1;
+            return view->document();
         }
 #endif
         if (auto *text = qobject_cast<QPlainTextEdit *>(widget)) {
-            return text->document() != nullptr ? text->document()->revision() : -1;
+            return text->document();
+        }
+        return nullptr;
+    }
+
+    static qint64 documentRevision(QObject *document)
+    {
+#if defined(VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR)
+        if (auto *text = qobject_cast<KTextEditor::Document *>(document)) {
+            return text->revision();
+        }
+#endif
+        if (auto *text = qobject_cast<QTextDocument *>(document)) {
+            return text->revision();
         }
         return -1;
+    }
+
+    static qint64 bufferRevision(QWidget *widget)
+    {
+        return documentRevision(bufferDocument(widget));
     }
 
     /// The watcher's observable state through the same shell-property seam as
@@ -387,6 +411,7 @@ private:
     /// the shell de-duplicates identical text), so an idle document cannot spam.
     void noteAnalysisDisabled(const QString &path, qint64 bytes)
     {
+        discardBufferClosure(path);
         ++tooLargeSkips_;
         const QString reason =
             QCoreApplication::translate(
@@ -460,53 +485,38 @@ private:
     /// its CURRENT path (an untitled tab that is saved-as updates the map).
     void trackDocument(QWidget *editor, const QString &path)
     {
-        if (editor == nullptr || path.isEmpty()) {
+        QObject *document = bufferDocument(editor);
+        if (document == nullptr) {
             return;
         }
-#if defined(VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR)
-        if (auto *view = qobject_cast<KTextEditor::View *>(editor)) {
-            KTextEditor::Document *document = view->document();
-            if (document == nullptr) {
-                return;
-            }
-            if (documents_.contains(document)) {
-                documents_.insert(document, path); // save-as / rename
-                return;
-            }
-            documents_.insert(document, path);
-            QObject::connect(document, &KTextEditor::Document::textChanged, this,
-                             [this, document]() { noteDocumentEdited(document); });
-            QObject::connect(document, &QObject::destroyed, this,
-                             [this, document]() { documents_.remove(document); });
-            // N2-r: a tab can be edited BEFORE anything subscribed to it (opened
-            // and edited inside one event-loop turn, then switched away). That
-            // first edit emitted no signal we could hear; the buffer's dirty flag
-            // is the only evidence left, and an edited buffer's upper (project)
-            // verdict is void. Checking EVERY newly tracked document - not just
-            // the active file at poll time - closes that window.
-            if (bufferModified(editor)) {
-                controller_->markFileEdited(path);
+        auto tracked = documents_.find(document);
+        if (tracked != documents_.end()) {
+            if (*tracked != path) {
+                discardBufferClosure(*tracked);
+                *tracked = path; // save-as / rename
             }
             return;
+        }
+        if (path.isEmpty()) {
+            return;
+        }
+        documents_.insert(document, path);
+        const auto edited = [this, document]() { noteDocumentEdited(document); };
+#if defined(VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR)
+        if (auto *text = qobject_cast<KTextEditor::Document *>(document)) {
+            connect(text, &KTextEditor::Document::textChanged, this, edited);
         }
 #endif
-        if (auto *text = qobject_cast<QPlainTextEdit *>(editor)) {
-            QTextDocument *document = text->document();
-            if (document == nullptr) {
-                return;
-            }
-            if (documents_.contains(document)) {
-                documents_.insert(document, path);
-                return;
-            }
-            documents_.insert(document, path);
-            QObject::connect(document, &QTextDocument::contentsChanged, this,
-                             [this, document]() { noteDocumentEdited(document); });
-            QObject::connect(document, &QObject::destroyed, this,
-                             [this, document]() { documents_.remove(document); });
-            if (bufferModified(editor)) {
-                controller_->markFileEdited(path);
-            }
+        if (auto *text = qobject_cast<QTextDocument *>(document)) {
+            connect(text, &QTextDocument::contentsChanged, this, edited);
+        }
+        connect(document, &QObject::destroyed, this, [this, document]() {
+            discardBufferClosure(documents_.take(document));
+        });
+        // N2-r: an edit made in the same event-loop turn as opening a tab may
+        // have missed the subscription. Check every newly tracked document.
+        if (bufferModified(editor)) {
+            controller_->markFileEdited(path);
         }
     }
 
@@ -518,12 +528,16 @@ private:
         }
         // R2: a file edited after the project pass loses its upper-layer verdict
         // at ONCE, whether or not it is the active tab.
+        discardBufferClosure(file);
         controller_->markFileEdited(file);
         vedit::app::EditorPane *pane = shell_->editorArea() != nullptr
                                            ? shell_->editorArea()->activePane()
                                            : nullptr;
         if (pane != nullptr && pane->currentFilePath() == file) {
-            debounce_->start(); // the active buffer still gets its file-scope analysis
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+            closureWaiting_ = false; // respect the active edit's debounce
+#endif
+            debounce_->start();
         }
     }
 
@@ -604,7 +618,11 @@ private:
             // hear. A save changes no verdict the watcher must invalidate, so a
             // clean buffer is left alone.
             if (bufferModified(widget)) {
+                discardBufferClosure(path);
                 controller_->markFileEdited(path);
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+                closureWaiting_ = false;
+#endif
                 debounce_->start();
             }
         }
@@ -625,50 +643,64 @@ private:
     {
         const QVariant revision = shell_->property("vedit.diagnostics.projectFilesRevision");
         const qulonglong catalogRevision = shell_->property("vedit.moduleTree.scopeRevision").toULongLong();
+        const qint64 catalogCutoff = shell_->property("vedit.moduleTree.sourceCutoffMs").toLongLong();
         const QStringList shadowed = shell_->property("vedit.moduleTree.shadowedFiles").toStringList();
         const bool project = shell_->property("vedit.project.hasFilelist").toBool();
         if (revision == goldenRevision_ && catalogRevision == catalogRevision_
-            && shadowed == shadowedFiles_ && project == hasFilelist_) {
+            && catalogCutoff == catalogCutoff_ && shadowed == shadowedFiles_ && project == hasFilelist_) {
             return false;
         }
         goldenRevision_ = revision;
         catalogRevision_ = catalogRevision;
+        catalogCutoff_ = catalogCutoff;
         hasFilelist_ = project;
         bufferClosures_.clear();
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        bufferClosureKeys_.clear();
+        ++closureScopeVersion_;
+#endif
         shadowedFiles_ = shadowed;
+        shadowedFileSet_ = diagnostics::realtime_scope::shadowedFileSetFrom(shadowed);
         const QStringList members = shell_->property("vedit.diagnostics.projectFiles").toStringList();
         goldenFiles_ = diagnostics::realtime_scope::goldenFileSetFrom(members);
         QStringList indexCandidates = members;
         if (!members.isEmpty()) {
             indexCandidates.append(shell_->property("vedit.moduleTree.includedDefinitions").toStringList());
         }
-        projectIndex_ = diagnostics::realtime_scope::dropShadowedFiles(
-            indexCandidates, diagnostics::realtime_scope::shadowedFileSetFrom(shadowed));
+        projectIndex_ = diagnostics::realtime_scope::dropShadowedFiles(indexCandidates, shadowedFileSet_);
         projectIndex_.removeDuplicates();
         projectIndex_.sort();
         return true;
     }
 
-#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-    void updateBufferClosure(const QFileInfo &source, const QString &disk, const QString &text)
+    void discardBufferClosure(const QString &path)
     {
-        namespace scope = diagnostics::realtime_scope;
-        const QString path = source.filePath();
-        const bool modified = disk != text;
-        const qint64 catalogCutoff = shell_->property("vedit.moduleTree.sourceCutoffMs").toLongLong();
-        const QDateTime diskTime = source.lastModified();
-        const bool catalogSawDisk = catalogCutoff > 0 && diskTime.isValid()
-            && diskTime.toMSecsSinceEpoch() < catalogCutoff;
-        const bool unchanged = !modified && catalogSawDisk;
-        if (!hasFilelist_ || !scope::isGoldenFile(goldenFiles_, path)) {
-            bufferClosures_.remove(path);
-            return;
+        bufferClosures_.remove(path);
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        bufferClosureKeys_.remove(path);
+        if (path == closureWorkerPath_) {
+            closureWorkerKey_.document.clear();
         }
-        const QVariantMap owners = shell_->property("vedit.moduleTree.owners").toMap();
-        if (owners.isEmpty()) {
-            return;
-        }
-        // The project elaboration can omit siblings or specialize generate branches
+#endif
+    }
+
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+    struct BufferClosureKey {
+        QPointer<QObject> document;
+        qint64 revision = -1;
+        QDateTime diskTime;
+        qint64 diskSize = 0;
+        size_t diskHash = 0;
+        bool modified = false;
+        bool operator==(const BufferClosureKey &) const = default;
+    };
+
+    static QStringList collectBufferClosure(const QString &text, const QString &catalogDisk,
+                                           const QVariantMap &owners, const QStringList &catalogChildren,
+                                           const QList<diagnostics::realtime_scope::CatalogDependencySite> &sites,
+                                           bool unchanged)
+    {
+        // Project elaboration can omit siblings or specialize generate branches
         // differently from the active file's compilation, even for unchanged text.
         const auto references = diagnostics::literalModuleReferences(text);
         QSet<QString> activeOwners;
@@ -678,40 +710,29 @@ private:
                 activeOwners.insert(owner);
             }
         }
-        const QStringList catalogChildren = scope::closureFilesFor(moduleClosure(), path);
         QSet<QString> removable;
-        // Removing a literal occurrence does not remove a macro or include
-        // occurrence of the same child. Match each catalog site against the
-        // actual identifiers in the disk text this catalog saw.
-        if (modified && catalogSawDisk) {
-            const auto diskReferences = diagnostics::literalModuleReferences(disk);
-            const auto allSites = shell_->property("vedit.moduleTree.closureSites")
-                .value<scope::CatalogDependencySites>();
-            auto fileSites = allSites.constFind(scope::normalizeFileKey(path));
-            if (fileSites == allSites.cend()) {
-                fileSites = allSites.constFind(scope::canonicalDirectoryVariant(path));
-            }
-            if (fileSites != allSites.cend()) {
-                QSet<QString> opaque;
-                for (const auto &site : *fileSites) {
-                    const auto literal = diskReferences.constFind(site.module);
-                    if (site.column > 0 && literal != diskReferences.cend()
-                        && literal->contains({site.line, site.column})) {
-                        removable.insert(site.owner);
-                    } else {
-                        opaque.insert(site.owner);
-                    }
+        // A removed literal doesn't remove a macro or include occurrence of the
+        // same child. Only match sites against disk text this catalog saw.
+        if (!sites.isEmpty()) {
+            const auto diskReferences = diagnostics::literalModuleReferences(catalogDisk);
+            QSet<QString> opaque;
+            for (const auto &site : sites) {
+                const auto literal = diskReferences.constFind(site.module);
+                if (site.column > 0 && literal != diskReferences.cend()
+                    && literal->contains({site.line, site.column})) {
+                    removable.insert(site.owner);
+                } else {
+                    opaque.insert(site.owner);
                 }
-                removable.subtract(opaque);
             }
+            removable.subtract(opaque);
         }
-        // When the source was saved after the catalog, add the live children
-        // and keep old catalog edges whose provenance can no longer be proved.
+        // When saved after the catalog, add live children and keep old edges
+        // whose provenance can no longer be proved. For catalogued disk text,
+        // prefer elaborated children over inferred (potentially inactive) ones.
         const QSet<QString> known(catalogChildren.cbegin(), catalogChildren.cend());
         QStringList additional = (activeOwners - known).values();
         additional.sort();
-        // Keep elaborated dependencies ahead of inferred ones for a clean file.
-        // Literal references may also occur in an inactive preprocessor branch.
         QStringList children = unchanged ? QStringList{} : additional;
         for (const QString &child : catalogChildren) {
             if (activeOwners.contains(child) || !removable.contains(child)) {
@@ -721,7 +742,82 @@ private:
         if (unchanged) {
             children.append(additional);
         }
-        bufferClosures_.insert(path, children);
+        return children;
+    }
+
+    bool prepareBufferClosure(const QFileInfo &source, QObject *document, const QString &disk,
+                              const QString &text, bool modified)
+    {
+        namespace scope = diagnostics::realtime_scope;
+        const QString path = source.filePath();
+        const QVariantMap owners = shell_->property("vedit.moduleTree.owners").toMap();
+        if (document == nullptr || !hasFilelist_ || !scope::isGoldenFile(goldenFiles_, path)
+            || scope::isShadowedFile(shadowedFileSet_, path) || owners.isEmpty()) {
+            discardBufferClosure(path);
+            return true;
+        }
+        const QDateTime diskTime = source.lastModified();
+        const bool catalogSawDisk = catalogCutoff_ > 0 && diskTime.isValid()
+            && diskTime.toMSecsSinceEpoch() < catalogCutoff_;
+        const bool compareSites = modified && catalogSawDisk;
+        const BufferClosureKey key{document, documentRevision(document), diskTime, source.size(),
+                                   compareSites ? qHash(disk) : 0, modified};
+        const auto cached = bufferClosureKeys_.constFind(path);
+        if (cached != bufferClosureKeys_.cend() && *cached == key) {
+            return true;
+        }
+        bufferClosureKeys_.remove(path);
+        bufferClosures_.remove(path);
+        closureWaiting_ = true;
+        if (!closureWorkerPath_.isEmpty()) {
+            return false; // the completion retries the active tab, with fresh inputs
+        }
+
+        const QStringList catalogChildren = scope::closureFilesFor(moduleClosure(), path);
+        QList<scope::CatalogDependencySite> sites;
+        if (compareSites) {
+            const auto allSites = shell_->property("vedit.moduleTree.closureSites")
+                .value<scope::CatalogDependencySites>();
+            auto fileSites = allSites.constFind(scope::normalizeFileKey(path));
+            if (fileSites == allSites.cend()) {
+                fileSites = allSites.constFind(scope::canonicalDirectoryVariant(path));
+            }
+            if (fileSites != allSites.cend()) {
+                sites = *fileSites;
+            }
+        }
+        closureWorkerPath_ = path;
+        closureWorkerKey_ = key;
+        closureWorkerScopeVersion_ = closureScopeVersion_;
+        const QString catalogDisk = sites.isEmpty() ? QString() : disk;
+        QPromise<QStringList> promise;
+        closureWorker_.setFuture(promise.future());
+        QThreadPool::globalInstance()->start([text, catalogDisk, owners, catalogChildren, sites,
+                                             unchanged = !modified && catalogSawDisk,
+                                             promise = std::move(promise)]() mutable {
+            promise.start();
+            promise.addResult(collectBufferClosure(text, catalogDisk, owners, catalogChildren, sites, unchanged));
+            promise.finish();
+        });
+        return false;
+    }
+
+    void finishBufferClosure()
+    {
+        const QString path = std::exchange(closureWorkerPath_, QString());
+        const auto &key = closureWorkerKey_;
+        const bool scopeChanged = refreshProjectScope();
+        if (closureWorkerScopeVersion_ == closureScopeVersion_ && key.document
+            && documents_.value(key.document) == path && documentRevision(key.document) == key.revision) {
+            const QFileInfo source(path);
+            if (source.lastModified() == key.diskTime && source.size() == key.diskSize) {
+                bufferClosureKeys_.insert(path, key);
+                bufferClosures_.insert(path, closureWorker_.result());
+            }
+        }
+        if (std::exchange(closureWaiting_, false) || scopeChanged) {
+            analyze();
+        }
     }
 #endif
 
@@ -734,18 +830,18 @@ private:
     QStringList realtimeFileSetFor(const QString &path, bool *truncated = nullptr) const
     {
         return diagnostics::realtime_scope::realtimeFileSetFor(
-            goldenFiles_, moduleClosure(), path, kRealtimeClosureMaxFiles, truncated, bufferClosures_);
+            goldenFiles_, moduleClosure(), path, kRealtimeClosureMaxFiles, truncated, bufferClosures_,
+            shadowedFileSet_);
     }
 
     /// A61.3 + G1-a: the session covers the union of the GOLDEN open documents'
     /// closures. A document outside the project file set contributes NOTHING -
     /// before G1-a every open tab did, so merely opening a file pulled its module
     /// definitions into the project-wide compile set (the reported defect: slang
-    /// and goto landed on a file no `.f` ever named). The union only moves when a
-    /// document is opened or closed, so switching between documents that are
-    /// already open reuses the running session. `outsideFileCount_` publishes how
-    /// many distinct open documents were excluded.
-    QStringList openDocumentSessionSet(bool *truncated = nullptr)
+    /// and goto landed on a file no `.f` ever named). When the union fits,
+    /// switching between open documents keeps its order for session reuse.
+    /// `outsideFileCount_` publishes how many distinct documents were excluded.
+    QStringList openDocumentSessionSet(const QString &activePath, bool *truncated = nullptr)
     {
         QStringList openDocuments;
         if (shell_->editorArea() != nullptr) {
@@ -761,12 +857,19 @@ private:
                 }
             }
         }
-        bufferClosures_.removeIf([&openDocuments](QHash<QString, QStringList>::iterator entry) {
-            return !openDocuments.contains(entry.key());
+        bufferClosures_.removeIf([this, &openDocuments](QHash<QString, QStringList>::iterator entry) {
+            if (openDocuments.contains(entry.key())) {
+                return false;
+            }
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+            bufferClosureKeys_.remove(entry.key());
+#endif
+            return true;
         });
         return diagnostics::realtime_scope::openDocumentSessionSet(
             goldenFiles_, moduleClosure(), openDocuments, kRealtimeClosureMaxFiles,
-            kRealtimeSessionMaxFiles, &outsideFileCount_, truncated, bufferClosures_);
+            kRealtimeSessionMaxFiles, &outsideFileCount_, truncated, bufferClosures_, activePath,
+            shadowedFileSet_);
     }
 
     /// The AC-3/AC-5 probe surface: what the realtime analysis covers right now.
@@ -776,14 +879,7 @@ private:
         // that arrives (or changes) after a document was opened applies on this
         // tick.
         refreshProjectScope();
-        // G1-c: a file the catalog dropped from the compiler input never enters
-        // the realtime compile set either. In practice the closure cannot name
-        // one (it resolves a module to its ADOPTED definition file, and a
-        // shadowed file defines no adopted module), so this is the DEFENSIVE
-        // half - the same rule the project pass applies.
-        const diagnostics::realtime_scope::ShadowedFileSet shadowed =
-            diagnostics::realtime_scope::shadowedFileSetFrom(
-                shell_->property("vedit.moduleTree.shadowedFiles").toStringList());
+        const auto &shadowed = shadowedFileSet_;
         // G1-a/G1-c: ONE decision about the ACTIVE document, and it decides the
         // SESSION (the compiler input), not just the published analysis set:
         //   * a golden member the catalog did not shadow -> it joins the golden
@@ -797,7 +893,7 @@ private:
         const QStringList analysedSet =
             activeJoins ? realtimeFileSetFor(path, &closureTruncated) : QStringList{path};
         bool sessionTruncated = false;
-        const QStringList sessionUnion = openDocumentSessionSet(&sessionTruncated);
+        const QStringList sessionUnion = openDocumentSessionSet(path, &sessionTruncated);
         // The ACTIVE document is kept in the ANALYSIS set even when shadowed: a
         // user who opens the losing file still gets single-file diagnostics for
         // it (`dropShadowedFiles`'s `keep`). Its SESSION is the separate,
@@ -871,6 +967,9 @@ private:
 
     void analyze()
     {
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        closureWaiting_ = false;
+#endif
         vedit::app::EditorPane *pane = shell_->editorArea() != nullptr
                                            ? shell_->editorArea()->activePane()
                                            : nullptr;
@@ -879,7 +978,9 @@ private:
         }
         const QString path = pane->currentFilePath();
         QWidget *widget = pane->editorWidget();
+        trackDocument(widget, path);
         if (path.isEmpty() || widget == nullptr) {
+            discardBufferClosure(path);
             return;
         }
         // RM-11: a document is analysed only when this build has an ANALYZER
@@ -891,6 +992,7 @@ private:
         // buffer copy: a language this build cannot analyse needs no text.
         const project::LanguageRegistry &languages = project::LanguageRegistry::instance();
         if (!languages.supports(path, project::Capability::Diagnostics)) {
+            discardBufferClosure(path);
             const QString reason = languages.unavailableReason(path, project::Capability::Diagnostics);
             QVariantMap availability;
             availability.insert(QStringLiteral("path"), path);
@@ -917,6 +1019,7 @@ private:
         disabledPath_.clear(); // small again: a future skip is a new state
         const QString text = bufferText(widget);
         if (text.isEmpty()) {
+            discardBufferClosure(path);
             controller_->setDocumentAnalysisAvailability(
                 path, false,
                 QCoreApplication::translate("VEdit", "the editor buffer is empty"));
@@ -936,6 +1039,13 @@ private:
             return;
         }
         const QString disk = QString::fromUtf8(diskBytes);
+        const bool modified = disk != text;
+        refreshProjectScope();
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+        if (!prepareBufferClosure(source, bufferDocument(widget), disk, text, modified)) {
+            return;
+        }
+#endif
         QVariantMap availability;
         availability.insert(QStringLiteral("path"), path);
         availability.insert(QStringLiteral("available"), true);
@@ -944,15 +1054,11 @@ private:
         controller_->setDocumentAnalysisAvailability(path, true, QString());
         ++analyzeCalls_;
         publishWatchStats();
-        refreshProjectScope();
-#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
-        updateBufferClosure(source, disk, text);
-#endif
         // AC-3.1/AC-5.1: publish the analysis closure and hand the stable session
         // set to the controller BEFORE the analysis, so the switch that triggered
         // this call finds the session it needs already covered.
         publishRealtimeSets(path);
-        controller_->analyzeFile(path, text, disk != text);
+        controller_->analyzeFile(path, text, modified);
         publishRealtimeSets(path);
     }
 
@@ -976,10 +1082,23 @@ private:
     diagnostics::realtime_scope::GoldenFileSet goldenFiles_;
     QVariant goldenRevision_;
     qulonglong catalogRevision_ = 0;
+    qint64 catalogCutoff_ = 0;
     bool hasFilelist_ = false;
     QStringList projectIndex_;
     QStringList shadowedFiles_;
+    diagnostics::realtime_scope::ShadowedFileSet shadowedFileSet_;
     QHash<QString, QStringList> bufferClosures_;
+#if defined(VEDIT_DIAGNOSTICS_HAVE_HDL_PARSER)
+    // At most one snapshot is in flight. Completed entries retain only per-tab
+    // file lists and keys. The next analysis always uses the current active tab.
+    QFutureWatcher<QStringList> closureWorker_;
+    QString closureWorkerPath_;
+    BufferClosureKey closureWorkerKey_;
+    QHash<QString, BufferClosureKey> bufferClosureKeys_;
+    quint64 closureScopeVersion_ = 0;
+    quint64 closureWorkerScopeVersion_ = 0;
+    bool closureWaiting_ = false;
+#endif
     /// Open documents excluded from the session by the golden rule (published).
     int outsideFileCount_ = 0;
     /// One notice per truncation episode, not one per 400 ms tick.
