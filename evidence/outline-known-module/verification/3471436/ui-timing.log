@@ -1,0 +1,120 @@
+
+X11 run perf.KPVPmd
+  12003  458791 target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv
+  45003 1811791 target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv
+  57006 2270582 total
+a3b10728fb28282595009d8b0b361fe486aa031f37062547e83b781394ab6abf  target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv
+4efd401490e7f8841008e232916576e6381f5b5c23d6f6d2daa1ae74799b1540  target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv
+UI-PROBE timestamp=1795747809307 interval_ms=10
+UI-PROBE timestamp=1795747809369 interval_ms=10
+UI-PULSE timestamp=1795747809478 gap_ms=108
+UI-PULSE timestamp=1795747810380 gap_ms=222
+UI-PARSE timestamp=1795747810680 gui=1 bytes=458791 duration_ms=290
+UI-PARSE timestamp=1795747811871 gui=1 bytes=1811791 duration_ms=1097
+UI-PARSE timestamp=1795747812459 gui=1 bytes=458791 duration_ms=292
+UI-PULSE timestamp=1795747812459 gap_ms=2078
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=1 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=1 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=1 session=2
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=1 session=2
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=1 session=2
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=1 session=2
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+UI-PARSE timestamp=1795747817019 gui=0 bytes=1811791 duration_ms=1198
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747822019 gap_ms=88
+UI-PARSE timestamp=1795747822492 gui=0 bytes=458791 duration_ms=284
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747823854 gap_ms=54
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747825710 gap_ms=44
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747827587 gap_ms=46
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747829452 gap_ms=38
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747831321 gap_ms=48
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747833192 gap_ms=49
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747835065 gap_ms=46
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.KPVPmd/project/rtl/large_b.sv' files=2 session=3
+UI-SWITCH timestamp=1795747821869 sequence=1 tab=large_a
+UI-SWITCH timestamp=1795747823748 sequence=2 tab=large_b
+UI-SWITCH timestamp=1795747825614 sequence=3 tab=large_a
+UI-SWITCH timestamp=1795747827483 sequence=4 tab=large_b
+UI-SWITCH timestamp=1795747829360 sequence=5 tab=large_a
+UI-SWITCH timestamp=1795747831227 sequence=6 tab=large_b
+UI-SWITCH timestamp=1795747833948 sequence=7 tab=large_a
+UI-SWITCH timestamp=1795747834967 sequence=8 tab=large_b
+OBSERVED_BACKEND_PROCESS=slang-server
+DRIVER_EXIT=1 (fallback key event raced container shutdown after all switches)
+
+X11 run perf.HCZGQ8
+  12003  458791 target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv
+  45003 1811791 target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv
+  57006 2270582 total
+a3b10728fb28282595009d8b0b361fe486aa031f37062547e83b781394ab6abf  target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv
+4efd401490e7f8841008e232916576e6381f5b5c23d6f6d2daa1ae74799b1540  target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv
+UI-PROBE timestamp=1795747892756 interval_ms=10
+UI-PROBE timestamp=1795747892841 interval_ms=10
+UI-PULSE timestamp=1795747892988 gap_ms=146
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=1 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=1 session=3
+UI-PULSE timestamp=1795747893813 gap_ms=235
+UI-PARSE timestamp=1795747894129 gui=1 bytes=458791 duration_ms=308
+UI-PARSE timestamp=1795747895424 gui=1 bytes=1811791 duration_ms=1190
+UI-PARSE timestamp=1795747895989 gui=1 bytes=458791 duration_ms=303
+UI-PULSE timestamp=1795747896020 gap_ms=2206
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=1 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=1 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=1 session=2
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=1 session=2
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+UI-PARSE timestamp=1795747901590 gui=0 bytes=1811791 duration_ms=1172
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747906463 gap_ms=81
+UI-PARSE timestamp=1795747906761 gui=0 bytes=458791 duration_ms=279
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747908304 gap_ms=61
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747910151 gap_ms=44
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747912015 gap_ms=42
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747913884 gap_ms=48
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747915750 gap_ms=44
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+UI-PULSE timestamp=1795747917615 gap_ms=43
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_a.sv' files=2 session=3
+UI-PULSE timestamp=1795747919479 gap_ms=43
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/perf.HCZGQ8/project/rtl/large_b.sv' files=2 session=3
+UI-SWITCH timestamp=1795747906317 sequence=1 tab=large_a
+UI-SWITCH timestamp=1795747908194 sequence=2 tab=large_b
+UI-SWITCH timestamp=1795747910595 sequence=3 tab=large_a
+UI-SWITCH timestamp=1795747911925 sequence=4 tab=large_b
+UI-SWITCH timestamp=1795747913790 sequence=5 tab=large_a
+UI-SWITCH timestamp=1795747915660 sequence=6 tab=large_b
+UI-SWITCH timestamp=1795747917526 sequence=7 tab=large_a
+UI-SWITCH timestamp=1795747919390 sequence=8 tab=large_b
+OBSERVED_BACKEND_PROCESS=slang-server
+APP_EXIT=0

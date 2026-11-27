@@ -1,0 +1,27 @@
+HEAD=347143645c888aa836cc869855ec5afaac503b4f
+Tracked product/status paths changed: 0
+4db2d731ae6cd51dc4189537288794ff2413e07c9bcf697968841a625cfd1c7c  target/outline-qa/qt/src/app/vedit-app
+3a848e3f7e94b81a27392778df1d493429104386285fc339ed0ccef76e4bb003  target/outline-qa/qt/src/app/workspace-lane-diagnostics/vedit-realtime-context-e2e
+IMAGE=sha256:809c8072ac65be85a15bfc010400f1a0b2cffa10966cfebd4e7dcd0b418360c1
+
+Focused xcb output
+AFTER-IMPORT pass=1 authored=[] resolved=[] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+ADDED pass=1 authored=[PROJECT_WIDTH=2] resolved=[PROJECT_WIDTH=2] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_width_two']
+REPLACED pass=1 authored=[PROJECT_WIDTH=3] resolved=[PROJECT_WIDTH=3] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_changed_width']
+REMOVED pass=1 authored=[] resolved=[] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+DIRECT-CHILD tree=1 pass=1 inputs=[lib/alternate.sv,rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_bad_port' does not exist in 'alternate'|unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+DIRECT-CHILD-CORRECTED fresh=1 disk-unchanged=1 rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+SAVED-REOPEN pass=1 saved=1 inputs=[lib/alternate.sv,rtl/original.sv,rtl/top.sv] rows=[unknown module 'genuinely_missing'|use of undeclared identifier 'only_undefined_width']
+SCOPED-SIBLING tree=1 pass=1 inputs=[lib/alternate.sv,rtl/scoped_bridge.sv,rtl/scoped_parent.sv] outline=[scoped_parent.sv:3:23 — port 'sibling_bad_port' does not exist in 'alternate' [slang]|scoped_parent.sv:4:3 — unknown module 'genuinely_missing' [slang]|scoped_parent.sv:3:13 — input port 'correct' has no connection [unconnected-input-port]]
+AUTO-VARIANT pass=1 inputs=[lib/alternate.sv,rtl/original.sv,rtl/variant.sv] outline=[variant.sv:3:25 — port 'variant_bad_port' does not exist in 'alternate' [slang]|variant.sv:4:5 — unknown module 'genuinely_missing' [slang]|variant.sv:3:15 — input port 'correct' has no connection [unconnected-input-port]]
+INFERRED-SCOPE-INVALIDATION empty=1 oversized=1 inactive-edit=1 inactive-close=1
+MACRO-CHILD pass=1 before=1 inputs=[lib/alternate.sv,rtl/macro_parent.sv] rows=[port 'macro_bad_port' does not exist in 'alternate'|input port 'correct' has no connection|unknown module 'genuinely_missing']
+PROJECT-MANUAL-ONLY pass=1
+MACRO-OVERRIDE NATIVE-FALLBACK pass=1 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[4:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE ADDED-SAME-AS-FILELIST pass=1 authored=[DOCK_OVERRIDE_WIDTH=2] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[1:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE REPLACED pass=1 authored=[DOCK_OVERRIDE_WIDTH=3] resolved=[DOCK_OVERRIDE_WIDTH=3,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=3] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[2:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE UPDATED-NAME-ONLY pass=1 authored=[DOCK_OVERRIDE_WIDTH] resolved=[DOCK_OVERRIDE_WIDTH,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[0:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE REMOVED-TO-NATIVE pass=1 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[4:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
+MACRO-OVERRIDE NATIVE-FILES-UNCHANGED pass=1
+
+FINAL_X11_CONTEXT_EXIT=0
