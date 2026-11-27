@@ -1,0 +1,58 @@
+# Console excerpts; transient paths replaced with placeholders
+
+$ CARGO_HOME="$PWD/target/cargo-home" cargo +stable test --locked --offline -p vd-lsp
+[base at 752c8ab8, before adding session_health; package groups 39+3+2+1+1+2+8+8 passed; exit 0]
+
+$ CARGO_HOME="$PWD/target/cargo-home" cargo +stable test --locked --offline -p vd-lsp --test session_health -- --nocapture
+[RED, unchanged product]
+startup failure: cannot open <startup-fixture>/top.sv on the server: initialize failed: service stopped
+test startup_failure_includes_child_stderr ... FAILED
+pid: original=231 failed=Some(231) replacement=255 public=Some(231)
+idle failure: the language server exited after Ready (0/3 restart(s)) — server stderr: fixture idle exit
+test idle_exit_and_recovery_publish_the_current_pid ... FAILED
+context: initial=1 replacement_before_caller_push=0 replacement_after_caller_push=1; unsaved didOpen replayed
+test restart_reopens_the_buffer_and_the_caller_reapplies_build_context_once ... ok
+restart limit: launches=4 public=3 message=buffer change failed: language server crashed 4 times; refusing to restart again (4/3 restart(s)) — server stderr: language server exited; it will be restarted lazily | fixture idle exit | language server exited; it will be restarted lazily | fixture idle exit | language server exited; it will be restarted lazily
+test idle_exit_stops_after_three_restarts ... FAILED
+assertion `left == right` failed: Ready must publish the replacement PID
+  left: Some(231)
+ right: Some(255)
+assertion failed: final_status.message.contains("3/3 restart(s)")
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.07s
+[exit 101]
+
+$ export CARGO_HOME="$PWD/target/cargo-home"
+$ export VEDIT_VERIBLE_BIN_DIR="$PWD/.mpd/recon/verible/bin"
+$ export VEDIT_SLANG_SERVER="$PWD/packaging/runtime/out/AppDir/usr/lib/lsp/slang-server"
+$ cargo +stable test --locked --offline -p vd-lsp -- --nocapture
+[GREEN, final package run]
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.07s
+startup failure: cannot open <startup-fixture>/top.sv on the server: initialize failed: service stopped — server stderr: fixture rejected initialization
+pid: original=461 failed=None replacement=473 public=Some(473)
+idle failure: the language server exited after Ready (0/3 restart(s)) — server stderr: fixture idle exit
+context: initial=1 replacement_before_caller_push=0 replacement_after_caller_push=1; unsaved didOpen replayed
+restart limit: launches=4 public=3 message=buffer change failed: language server failed after 3 restart attempts; refusing to restart again (3/3 restart(s)) — server stderr: fixture idle exit
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s
+OBSERVED recovered restarts=1 message=recovered: buffer changed (69 bytes): <slang-fixture>/design/rtl/top.sv
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[exit 0]
+
+$ cargo +stable check --locked --offline -p vd-lsp --all-targets
+    Checking vd-lsp v0.5.0 (<checkout>/crates/vd-lsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.12s
+[exit 0]
+$ cargo +stable clippy --locked --offline -p vd-lsp --all-targets -- -D warnings
+    Checking vd-lsp v0.5.0 (<checkout>/crates/vd-lsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.16s
+[exit 0]
+$ cargo +stable fmt -p vd-lsp -- --check
+[exit 0, no output]
+$ git diff --check
+[exit 0, no output]

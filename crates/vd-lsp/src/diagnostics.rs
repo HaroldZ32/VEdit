@@ -3,6 +3,7 @@
 //! Rendering belongs to the application layer (T21); this crate only records
 //! what arrived, when, and for which document version.
 
+use std::sync::Arc;
 use std::time::Instant;
 
 use lsp_types::{Diagnostic, PublishDiagnosticsParams, Url};
@@ -26,10 +27,11 @@ pub struct PublishedDiagnostics {
 pub struct DiagnosticsSnapshot {
     generation: u64,
     entries: Vec<PublishedDiagnostics>,
+    source: Option<Arc<()>>,
 }
 
 impl DiagnosticsSnapshot {
-    /// Monotonic counter, bumped on every received notification.
+    /// Monotonic counter, bumped on publication or when publications are invalidated.
     pub fn generation(&self) -> u64 {
         self.generation
     }
@@ -96,15 +98,45 @@ impl DiagnosticsStore {
         (Self { tx }, rx)
     }
 
-    /// Record one notification, replacing the entry for its document.
+    pub(crate) fn publisher(&self) -> DiagnosticsPublisher {
+        let source = Arc::new(());
+        self.tx.send_if_modified(|snapshot| {
+            snapshot.source = Some(source.clone());
+            snapshot.clear_publications()
+        });
+        DiagnosticsPublisher {
+            tx: self.tx.clone(),
+            source,
+        }
+    }
+
+    pub(crate) fn forget(&self, uri: &Url) {
+        self.tx.send_if_modified(|snapshot| {
+            let before = snapshot.entries.len();
+            snapshot.entries.retain(|entry| &entry.uri != uri);
+            snapshot.entries.len() != before
+        });
+    }
+}
+
+/// The active transport's right to publish. The watch lock covers both the
+/// source check and the update, so retired transports cannot race a clear.
+pub(crate) struct DiagnosticsPublisher {
+    tx: watch::Sender<DiagnosticsSnapshot>,
+    source: Arc<()>,
+}
+
+impl DiagnosticsPublisher {
     pub(crate) fn record(&self, params: PublishDiagnosticsParams) {
         self.tx.send_if_modified(|snapshot| {
-            if snapshot.for_uri(&params.uri).is_some_and(|previous| {
-                previous
-                    .version
-                    .zip(params.version)
-                    .is_some_and(|(old, new)| old > new)
-            }) {
+            if !self.is_current(snapshot)
+                || snapshot.for_uri(&params.uri).is_some_and(|previous| {
+                    previous
+                        .version
+                        .zip(params.version)
+                        .is_some_and(|(old, new)| old > new)
+                })
+            {
                 return false;
             }
             snapshot.generation += 1;
@@ -119,12 +151,34 @@ impl DiagnosticsStore {
         });
     }
 
-    pub(crate) fn forget(&self, uri: &Url) {
+    fn is_current(&self, snapshot: &DiagnosticsSnapshot) -> bool {
+        snapshot
+            .source
+            .as_ref()
+            .is_some_and(|source| Arc::ptr_eq(source, &self.source))
+    }
+}
+
+impl Drop for DiagnosticsPublisher {
+    fn drop(&mut self) {
         self.tx.send_if_modified(|snapshot| {
-            let before = snapshot.entries.len();
-            snapshot.entries.retain(|entry| &entry.uri != uri);
-            snapshot.entries.len() != before
+            if !self.is_current(snapshot) {
+                return false;
+            }
+            snapshot.source = None;
+            snapshot.clear_publications()
         });
+    }
+}
+
+impl DiagnosticsSnapshot {
+    fn clear_publications(&mut self) -> bool {
+        if self.entries.is_empty() {
+            return false;
+        }
+        self.entries.clear();
+        self.generation += 1;
+        true
     }
 }
 
@@ -185,15 +239,16 @@ mod tests {
     fn recording_bumps_the_generation_and_replaces_per_uri(
     ) -> Result<(), Box<dyn std::error::Error>> {
         let (store, rx) = DiagnosticsStore::new();
+        let publisher = store.publisher();
         let uri = Url::parse("file:///tmp/top.sv")?;
-        store.record(PublishDiagnosticsParams {
+        publisher.record(PublishDiagnosticsParams {
             uri: uri.clone(),
             version: Some(1),
             diagnostics: vec![diagnostic(0, "first")],
         });
         assert_eq!(rx.borrow().generation(), 1);
         assert_eq!(rx.borrow().diagnostic_count(), 1);
-        store.record(PublishDiagnosticsParams {
+        publisher.record(PublishDiagnosticsParams {
             uri: uri.clone(),
             version: Some(2),
             diagnostics: vec![diagnostic(0, "a"), diagnostic(1, "b")],
@@ -214,9 +269,10 @@ mod tests {
     fn late_older_version_does_not_replace_current_diagnostics(
     ) -> Result<(), Box<dyn std::error::Error>> {
         let (store, rx) = DiagnosticsStore::new();
+        let publisher = store.publisher();
         let uri = Url::parse("file:///tmp/top.sv")?;
         for version in [3, 2] {
-            store.record(PublishDiagnosticsParams {
+            publisher.record(PublishDiagnosticsParams {
                 uri: uri.clone(),
                 version: Some(version),
                 diagnostics: Vec::new(),
@@ -228,6 +284,30 @@ mod tests {
             Some(3)
         );
         store.forget(&uri);
+        assert!(rx.borrow().for_uri(&uri).is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn retired_publisher_cannot_record_or_clear_replacement_diagnostics() -> anyhow::Result<()> {
+        let (store, rx) = DiagnosticsStore::new();
+        let uri = Url::parse("file:///tmp/top.sv")?;
+        let empty = PublishDiagnosticsParams::new(uri.clone(), Vec::new(), None);
+        let old = store.publisher();
+        old.record(empty.clone());
+        assert!(rx.borrow().for_uri(&uri).is_some());
+        let new = store.publisher();
+        let cleared = rx.borrow().generation();
+        assert!(rx.borrow().for_uri(&uri).is_none());
+        old.record(empty.clone());
+        assert_eq!(rx.borrow().generation(), cleared);
+        assert!(rx.borrow().for_uri(&uri).is_none());
+        new.record(empty);
+        drop(old);
+        assert_eq!(rx.borrow().generation(), cleared + 1);
+        assert!(rx.borrow().for_uri(&uri).is_some());
+        drop(new);
+        assert_eq!(rx.borrow().generation(), cleared + 2);
         assert!(rx.borrow().for_uri(&uri).is_none());
         Ok(())
     }

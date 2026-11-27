@@ -511,6 +511,8 @@ private:
     void startLints();
     void collectLints();
     void collectLspDiagnostics();
+    void sampleLspSession();
+    void clearLspResults();
     void finaliseState();
     /// ONE user-visible count: the session message is composed from the merged
     /// view, never from the lower-layer `diagnostics_` vector (R2).

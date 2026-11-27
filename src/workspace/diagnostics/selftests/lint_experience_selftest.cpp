@@ -17,6 +17,7 @@
 #include "diagnostics_panel.h"
 #include "project_lint_notice.h"
 #include "project_lint_trigger.h"
+#include "runtime_init.h"
 #include "symbol_scan.h"
 
 #include "editor_area.h"
@@ -165,6 +166,12 @@ public:
     }
     void stop() override { started = false; }
     SessionSnapshot status() const override { return snapshot; }
+    void setHealth(BackendState state, int restarts, const QString &message = {})
+    {
+        snapshot.state = state;
+        snapshot.restarts = restarts;
+        snapshot.message = message;
+    }
 
     quint64 requestDefinition(const QString &, int, int) override { return ++last_; }
     quint64 requestReferences(const QString &, int, int) override { return ++last_; }
@@ -311,17 +318,120 @@ QString projectFile(QTemporaryDir &dir, const QString &name, const QString &text
     return path;
 }
 
+void checkSessionRecovery(const QString &server)
+{
+    section("Recovery through Rust FFI and a controlled LSP process");
+    QTemporaryDir dir;
+    const QString saved = QStringLiteral("module top; endmodule\n");
+    const QString unsaved = QStringLiteral("module unsaved; endmodule\n");
+    const QString top = projectFile(dir, QStringLiteral("top.sv"), saved);
+    auto lsp = createFfiLspSessionBackend();
+    QString error;
+    const bool configured = lsp && lsp->selectBackend(LspBackendKind::Slang, server,
+        {dir.path()}, {QStringLiteral("WIDTH=8 + 4")}, &error);
+    check("wire.configured", !top.isEmpty() && configured, error);
+    if (top.isEmpty() || !configured) {
+        return;
+    }
+
+    DiagnosticsController controller(std::move(lsp), std::make_unique<FakeSlang>());
+    controller.setConfiguration(server, dir.path());
+    ToolchainReport toolchain;
+    toolchain.verible.path = server;
+    toolchain.verible.source = ToolSource::Bundled;
+    toolchain.slang.path = server;
+    toolchain.slang.source = ToolSource::Bundled;
+    controller.setToolchainReport(toolchain);
+    DiagnosticsPanel panel(&controller);
+    panel.resize(720, 460);
+    panel.show();
+    const QString captureDir = qEnvironmentVariable("VEDIT_RECOVERY_SNAPSHOT_DIR");
+    const auto capture = [&](const QString &name) {
+        if (!captureDir.isEmpty()) {
+            check("wire.panel-snapshot", panel.grab().save(QDir(captureDir).filePath(name)));
+        }
+    };
+    const auto events = [&]() {
+        QFile file(dir.filePath(QStringLiteral("wire.log")));
+        return file.open(QIODevice::ReadOnly) ? QString::fromUtf8(file.readAll()) : QString();
+    };
+    const auto clean = [&]() {
+        return controller.statusForFile(top) == DiagnosticsController::FileStatus::Clean
+            && panel.statusText().contains(QStringLiteral("0 diagnostic"));
+    };
+
+    check("wire.analyze", controller.analyzeFile(top, saved, false));
+    const bool firstReady = waitFor([&]() {
+        return clean() && controller.session().serverPid > 0
+            && events().count(QStringLiteral("context ")) == 1;
+    }, 8000);
+    check("wire.initial-ready-and-one-context", firstReady, panel.statusText());
+    if (!firstReady) {
+        return;
+    }
+    const int firstPid = controller.session().serverPid;
+    capture(QStringLiteral("ready.png"));
+    check("wire.trigger-idle-exit", !projectFile(dir, QStringLiteral("exit-%1").arg(firstPid),
+                                                QString()).isEmpty());
+    const bool failed = waitFor([&]() {
+        return panel.statusText().contains(QStringLiteral("server stderr: fixture idle exit"));
+    }, 5000);
+    check("wire.idle-failure-visible", failed && controller.session().serverPid == 0
+              && controller.statusForFile(top) != DiagnosticsController::FileStatus::Clean,
+          panel.statusText());
+    capture(QStringLiteral("failed.png"));
+    QElapsedTimer quiet;
+    quiet.start();
+    waitFor([&]() { return quiet.elapsed() >= 650; }, 700);
+    check("wire.idle-did-not-restart", events().count(QStringLiteral("spawn ")) == 1,
+          panel.statusText());
+
+    check("wire.edit-wakes-session", controller.analyzeFile(top, unsaved, true));
+    const bool recovered = waitFor([&]() {
+        return clean() && controller.session().serverPid > 0
+            && controller.session().serverPid != firstPid && controller.session().restarts == 1
+            && events().count(QStringLiteral("context ")) == 2;
+    }, 10000);
+    check("wire.new-process-and-verdict", recovered, panel.statusText());
+    capture(QStringLiteral("recovered.png"));
+    const quint64 requests = controller.diagnosticsRequestCount();
+    quiet.restart();
+    waitFor([&]() { return quiet.elapsed() >= 650; }, 700);
+    check("wire.recovered-idle-did-not-reanalyze", controller.diagnosticsRequestCount() == requests,
+          QStringLiteral("requests=%1→%2").arg(requests).arg(controller.diagnosticsRequestCount()));
+    const QString log = events();
+    const int newPid = controller.session().serverPid;
+    check("wire.recovery-context-exactly-once",
+          log.count(QStringLiteral("context %1\n").arg(firstPid)) == 1
+              && log.count(QStringLiteral("context %1\n").arg(newPid)) == 1
+              && log.count(QStringLiteral("context ")) == 2,
+          log.trimmed());
+    QFile disk(top);
+    check("wire.recovered-unsaved-buffer", disk.open(QIODevice::ReadOnly)
+              && QString::fromUtf8(disk.readAll()) == saved
+              && (log.contains(QStringLiteral("change %1 unsaved\n").arg(newPid))
+                  || log.contains(QStringLiteral("open %1 unsaved\n").arg(newPid))),
+          panel.statusText());
+}
+
 } // namespace
 
 int main(int argc, char **argv)
 {
+    vedit_runtime_init();
     QApplication app(argc, argv);
     QString veribleLint;
+    QString healthServer;
     for (int index = 1; index < argc; ++index) {
         const QString argument = QString::fromLocal8Bit(argv[index]);
         if (argument == QLatin1String("--verible-lint") && index + 1 < argc) {
             veribleLint = QString::fromLocal8Bit(argv[++index]);
+        } else if (argument == QLatin1String("--health-server") && index + 1 < argc) {
+            healthServer = QString::fromLocal8Bit(argv[++index]);
         }
+    }
+    if (!healthServer.isEmpty()) {
+        checkSessionRecovery(healthServer);
     }
 
     // =======================================================================
@@ -600,6 +710,59 @@ int main(int argc, char **argv)
         check("ac2.outline-state-names-the-cause",
               panel.emptyStateText().contains(QStringLiteral("did not analyse this file")),
               panel.emptyStateText());
+        check("ac2.status-names-silence",
+              panel.statusText().contains(QStringLiteral("did not analyse this file")),
+              panel.statusText());
+        check("ac2.status-does-not-report-zero",
+              !panel.statusText().contains(QStringLiteral("0 diagnostic")), panel.statusText());
+
+        lspRaw->neverPublishes = false;
+        panel.show();
+        const auto clean = [&]() {
+            return controller.statusForFile(a) == DiagnosticsController::FileStatus::Clean
+                && panel.statusText().contains(QStringLiteral("0 diagnostic"));
+        };
+        const bool publishedClean = waitFor(clean, 2000);
+        check("recovery.published-empty-is-clean", publishedClean, panel.statusText());
+        check("recovery.initial-context-once", lspRaw->buildContextPushes == 1,
+              QString::number(lspRaw->buildContextPushes));
+
+        const QString serverError = QStringLiteral("child exited after Ready (stderr: fixture failure)");
+        lspRaw->setHealth(BackendState::Failed, 1, serverError);
+        const bool detected = waitFor([&]() {
+            return panel.statusText().contains(serverError);
+        }, 1500);
+        check("recovery.idle-failure-visible", detected, panel.statusText());
+        check("recovery.failed-no-stale-clean",
+              controller.statusForFile(a) != DiagnosticsController::FileStatus::Clean
+                  && !panel.diagnosticsEmptyStateText().contains(QStringLiteral("no problems reported")),
+              panel.diagnosticsEmptyStateText());
+
+        // Force an analysis round while the same session is still failed. This
+        // independently checks the failure detail even if idle polling missed it.
+        controller.analyzeFile(a, QStringLiteral("module a; endmodule\n"), false);
+        waitFor([&]() { return controller.state() != BackendState::Reparsing; }, 1500);
+        check("recovery.failed-round-keeps-server-reason",
+              controller.session().message.contains(serverError), controller.session().message);
+
+        lspRaw->setHealth(BackendState::Reparsing, 1, serverError);
+        QElapsedTimer quiet;
+        quiet.start();
+        waitFor([&]() { return quiet.elapsed() >= 650; }, 700);
+        check("recovery.no-context-until-ready", lspRaw->buildContextPushes == 1,
+              QString::number(lspRaw->buildContextPushes));
+        lspRaw->setHealth(BackendState::Ready, 1);
+        const bool recovered = waitFor(clean, 2000);
+        check("recovery.ready-publishes-new-verdict", recovered, panel.statusText());
+        const quint64 requests = controller.diagnosticsRequestCount();
+        quiet.restart();
+        waitFor([&]() { return quiet.elapsed() >= 650; }, 700);
+        check("recovery.context-exactly-once-and-idle-quiescent",
+              lspRaw->buildContextPushes == 2 && lspRaw->startCount == 1
+                  && controller.diagnosticsRequestCount() == requests,
+              QStringLiteral("pushes=%1 starts=%2 requests=%3→%4")
+                  .arg(lspRaw->buildContextPushes).arg(lspRaw->startCount).arg(requests)
+                  .arg(controller.diagnosticsRequestCount()));
     }
     {
         // N1: the CLEAN verdict belongs to the CURRENT analysis. A file the LSP

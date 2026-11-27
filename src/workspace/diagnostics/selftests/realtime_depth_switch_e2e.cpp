@@ -674,6 +674,12 @@ int main(int argc, char **argv)
               QStringLiteral("set=%1").arg(midSet.join(QLatin1Char(','))));
         check("midlevel.realtime-set-has-active", midSet.contains(subPath),
               midSet.join(QLatin1Char(',')));
+        QStringList expectedMidSet{subPath, leafPath};
+        expectedMidSet.sort();
+        QStringList sortedMidSet = midSet;
+        sortedMidSet.sort();
+        check("midlevel.realtime-set-exact", sortedMidSet == expectedMidSet,
+              midSet.join(QLatin1Char(',')));
         check("midlevel.realtime-set-excludes-top", !midSet.contains(topPath),
               midSet.join(QLatin1Char(',')));
         check("midlevel.realtime-set-excludes-unrelated",
@@ -692,6 +698,10 @@ int main(int argc, char **argv)
             },
             15000);
         const QStringList midRequestSet = controller->lastDiagnosticsRequestFiles();
+        QStringList sortedRequestSet = midRequestSet;
+        sortedRequestSet.sort();
+        check("midlevel.request-set-exact", sortedRequestSet == expectedMidSet,
+              midRequestSet.join(QLatin1Char(',')));
         check("midlevel.request-set-has-leaf", midRequested,
               QStringLiteral("requested=%1")
                   .arg(midRequestSet.join(QLatin1Char(','))));
