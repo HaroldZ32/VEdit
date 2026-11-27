@@ -30,7 +30,7 @@
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread::JoinHandle;
@@ -766,12 +766,12 @@ async fn session_loop(
                 continue;
             }
         };
-        let uri = match Url::from_file_path(path) {
+        let uri = match document_uri(path) {
             Ok(uri) => uri,
-            Err(()) => {
+            Err(error) => {
                 skipped.push(SkippedFile {
                     path: path.clone(),
-                    reason: "not an absolute file path".to_string(),
+                    reason: error.to_string(),
                 });
                 continue;
             }
@@ -1380,8 +1380,7 @@ async fn apply_buffer_change(
     text: String,
     refresh_slang: bool,
 ) -> Result<usize> {
-    let uri =
-        Url::from_file_path(path).map_err(|()| anyhow!("{} is not a file path", path.display()))?;
+    let uri = document_uri(path)?;
     let bytes = text.len();
     if refresh_slang && client.is_running() && client.document_matches(&uri, &text)? {
         return Ok(bytes);
@@ -1582,9 +1581,28 @@ fn parameter_label_text(signature_label: &str, label: ParameterLabel) -> String 
     }
 }
 
+fn document_uri(path: &Path) -> Result<Url> {
+    let to_uri = |file: &Path| {
+        Url::from_file_path(file)
+            .map_err(|()| anyhow!("{} is not an absolute file path", file.display()))
+    };
+    let uri = to_uri(path)?;
+    if !path.components().any(|part| part == Component::ParentDir) {
+        return Ok(uri);
+    }
+
+    // Incoming LSP URLs collapse `..`. Resolve the parent on disk first so a
+    // symlink followed by `..` still names the file we opened. An unsaved path
+    // may have no parent on disk, so it uses the URL parser's normalization.
+    let resolved_parent = path.parent().map(Path::canonicalize);
+    if let (Some(Ok(parent)), Some(name)) = (resolved_parent, path.file_name()) {
+        return to_uri(&parent.join(name));
+    }
+    Ok(Url::parse(uri.as_str())?)
+}
+
 async fn ensure_open(client: &mut LspClient, file: &Path) -> Result<Url> {
-    let uri =
-        Url::from_file_path(file).map_err(|()| anyhow!("not a file path: {}", file.display()))?;
+    let uri = document_uri(file)?;
     if client.document(&uri)?.is_some() {
         return Ok(uri);
     }
