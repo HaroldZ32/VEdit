@@ -1768,6 +1768,87 @@ int main(int argc, char **argv)
                                                                  QString()));
     }
 
+    {
+        const QString active = QStringLiteral("/proj/active.sv");
+        const QString shadowedTab = QStringLiteral("/proj/shadowed.sv");
+        const QString outsideTab = QStringLiteral("/external/tab.sv");
+        const QString shadowedTabChild = QStringLiteral("/proj/shadowed_tab_child.sv");
+        const QString outsideTabChild = QStringLiteral("/proj/outside_tab_child.sv");
+        const QString includeOwner = QStringLiteral("/proj/include_owner.sv");
+        const auto shadowed = realtime_scope::shadowedFileSetFrom({shadowedTab});
+        const auto golden = realtime_scope::goldenFileSetFrom(
+            {active, shadowedTab, shadowedTabChild, outsideTabChild, includeOwner});
+        const QHash<QString, QStringList> edited{{shadowedTab, {shadowedTabChild}},
+                                                {outsideTab, {outsideTabChild}},
+                                                {active, {shadowedTab, includeOwner}}};
+        int outsideCount = 0;
+        const auto session = realtime_scope::openDocumentSessionSet(
+            golden, {}, {shadowedTab, outsideTab, active}, 64, 128, &outsideCount, nullptr,
+            edited, active, shadowed);
+        check("scope.session-excluded-tabs-do-not-contribute-children",
+              session == QStringList{active, includeOwner} && outsideCount == 1,
+              QStringLiteral("outside=%1 session=[%2]").arg(outsideCount).arg(session.join(QLatin1Char(','))));
+        bool truncated = true;
+        const auto analysis = realtime_scope::realtimeFileSetFor(
+            golden, {}, active, 2, &truncated, edited, shadowed);
+        check("scope.shadowed-child-does-not-consume-closure-budget",
+              analysis == QStringList{active, includeOwner} && !truncated,
+              QStringLiteral("truncated=%1 analysis=[%2]").arg(truncated).arg(analysis.join(QLatin1Char(','))));
+    }
+
+    {
+        const QString first = QStringLiteral("/proj/first/top.sv");
+        const QString second = QStringLiteral("/proj/second/top.sv");
+        const QString active = QStringLiteral("/proj/active/top.sv");
+        QStringList members;
+        QVariantMap closure;
+        for (const QString &tab : {first, second, active}) {
+            QStringList children;
+            for (int i = 0; i < 63; ++i) {
+                children.append(QStringLiteral("%1/child_%2.sv").arg(QFileInfo(tab).path()).arg(i));
+            }
+            members.append(tab);
+            members.append(children);
+            closure.insert(tab, children);
+        }
+        const auto golden = realtime_scope::goldenFileSetFrom(members);
+        const auto firstClosure = realtime_scope::realtimeFileSetFor(golden, closure, first, 64);
+        const auto activeClosure = realtime_scope::realtimeFileSetFor(golden, closure, active, 64);
+        QStringList expected = firstClosure + activeClosure;
+        expected.sort();
+        bool truncated = false;
+        const auto capped = realtime_scope::openDocumentSessionSet(
+            golden, closure, {first, second, active}, 64, 128, nullptr, &truncated, {}, active);
+        auto lsp = std::make_unique<FakeLsp>();
+        auto *backend = lsp.get();
+        DiagnosticsController controller(std::move(lsp), std::make_unique<FakeSlang>());
+        controller.setConfiguration(QStringLiteral("/payload/verible-verilog-ls"), QStringLiteral("/proj"));
+        controller.setRealtimeSessionFiles(capped);
+        const QString text = QStringLiteral("module top; endmodule\n");
+        const bool started = controller.analyzeFile(active, text, false);
+        check("scope.session-cap-preserves-active-closure-in-compiler-inputs",
+              started && truncated && capped == expected && capped.size() == 128
+                  && backend->startedFiles == expected,
+              QStringLiteral("truncated=%1 selected=%2 compiler=%3")
+                  .arg(truncated).arg(capped.size()).arg(backend->startedFiles.size()));
+
+        const auto firstSession = realtime_scope::openDocumentSessionSet(
+            golden, closure, {first, active}, 64, 128, nullptr, &truncated, {}, first);
+        const bool firstComplete = !truncated;
+        const auto activeSession = realtime_scope::openDocumentSessionSet(
+            golden, closure, {first, active}, 64, 128, nullptr, &truncated, {}, active);
+        const int starts = backend->startCount;
+        controller.setRealtimeSessionFiles(firstSession);
+        const bool switchedFirst = controller.analyzeFile(first, text, false);
+        controller.setRealtimeSessionFiles(activeSession);
+        const bool switchedBack = controller.analyzeFile(active, text, false);
+        check("scope.session-reuses-compiler-inputs-when-complete-union-fits",
+              switchedFirst && switchedBack && firstComplete && !truncated && firstSession == expected
+                  && activeSession == expected && backend->startCount == starts,
+              QStringLiteral("truncated=%1 selected=%2 starts_before=%3 starts_after=%4")
+                  .arg(truncated).arg(activeSession.size()).arg(starts).arg(backend->startCount));
+    }
+
     // ---- G1-a/G1-c (batch-20261120): the COMPILE set is `{active}` alone ----
     // The predicate above is only half the fix; this drives the controller and
     // reads the exact list the language server is started over

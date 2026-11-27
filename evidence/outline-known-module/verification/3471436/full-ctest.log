@@ -1,0 +1,27 @@
+PRODUCT_SHA=347143645c888aa836cc869855ec5afaac503b4f
+CHECKOUT_HEAD=9a3d831d63d12eb1307e175b3a41fe04a259727b
+PRODUCTION_DIFF=none
+QT_QPA_PLATFORM=offscreen
+COMMAND=ctest --test-dir target/outline-qa/qt --output-on-failure -j 2
+FINAL_FULL_CTEST_EXIT=8
+4a05b5329e90e79ccab69d106e4057df6af755ef6ed26745487949eb0cb3febc  target/outline-qa/verifier-3471436-full.XSvtdU/full.log
+PASS=97 SKIP=2 FAIL=1
+        Start  77: vedit-realtime-depth-switch-e2e
+  6/100 Test  #77: vedit-realtime-depth-switch-e2e ..................   Passed    6.88 sec
+        Start  88: vedit-realtime-context-e2e
+        Start  92: vedit-filelist-authority-include-e2e
+ 28/100 Test  #92: vedit-filelist-authority-include-e2e .............   Passed    2.30 sec
+ 30/100 Test  #88: vedit-realtime-context-e2e .......................   Passed   30.13 sec
+        Start  14: vedit-signal-trace-selftest
+ 47/100 Test  #14: vedit-signal-trace-selftest ......................   Passed    0.95 sec
+ 98/100 Test  #23: vedit-svn-workbench-selftest .....................***Skipped   0.04 sec
+ 99/100 Test  #95: vedit-svn-workspaces-selftest ....................***Skipped   0.02 sec
+100/100 Test  #72: vedit-diagnostics-product-seam ...................***Failed    6.30 sec
+expected ';' [slang]
+expected a declaration name [slang]'
+expected ';' [slang]
+expected a declaration name [slang]
+CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+expected ';' [slang]
+expected a declaration name [slang]
+Total Test time (real) = 182.76 sec

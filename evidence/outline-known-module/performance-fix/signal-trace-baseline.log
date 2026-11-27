@@ -1,0 +1,7 @@
+Test project /src/target/outline-qa/baseline/qt
+    Start 14: vedit-signal-trace-selftest
+1/1 Test #14: vedit-signal-trace-selftest ......   Passed    0.89 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.90 sec

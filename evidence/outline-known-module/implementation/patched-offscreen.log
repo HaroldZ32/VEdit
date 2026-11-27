@@ -1,0 +1,14 @@
+88: SCOPED-SIBLING tree=1 pass=1 inputs=[lib/alternate.sv,rtl/scoped_bridge.sv,rtl/scoped_parent.sv] outline=[scoped_parent.sv:3:23 — port 'sibling_bad_port' does not exist in 'alternate' [slang]|scoped_parent.sv:4:3 — unknown module 'genuinely_missing' [slang]|scoped_parent.sv:3:13 — input port 'correct' has no connection [unconnected-input-port]]
+77: OBSERVED switch.p95 ms=10 samples=10
+88: AUTO-VARIANT pass=1 inputs=[lib/alternate.sv,rtl/original.sv,rtl/variant.sv] outline=[variant.sv:3:25 — port 'variant_bad_port' does not exist in 'alternate' [slang]|variant.sv:4:5 — unknown module 'genuinely_missing' [slang]|variant.sv:3:15 — input port 'correct' has no connection [unconnected-input-port]]
+33: BATCH-LAYOUT-SELFTEST PASS checks=114 failures=0
+12/12 Test #92: vedit-filelist-authority-include-e2e ...***Failed    9.71 sec
+The following tests passed:
+92% tests passed, 1 tests failed out of 12
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+92: CTRL pass=1 canonical=include/child.svh
+92: CTRL expected=include/signal.svh canonical=include/signal.svh
+    Test #92: vedit-filelist-authority-include-e2e ...   Passed    2.31 sec
+92: CTRL pass=1 canonical=include/child.svh
+    Test #92: vedit-filelist-authority-include-e2e ...***Failed    9.71 sec
+0% tests passed, 1 tests failed out of 1

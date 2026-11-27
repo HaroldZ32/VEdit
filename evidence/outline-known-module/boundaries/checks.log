@@ -1,0 +1,47 @@
+# vedit-qt6-build:local, QT_QPA_PLATFORM=offscreen, Slang CLI and slang-server from the patched worktree
+# src/app/workspace-lane-diagnostics/vedit-realtime-context-e2e
+319ff34eb7c78a32704d4d405a9a8d199d8513b7103f75bd3f134ed79d00c0fc  src/app/workspace-lane-diagnostics/vedit-realtime-context-e2e
+baseline exit=0
+
+# Release Ninja command for vedit-realtime-context-e2e with scratch boundaries.cpp and executable paths
+# /scratch/boundaries
+18c13ece24d8bd2a3b9e3df3c150c8cafedcf5308d64f54a9436ef22d904e832  src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+f43f2f338c7bb6e7df720a80cb10c74066c2a79e357376b494725337ac6f9528  src/syntax/grammars/libvedit_tree_sitter_verilog.a
+CAP oracle=1 owners=73 inferred=66 catalog_children=[z_real.sv] catalog_saw_disk=1 selected=64 real=1 a61=1 a62=0 a65=0 exact=1 dirty=0 analysis_count=64 truncated=1
+FORMS grammar param=1 multi=2 escaped=1 missing=1 owner_param=1 owner_multi=1 owner_escaped=1 owner_missing=0 catalog_children=[] catalog_saw_disk=1
+FORMS result oracle=1 pass=1 dirty=0 files=[escaped_child.sv,forms.sv,multi_child.sv,param_child.sv] rows=[forms.sv:3:40 — port 'bad_param_port' does not exist in 'param_child' [slang]|forms.sv:4:27 — port 'bad_first_port' does not exist in 'multi_child' [slang]|forms.sv:4:61 — port 'bad_second_port' does not exist in 'multi_child' [slang]|forms.sv:5:32 — port 'bad_escaped_port' does not exist in 'escaped.child' [slang]|forms.sv:6:5 — unknown module 'genuinely_missing' [slang]|forms.sv:3:30 — input port 'ok' has no connection [unconnected-input-port]|forms.sv:4:17 — input port 'ok' has no connection [unconnected-input-port]|forms.sv:4:50 — input port 'ok' has no connection [unconnected-input-port]|forms.sv:5:20 — input port 'ok' has no connection [unconnected-input-port]]
+boundaries exit=0
+
+# c++ -std=c++20 -Wall -Wextra -Wpedantic -Werror -DORIGINAL -I/src/src/workspace/diagnostics $(pkg-config --cflags Qt6Core) /scratch/scope-red.cpp -o /scratch/scope-red $(pkg-config --libs Qt6Core)
+# /scratch/scope-red
+ELIGIBILITY pass=0 shadowed_child=1 outside_child=0 legitimate_owner=1 outside_tabs=1
+SESSION-CAP pass=0 selected=128 active_closure=0 compiler_inputs=129 stable_at_exact_cap=1
+exit=1
+
+# c++ -std=c++20 -Wall -Wextra -Wpedantic -Werror -I/src/src/workspace/diagnostics $(pkg-config --cflags Qt6Core) /scratch/scope-red.cpp -o /scratch/scope-green $(pkg-config --libs Qt6Core)
+# /scratch/scope-green
+ELIGIBILITY pass=1 shadowed_child=0 outside_child=0 legitimate_owner=1 outside_tabs=1
+SESSION-CAP pass=1 selected=128 active_closure=64 compiler_inputs=128 stable_at_exact_cap=1
+exit=0
+
+# src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest (baseline)
+VE-DIAGNOSTICS-SELFTEST checks=192 failures=0
+scope-baseline exit=0
+
+# Release Ninja command for vedit-workspace-diagnostics-selftest with scratch object and executable paths
+# /scratch/scope-selftest
+CHECK PASS scope.session-excluded-tabs-do-not-contribute-children  outside=1 session=[/proj/active.sv,/proj/include_owner.sv]
+CHECK PASS scope.shadowed-child-does-not-consume-closure-budget  truncated=0 analysis=[/proj/active.sv,/proj/include_owner.sv]
+CHECK PASS scope.session-cap-preserves-active-closure-in-compiler-inputs  truncated=1 selected=128 compiler=128
+CHECK PASS scope.session-reuses-compiler-inputs-when-complete-union-fits  truncated=0 selected=128 starts_before=1 starts_after=1
+VE-DIAGNOSTICS-SELFTEST checks=196 failures=0
+scope-selftest exit=0
+
+# Original scratch fixture rebuilt using the integrated diagnostics archive
+# /scratch/boundaries
+6b7d1bc9488932a1cd7532b5dcbc9ffb0fdc5c8be45947790f493084c4855505  src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+9e74b51a90500c68df49adfcdf92a3588543c889e3afb9b2c55802fe22730e94  /scratch/boundaries
+CAP oracle=1 owners=73 inferred=66 catalog_children=[z_real.sv] catalog_saw_disk=1 selected=64 real=1 a61=1 a62=0 a65=0 exact=1 dirty=0 analysis_count=64 truncated=1
+FORMS grammar param=1 multi=2 escaped=1 missing=1 owner_param=1 owner_multi=1 owner_escaped=1 owner_missing=0 catalog_children=[] catalog_saw_disk=1
+FORMS result oracle=1 pass=1 dirty=0 files=[escaped_child.sv,forms.sv,multi_child.sv,param_child.sv] rows=[forms.sv:3:40 — port 'bad_param_port' does not exist in 'param_child' [slang]|forms.sv:4:27 — port 'bad_first_port' does not exist in 'multi_child' [slang]|forms.sv:4:61 — port 'bad_second_port' does not exist in 'multi_child' [slang]|forms.sv:5:32 — port 'bad_escaped_port' does not exist in 'escaped.child' [slang]|forms.sv:6:5 — unknown module 'genuinely_missing' [slang]|forms.sv:3:30 — input port 'ok' has no connection [unconnected-input-port]|forms.sv:4:17 — input port 'ok' has no connection [unconnected-input-port]|forms.sv:4:50 — input port 'ok' has no connection [unconnected-input-port]|forms.sv:5:20 — input port 'ok' has no connection [unconnected-input-port]]
+integrated boundaries exit=0

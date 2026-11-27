@@ -1,0 +1,27 @@
+  1/100 Test  #92: vedit-filelist-authority-include-e2e .............   Passed    2.36 sec
+  2/100 Test  #87: vedit-module-closure-e2e .........................   Passed   11.53 sec
+  3/100 Test  #77: vedit-realtime-depth-switch-e2e ..................   Passed    7.20 sec
+  4/100 Test  #91: vedit-filelist-authority-config-e2e ..............   Passed    4.72 sec
+  5/100 Test  #88: vedit-realtime-context-e2e .......................   Passed   21.37 sec
+  6/100 Test  #89: vedit-filelist-authority-e2e .....................   Passed    4.68 sec
+  8/100 Test  #93: vedit-filelist-authority-wrapper-e2e .............   Passed    2.33 sec
+  9/100 Test  #83: vedit-rm17b-top-scope-e2e ........................   Passed    3.69 sec
+ 10/100 Test  #90: vedit-filelist-authority-verible-e2e .............   Passed    1.99 sec
+ 11/100 Test  #32: vedit-editor-open-bench ..........................   Passed    1.14 sec
+ 12/100 Test  #33: vedit-app-batch-layout-selftest ..................   Passed    0.93 sec
+ 34/100 Test  #23: vedit-svn-workbench-selftest .....................***Skipped   0.03 sec
+ 81/100 Test  #72: vedit-diagnostics-product-seam ...................***Failed    6.32 sec
+CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+ 83/100 Test  #73: vedit-active-watcher-cap-selftest ................   Passed    6.11 sec
+ 94/100 Test  #95: vedit-svn-workspaces-selftest ....................***Skipped   0.01 sec
+99% tests passed, 1 tests failed out of 100
+Total Test time (real) = 217.72 sec
+FULL_CTEST_EXIT=8
+1/2 Test #72: vedit-diagnostics-product-seam ...***Failed    6.31 sec
+CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+50% tests passed, 1 tests failed out of 2
+	 72 - vedit-diagnostics-product-seam (Failed)
+BASELINE_SEAM_RENAME_CTEST_EXIT=8
+CHECK seam.annotation-tooltip-has-syntax PASS  syntax error at "b" [verible]
+VE-DIAGNOSTICS-PRODUCT-SEAM checks=20 failures=0 skipped=0
+PATCHED_SEAM_WITH_VERIBLE_EXIT=0

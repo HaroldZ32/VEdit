@@ -1,0 +1,118 @@
+[1/47] Automatic MOC for target vedit_workspace_diagnostics
+[2/46] Automatic MOC for target vedit_workspace_module_tree
+[3/45] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/realtime_module_references.cpp.o
+[4/45] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/module_catalog.cpp.o
+[5/45] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/module_tree_integration.cpp.o
+[6/45] Linking CXX static library src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a
+[7/45] Linking CXX executable src/app/workspace-lane-module_tree/vedit-module-tree-catalog-test
+[8/45] Linking CXX executable src/app/workspace-lane-module_tree/vedit-module-tree-lane-b-test
+[9/45] Linking CXX executable src/app/workspace-lane-module_tree/vedit-module-tree-selftest
+[10/45] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_integration.cpp.o
+[11/45] Linking CXX static library src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+[12/45] Automatic MOC for target vedit-workspace-diagnostics-selftest
+[13/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+[14/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-verdict-retention-selftest
+[15/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-edit-jank-bench
+[16/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-orchestration-probe
+[17/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+[18/44] Linking CXX executable src/app/vedit-app
+[19/44] Linking CXX executable src/app/vedit-signal-trace-selftest
+[20/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+[21/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-experience-selftest
+[22/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-active-watcher-cap-selftest
+[23/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rename-e2e
+[24/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-project-lint-e2e
+[25/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-realtime-depth-switch-e2e
+[26/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-slang-build-context-e2e
+[27/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-b3-repair-api-selftest
+[28/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-split-pane-mouse-e2e
+[29/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-b3-wiring-e2e
+[30/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm2-project-switch-e2e
+[31/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm9-status-dots-e2e
+[32/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm17b-top-scope-e2e
+[33/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+[34/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-verible-preprocess-hint-selftest
+[35/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-module-closure-e2e
+[36/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-realtime-context-e2e
+[37/44] Linking CXX executable src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+[38/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e
+[39/44] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-lint-probe
+[40/44] Linking CXX executable src/app/workspace-lane-rename/vedit-rename-ui-probe
+[41/44] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-lane-probe
+[42/44] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-format-probe
+[43/44] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-workspace-diagnostics-selftest.dir/diagnostics_selftest.cpp.o
+[44/44] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+[1/38] Automatic MOC for target vedit_workspace_diagnostics
+[2/37] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_integration.cpp.o
+[3/37] Linking CXX static library src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+[4/37] Automatic MOC for target vedit-realtime-context-e2e
+[5/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-verdict-retention-selftest
+[6/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+[7/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-orchestration-probe
+[8/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-edit-jank-bench
+[9/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+[10/36] Linking CXX executable src/app/vedit-signal-trace-selftest
+[11/36] Linking CXX executable src/app/vedit-app
+[12/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+[13/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-active-watcher-cap-selftest
+[14/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+[15/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-experience-selftest
+[16/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rename-e2e
+[17/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-project-lint-e2e
+[18/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-realtime-depth-switch-e2e
+[19/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-slang-build-context-e2e
+[20/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-b3-repair-api-selftest
+[21/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-split-pane-mouse-e2e
+[22/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-b3-wiring-e2e
+[23/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm2-project-switch-e2e
+[24/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm9-status-dots-e2e
+[25/36] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-realtime-context-e2e.dir/selftests/realtime_context_e2e.cpp.o
+[26/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm17b-top-scope-e2e
+[27/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-verible-preprocess-hint-selftest
+[28/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+[29/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-module-closure-e2e
+[30/36] Linking CXX executable src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+[31/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e
+[32/36] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-lane-probe
+[33/36] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-lint-probe
+[34/36] Linking CXX executable src/app/workspace-lane-rename/vedit-rename-ui-probe
+[35/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-realtime-context-e2e
+[36/36] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-format-probe
+[1/38] Automatic MOC for target vedit_workspace_diagnostics
+[2/37] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_integration.cpp.o
+[3/37] Linking CXX static library src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+[4/37] Automatic MOC for target vedit-realtime-context-e2e
+[5/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-verdict-retention-selftest
+[6/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-orchestration-probe
+[7/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-edit-jank-bench
+[8/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+[9/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+[10/36] Linking CXX executable src/app/vedit-signal-trace-selftest
+[11/36] Linking CXX executable src/app/vedit-app
+[12/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+[13/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+[14/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-active-watcher-cap-selftest
+[15/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-experience-selftest
+[16/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rename-e2e
+[17/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-project-lint-e2e
+[18/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-slang-build-context-e2e
+[19/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-realtime-depth-switch-e2e
+[20/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-b3-repair-api-selftest
+[21/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-b3-wiring-e2e
+[22/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-split-pane-mouse-e2e
+[23/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm2-project-switch-e2e
+[24/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm9-status-dots-e2e
+[25/36] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-realtime-context-e2e.dir/selftests/realtime_context_e2e.cpp.o
+[26/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-rm17b-top-scope-e2e
+[27/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-verible-preprocess-hint-selftest
+[28/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+[29/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-module-closure-e2e
+[30/36] Linking CXX executable src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+[31/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e
+[32/36] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-lint-probe
+[33/36] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-lane-probe
+[34/36] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-realtime-context-e2e
+[35/36] Linking CXX executable src/app/workspace-lane-rename/vedit-rename-ui-probe
+[36/36] Linking CXX executable src/app/workspace-lane-vhdl/vedit-vhdl-format-probe
+
+BUILD_EXIT=0

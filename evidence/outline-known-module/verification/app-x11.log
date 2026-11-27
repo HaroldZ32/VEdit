@@ -1,0 +1,25 @@
+
+auto.lSbRd7
+BACKEND-SWITCHED backend=slang lint=slang lsp=/src/target/outline-qa/bin/slang-server engine=/src/build/slang/out/slang basis=measured argv=''
+module-tree: catalog ready files=4 modules=4 source='live project file set'
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/auto.lSbRd7/project/rtl/variant.sv' files=2 session=3
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/auto.lSbRd7/project/rtl/variant.sv' files=3 session=3
+diagnostics: 3 inline annotation(s) on /src/target/outline-qa/reviewer-app/auto.lSbRd7/project/rtl/variant.sv
+diagnostics: 3 inline annotation(s) on /src/target/outline-qa/reviewer-app/auto.lSbRd7/project/rtl/variant.sv
+Observed process: slang-server
+APP_EXIT=0
+
+scoped.pfqYCf
+BACKEND-SWITCHED backend=slang lint=slang lsp=/src/target/outline-qa/bin/slang-server engine=/src/build/slang/out/slang basis=measured argv=''
+module-tree: catalog ready files=3 modules=4 source='live project file set'
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/scoped.pfqYCf/project/rtl/scoped_parent.sv' files=3 session=4
+REALTIME-SET active='/src/target/outline-qa/reviewer-app/scoped.pfqYCf/project/rtl/scoped_parent.sv' files=3 session=3
+module-tree: catalog ready files=3 modules=3 source='live project file set'
+[app-shell] 0 file(s) outside the top scoped_top are not analysed
+diagnostics: 3 inline annotation(s) on /src/target/outline-qa/reviewer-app/scoped.pfqYCf/project/rtl/scoped_parent.sv
+diagnostics: 3 inline annotation(s) on /src/target/outline-qa/reviewer-app/scoped.pfqYCf/project/rtl/scoped_parent.sv
+Observed process: slang-server
+APP_EXIT=0
+
+Saved scoped-top selection
+    "top": "scoped_top",

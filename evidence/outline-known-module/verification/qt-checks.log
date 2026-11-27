@@ -1,0 +1,51 @@
+Focused CTest (offscreen), exit 0
+88: SCOPED-SIBLING tree=1 pass=1 inputs=[lib/alternate.sv,rtl/scoped_bridge.sv,rtl/scoped_parent.sv] outline=[scoped_parent.sv:3:23 — port 'sibling_bad_port' does not exist in 'alternate' [slang]|scoped_parent.sv:4:3 — unknown module 'genuinely_missing' [slang]|scoped_parent.sv:3:13 — input port 'correct' has no connection [unconnected-input-port]]
+88: AUTO-VARIANT pass=1 inputs=[lib/alternate.sv,rtl/original.sv,rtl/variant.sv] outline=[variant.sv:3:25 — port 'variant_bad_port' does not exist in 'alternate' [slang]|variant.sv:4:5 — unknown module 'genuinely_missing' [slang]|variant.sv:3:15 — input port 'correct' has no connection [unconnected-input-port]]
+The following tests passed:
+100% tests passed, 0 tests failed out of 1
+
+Exact-head xcb, exit 1
+SCOPED-SIBLING tree=1 pass=1 inputs=[lib/alternate.sv,rtl/scoped_bridge.sv,rtl/scoped_parent.sv] outline=[scoped_parent.sv:3:23 — port 'sibling_bad_port' does not exist in 'alternate' [slang]|scoped_parent.sv:4:3 — unknown module 'genuinely_missing' [slang]|scoped_parent.sv:3:13 — input port 'correct' has no connection [unconnected-input-port]]
+AUTO-VARIANT pass=1 inputs=[lib/alternate.sv,rtl/original.sv,rtl/variant.sv] outline=[variant.sv:3:25 — port 'variant_bad_port' does not exist in 'alternate' [slang]|variant.sv:4:5 — unknown module 'genuinely_missing' [slang]|variant.sv:3:15 — input port 'correct' has no connection [unconnected-input-port]]
+MACRO-OVERRIDE NATIVE-FALLBACK pass=0 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[]
+
+Baseline xcb, exit 1
+SCOPED-SIBLING tree=1 pass=0 inputs=[rtl/scoped_bridge.sv,rtl/scoped_parent.sv] outline=[scoped_parent.sv:3:3 — unknown module 'alternate' [slang]|scoped_parent.sv:4:3 — unknown module 'genuinely_missing' [slang]]
+AUTO-VARIANT pass=0 inputs=[rtl/original.sv,rtl/variant.sv] outline=[variant.sv:3:5 — unknown module 'alternate' [slang]|variant.sv:4:5 — unknown module 'genuinely_missing' [slang]]
+
+ABI smoke, exit 0
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+
+Full exact-head CTest, exit 8
+        Start  77: vedit-realtime-depth-switch-e2e
+  7/100 Test  #77: vedit-realtime-depth-switch-e2e ..................   Passed    7.17 sec
+        Start  88: vedit-realtime-context-e2e
+ 11/100 Test  #88: vedit-realtime-context-e2e .......................   Passed   21.39 sec
+        Start  89: vedit-filelist-authority-e2e
+ 14/100 Test  #89: vedit-filelist-authority-e2e .....................   Passed    4.71 sec
+ 32/100 Test  #92: vedit-filelist-authority-include-e2e .............   Passed    2.30 sec
+ 98/100 Test  #23: vedit-svn-workbench-selftest .....................***Skipped   0.03 sec
+ 99/100 Test  #95: vedit-svn-workspaces-selftest ....................***Skipped   0.01 sec
+100/100 Test  #72: vedit-diagnostics-product-seam ...................***Failed    6.25 sec
+expected ';' [slang]
+expected a declaration name [slang]'
+expected ';' [slang]
+expected a declaration name [slang]
+CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+expected ';' [slang]
+expected a declaration name [slang]
+99% tests passed, 1 tests failed out of 100
+
+Baseline annotation seam, exit 1
+expected ';' [slang]
+expected a declaration name [slang]'
+expected ';' [slang]
+expected a declaration name [slang]
+CHECK seam.annotation-tooltip-has-syntax FAIL  variable 'a' is assigned but its value is never used [unused-but-set-variable]
+expected ';' [slang]
+expected a declaration name [slang]
+
+Exact-head direct Xvfb xcb repeat, exit 0
+SCOPED-SIBLING tree=1 pass=1 inputs=[lib/alternate.sv,rtl/scoped_bridge.sv,rtl/scoped_parent.sv] outline=[scoped_parent.sv:3:23 — port 'sibling_bad_port' does not exist in 'alternate' [slang]|scoped_parent.sv:4:3 — unknown module 'genuinely_missing' [slang]|scoped_parent.sv:3:13 — input port 'correct' has no connection [unconnected-input-port]]
+AUTO-VARIANT pass=1 inputs=[lib/alternate.sv,rtl/original.sv,rtl/variant.sv] outline=[variant.sv:3:25 — port 'variant_bad_port' does not exist in 'alternate' [slang]|variant.sv:4:5 — unknown module 'genuinely_missing' [slang]|variant.sv:3:15 — input port 'correct' has no connection [unconnected-input-port]]
+MACRO-OVERRIDE NATIVE-FALLBACK pass=1 authored=[] resolved=[DOCK_OVERRIDE_WIDTH=2,DOCK_SETTINGS_PRESENT] displayed=[DOCK_OVERRIDE_WIDTH=2] rows=[unknown module 'genuinely_missing'|cannot refer to element 8 of 'logic[4:0]'|variable 'sink' is assigned but its value is never used|variable 'bits' is never assigned a value]
