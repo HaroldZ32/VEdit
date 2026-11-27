@@ -1,0 +1,29 @@
+   Compiling rustix v1.1.6
+   Compiling libc v0.2.191
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling getrandom v0.4.3
+   Compiling cfg-if v1.0.5
+   Compiling once_cell v1.21.4
+   Compiling fastrand v2.5.0
+   Compiling vd-vcs v0.5.0 (/src/crates/vd-vcs)
+   Compiling tempfile v3.27.0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.39s
+     Running tests/svn_compare_e2e.rs (/tmp/svn17-target/debug/deps/svn_compare_e2e-5a2f549327bb4062)
+
+running 1 test
+EVIDENCE underlying SVN client: 1.7.14
+EVIDENCE negative control: svn: invalid option: --show-item
+Type 'svn help' for usage.
+EVIDENCE working tree status and exact BASE for modified, added, copied-add and deleted files
+Error: "svn: E125001: '@HEAD' is just a peg revision. Maybe try '@HEAD@' instead?"
+test checkout_history_and_comparison_work_without_recent_client_options ... FAILED
+
+failures:
+
+failures:
+    checkout_history_and_comparison_work_without_recent_client_options
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s
+
+error: test failed, to rerun pass `-p vd-vcs --test svn_compare_e2e`

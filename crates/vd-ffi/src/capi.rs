@@ -853,7 +853,7 @@ pub struct VdModuleCatalog {
     /// unchanged, but the STRUCT GREW (88 -> 112 bytes) and the provider writes
     /// the whole current struct in `vd_catalog_poll`, so a consumer built against
     /// an older header must be RECOMPILED - offsets are stable, the size is not
-    /// (`VD_ABI_VERSION` = 2).
+    /// (growth introduced in `VD_ABI_VERSION` 2).
     pub shadowed_files: VdStringList,
     /// G1-c: the sentence saying those files are excluded from the compiler
     /// input, or null. Meant to be shown right AFTER `warning` (the B-2

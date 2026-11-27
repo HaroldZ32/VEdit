@@ -1,0 +1,35 @@
+   Compiling rustix v1.1.6
+   Compiling libc v0.2.191
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling getrandom v0.4.3
+   Compiling cfg-if v1.0.5
+   Compiling fastrand v2.5.0
+   Compiling once_cell v1.21.4
+   Compiling tempfile v3.27.0
+   Compiling vd-vcs v0.5.0 (<checkout>/crates/vd-vcs)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.97s
+     Running tests/svn_compare_e2e.rs (/tmp/vedit-svn-data-target/debug/deps/svn_compare_e2e-5a2f549327bb4062)
+
+running 1 test
+EVIDENCE underlying SVN client: 1.14.5
+EVIDENCE negative control: svn: invalid option: --show-item
+EVIDENCE working tree status and exact BASE for modified, added, copied-add and deleted files
+EVIDENCE project log r3/r2 and seven in-subtree A/D/M/R rows with decoded paths and copy/move origins
+EVIDENCE file histories and exact comparison pegs matched and unsupported text was rejected
+
+thread 'checkout_history_and_comparison_work_without_recent_client_options' (238) panicked at crates/vd-vcs/tests/svn_compare_e2e.rs:305:5:
+assertion `left == right` failed: history must follow the stale WC node through deletion
+  left: [7]
+ right: [6, 5, 3, 2]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test checkout_history_and_comparison_work_without_recent_client_options ... FAILED
+
+failures:
+
+failures:
+    checkout_history_and_comparison_work_without_recent_client_options
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.12s
+
+error: test failed, to rerun pass `-p vd-vcs --test svn_compare_e2e`

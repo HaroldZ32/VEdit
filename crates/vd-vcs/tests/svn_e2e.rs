@@ -270,9 +270,9 @@ fn exercise_svn_parity(root: &Path, repository: &str, svn: &Path) -> Result<(), 
     let number = history[0].revision.to_string();
     assert_eq!(svn_read::log(&wc, &format!("r{number}"), 20)?.len(), 1);
     assert!(svn_read::revision_detail(&wc, &number)?
-        .1
+        .changes
         .iter()
-        .any(|path| path.contains("a space.sv")));
+        .any(|change| change.path == "/trunk/a space.sv"));
     eprintln!(
         "EVIDENCE real incoming status, text search, revision search, and changed paths matched"
     );
@@ -282,10 +282,11 @@ fn exercise_svn_parity(root: &Path, repository: &str, svn: &Path) -> Result<(), 
         .iter()
         .any(|entry| entry.revision.to_string() == number));
     let revision = history[0].revision;
-    let (_, changed) = bookmark.detail(&number)?;
-    assert!(changed
+    let detail = bookmark.detail(&number)?;
+    assert!(detail
+        .changes
         .iter()
-        .any(|path| path.ends_with("/trunk/a space.sv")));
+        .any(|change| change.path == "/trunk/a space.sv"));
     let previous = bookmark
         .previous("/trunk/a space.sv", revision, revision)?
         .ok_or("missing previous remote revision")?;

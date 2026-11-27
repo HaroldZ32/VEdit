@@ -32,8 +32,10 @@
  header, and the version is the signal that says so. Appending fields was
  previously kept inside version 1 (T72's `VdRenameOptions`); that rule is
  retired - a filled struct that grows is a consumer-visible ABI change.
+ Version 3 extends `VdVcsFileStat` with SVN action, node kind and copy provenance.
+ Recompile consumers so indexing a history result uses the current row stride.
  */
-#define VD_ABI_VERSION 2
+#define VD_ABI_VERSION 3
 
 /*
  Poll result: the job is still running.
@@ -816,7 +818,7 @@ typedef struct VdModuleCatalog {
    unchanged, but the STRUCT GREW (88 -> 112 bytes) and the provider writes
    the whole current struct in `vd_catalog_poll`, so a consumer built against
    an older header must be RECOMPILED - offsets are stable, the size is not
-   (`VD_ABI_VERSION` = 2).
+   (growth introduced in `VD_ABI_VERSION` 2).
    */
   struct VdStringList shadowed_files;
   /*
@@ -2490,7 +2492,7 @@ typedef struct VdVcsHistoryEntry {
  */
 typedef struct VdVcsFileStat {
   /*
-   Repository-relative path, or NULL.
+   Repository-relative path (repository-absolute for SVN revision detail), or NULL.
    */
   char *path;
   /*
@@ -2501,6 +2503,22 @@ typedef struct VdVcsFileStat {
    Deleted lines (`-1` when binary).
    */
   int64_t deletions;
+  /*
+   SVN action as ASCII A/D/M/R, or zero for other file rows.
+   */
+  int32_t svn_action;
+  /*
+   SVN node kind: 0 unknown, 1 file, 2 directory.
+   */
+  int32_t svn_node_kind;
+  /*
+   SVN copy source repository-absolute path, or NULL when absent.
+   */
+  char *svn_copy_from_path;
+  /*
+   SVN copy source revision, or zero when absent.
+   */
+  uint64_t svn_copy_from_revision;
 } VdVcsFileStat;
 
 /*
@@ -2623,11 +2641,11 @@ typedef struct VdVcsHistoryResult {
    */
   char *path;
   /*
-   Comparison "from" side as requested, or NULL.
+   Comparison "from" side or the repository root URL of an SVN revision detail.
    */
   char *from;
   /*
-   Comparison "to" side as requested, or NULL.
+   Comparison "to" side or the decoded subtree path of an SVN revision detail.
    */
   char *to;
   /*

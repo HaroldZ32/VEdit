@@ -312,4 +312,6 @@ pub(crate) mod jobgate {
 /// header, and the version is the signal that says so. Appending fields was
 /// previously kept inside version 1 (T72's `VdRenameOptions`); that rule is
 /// retired - a filled struct that grows is a consumer-visible ABI change.
-pub const VD_ABI_VERSION: u32 = 2;
+/// Version 3 extends `VdVcsFileStat` with SVN action, node kind and copy provenance.
+/// Recompile consumers so indexing a history result uses the current row stride.
+pub const VD_ABI_VERSION: u32 = 3;

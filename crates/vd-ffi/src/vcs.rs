@@ -299,12 +299,20 @@ pub struct VdVcsHistoryEntry {
 /// One file of a commit / comparison (owned string).
 #[repr(C)]
 pub struct VdVcsFileStat {
-    /// Repository-relative path, or NULL.
+    /// Repository-relative path (repository-absolute for SVN revision detail), or NULL.
     pub path: *mut c_char,
     /// Added lines (`-1` when git reported the file as binary).
     pub additions: i64,
     /// Deleted lines (`-1` when binary).
     pub deletions: i64,
+    /// SVN action as ASCII A/D/M/R, or zero for other file rows.
+    pub svn_action: i32,
+    /// SVN node kind: 0 unknown, 1 file, 2 directory.
+    pub svn_node_kind: i32,
+    /// SVN copy source repository-absolute path, or NULL when absent.
+    pub svn_copy_from_path: *mut c_char,
+    /// SVN copy source revision, or zero when absent.
+    pub svn_copy_from_revision: u64,
 }
 
 /// One blamed line (owned strings).
@@ -420,9 +428,9 @@ pub struct VdVcsHistoryResult {
     pub patch: *mut c_char,
     /// Repository-relative path (file history / blame), or NULL.
     pub path: *mut c_char,
-    /// Comparison "from" side as requested, or NULL.
+    /// Comparison "from" side or the repository root URL of an SVN revision detail.
     pub from: *mut c_char,
-    /// Comparison "to" side as requested, or NULL.
+    /// Comparison "to" side or the decoded subtree path of an SVN revision detail.
     pub to: *mut c_char,
     /// Author time, unix seconds (detail).
     pub time: i64,
@@ -612,10 +620,14 @@ pub(crate) struct VcsHistoryEntryData {
 }
 
 /// One file stat, owned by the job until it is converted to C.
+#[derive(Default)]
 pub(crate) struct VcsFileStatData {
     pub(crate) path: String,
     pub(crate) additions: i64,
     pub(crate) deletions: i64,
+    svn_action: i32,
+    svn_node_kind: i32,
+    svn_copy_from: Option<vd_vcs::svn_read::CopySource>,
 }
 
 /// One blamed line, owned by the job until it is converted to C.
@@ -707,6 +719,15 @@ impl VcsHistoryData {
                 path: c_string(&entry.path),
                 additions: entry.additions,
                 deletions: entry.deletions,
+                svn_action: entry.svn_action,
+                svn_node_kind: entry.svn_node_kind,
+                svn_copy_from_path: owned(
+                    entry
+                        .svn_copy_from
+                        .as_ref()
+                        .map(|source| source.path.as_str()),
+                ),
+                svn_copy_from_revision: entry.svn_copy_from.map_or(0, |source| source.revision),
             })
             .collect();
         let (file_count, files) = if file_items.is_empty() {
@@ -781,7 +802,8 @@ fn history_commits_data(root: &Path, offset: usize, limit: usize, query: &str) -
         let limit = limit.clamp(1, 200);
         match vd_vcs::svn_read::log(root, query, offset.saturating_add(limit).saturating_add(1)) {
             Ok(entries) => {
-                data.has_more = offset + limit < 1000 && entries.len() > offset + limit;
+                let end = offset.saturating_add(limit);
+                data.has_more = end < 1000 && entries.len() > end;
                 data.commits = entries
                     .into_iter()
                     .skip(offset)
@@ -845,16 +867,7 @@ fn history_commit_data(root: &Path, hash: &str) -> VcsHistoryData {
             ..VcsHistoryData::default()
         };
         match vd_vcs::svn_read::revision_detail(root, hash) {
-            Ok((entry, paths)) => {
-                data.time = entry.unix_time();
-                data.hash = Some(format!("r{}", entry.revision));
-                data.author = Some(entry.author);
-                data.body = Some(entry.message);
-                data.from = vd_vcs::svn_read::checkout_repository_url(root).ok();
-                data.to = vd_vcs::svn_read::checkout_repository_path(root).ok();
-                data.files = svn_revision_files(&paths);
-                data.patch = Some(paths.join("\n"));
-            }
+            Ok(detail) => fill_svn_revision(&mut data, detail),
             Err(error) => {
                 data.error = true;
                 data.note = Some(error);
@@ -878,6 +891,7 @@ fn history_commit_data(root: &Path, hash: &str) -> VcsHistoryData {
                 path: file.path,
                 additions: file.additions,
                 deletions: file.deletions,
+                ..VcsFileStatData::default()
             })
             .collect(),
         blame: Vec::new(),
@@ -895,18 +909,40 @@ fn history_commit_data(root: &Path, hash: &str) -> VcsHistoryData {
     }
 }
 
-fn svn_revision_files(paths: &[String]) -> Vec<VcsFileStatData> {
-    paths
-        .iter()
-        .filter_map(|row| {
-            let (action, path) = row.split_once("  ")?;
-            Some(VcsFileStatData {
-                path: path.to_owned(),
-                additions: 0,
-                deletions: i64::from(action == "D"),
-            })
+fn fill_svn_revision(data: &mut VcsHistoryData, detail: vd_vcs::svn_read::RevisionDetail) {
+    use vd_vcs::svn_read::{NodeKind, PathAction};
+
+    let entry = detail.entry;
+    data.time = entry.unix_time();
+    data.hash = Some(format!("r{}", entry.revision));
+    data.author = Some(entry.author);
+    data.body = Some(entry.message);
+    data.from = Some(detail.repository_root);
+    data.to = Some(detail.repository_path);
+    data.patch = Some(
+        detail
+            .changes
+            .iter()
+            .map(|change| format!("{}  {}", char::from(change.action as u8), change.path))
+            .collect::<Vec<_>>()
+            .join("\n"),
+    );
+    data.files = detail
+        .changes
+        .into_iter()
+        .map(|change| VcsFileStatData {
+            path: change.path,
+            additions: 0,
+            deletions: i64::from(change.action == PathAction::Deleted),
+            svn_action: change.action as i32,
+            svn_node_kind: match change.kind {
+                NodeKind::Unknown => 0,
+                NodeKind::File => 1,
+                NodeKind::Directory => 2,
+            },
+            svn_copy_from: change.copy_from,
         })
-        .collect()
+        .collect();
 }
 
 fn svn_log_entry(entry: vd_vcs::svn_read::LogEntry) -> VcsHistoryEntryData {
@@ -1064,6 +1100,7 @@ fn history_compare_data(root: &Path, from: &str, to: &str) -> VcsHistoryData {
                 path: file.path,
                 additions: file.additions,
                 deletions: file.deletions,
+                ..VcsFileStatData::default()
             })
             .collect(),
         blame: Vec::new(),
@@ -1685,8 +1722,7 @@ pub unsafe extern "C" fn vd_vcs_svn_working_job(
                     .into_iter()
                     .map(|entry| VcsFileStatData {
                         path: entry.path,
-                        additions: 0,
-                        deletions: 0,
+                        ..VcsFileStatData::default()
                     })
                     .collect();
             })
@@ -1775,13 +1811,7 @@ pub unsafe extern "C" fn vd_vcs_svn_remote_job(
                 Ok(())
             }
             VD_VCS_HISTORY_SVN_REMOTE_DETAIL => {
-                let (entry, paths) = remote.detail(&revision.to_string())?;
-                data.time = entry.unix_time();
-                data.hash = Some(format!("r{}", entry.revision));
-                data.author = Some(entry.author);
-                data.body = Some(entry.message);
-                data.files = svn_revision_files(&paths);
-                data.patch = Some(paths.join("\n"));
+                fill_svn_revision(&mut data, remote.detail(&revision.to_string())?);
                 Ok(())
             }
             VD_VCS_HISTORY_SVN_REMOTE_SNAPSHOT => {
@@ -1896,7 +1926,9 @@ pub unsafe extern "C" fn vd_vcs_history_free(result: *mut VdVcsHistoryResult) {
         let slice = &mut *std::ptr::slice_from_raw_parts_mut(result.files, result.file_count);
         for entry in slice.iter_mut() {
             free_string(entry.path);
+            free_string(entry.svn_copy_from_path);
             entry.path = std::ptr::null_mut();
+            entry.svn_copy_from_path = std::ptr::null_mut();
         }
         drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(
             result.files,
