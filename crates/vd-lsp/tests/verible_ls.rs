@@ -489,7 +489,10 @@ async fn initialize_timeout_is_enforced_and_the_child_is_reaped() -> Result<()> 
 
     let scratch = Scratch::new()?;
     let script = scratch.path.join("hanging-ls.sh");
-    std::fs::write(&script, "#!/bin/sh\nexec sleep 30\n")?;
+    std::fs::write(
+        &script,
+        "#!/bin/sh\nprintf '%s\\n' \"$$\" > pid\nexec sleep 30\n",
+    )?;
     let mut permissions = std::fs::metadata(&script)?.permissions();
     permissions.set_mode(0o755);
     std::fs::set_permissions(&script, permissions)?;
@@ -512,10 +515,11 @@ async fn initialize_timeout_is_enforced_and_the_child_is_reaped() -> Result<()> 
         message.contains("initialize timed out"),
         "expected an initialize timeout, got `{message}`"
     );
-    let pid = client.pid();
+    let pid = std::fs::read_to_string(scratch.path.join("pid"))?
+        .trim()
+        .parse()?;
+    assert_eq!(client.pid(), None);
+    assert!(!process_alive(pid), "initialization left child {pid}");
     client.shutdown().await?;
-    if let Some(pid) = pid {
-        wait_gone(pid, Duration::from_secs(3))?;
-    }
     Ok(())
 }

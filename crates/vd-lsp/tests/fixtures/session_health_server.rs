@@ -11,9 +11,13 @@ pub const IDLE_STDERR: &str = "fixture idle exit";
 pub const STARTUP_STDERR: &str = "fixture rejected initialization";
 pub const UNSAVED: &str = "module unsaved; endmodule\n";
 pub const DEFINE: &str = "WIDTH=8 + 4";
+pub const FIRST_DIAGNOSTIC: &str = "diagnostic from first process";
+pub const PUBLISH_EMPTY: &str = "module publish_empty; endmodule\n";
 
 pub fn run(mode: &str) -> Result<()> {
     let pid = std::process::id();
+    let first = !Path::new(EVENTS).exists();
+    let silent_replacement = mode.starts_with("silent-replacement");
     let mut events = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
@@ -43,18 +47,26 @@ pub fn run(mode: &str) -> Result<()> {
                 if doc["text"] == UNSAVED {
                     writeln!(events, "open {pid} unsaved")?;
                 }
-                send(
-                    &mut output,
-                    &json!({
-                        "jsonrpc": "2.0", "method": "textDocument/publishDiagnostics",
-                        "params": {"uri": doc["uri"], "diagnostics": []}
-                    }),
-                )?;
+                if !silent_replacement || first {
+                    let diagnostics = if mode == "silent-replacement" {
+                        json!([{"range": {"start": {"line": 0, "character": 0},
+                                            "end": {"line": 0, "character": 1}},
+                                "severity": 1, "message": FIRST_DIAGNOSTIC}])
+                    } else {
+                        json!([])
+                    };
+                    publish(&mut output, &doc["uri"], diagnostics)?;
+                }
                 continue;
             }
             Some("textDocument/didChange") => {
-                if message["params"]["contentChanges"][0]["text"] == UNSAVED {
-                    writeln!(events, "change {pid} unsaved")?;
+                let params = &message["params"];
+                match params["contentChanges"][0]["text"].as_str() {
+                    Some(UNSAVED) => writeln!(events, "change {pid} unsaved")?,
+                    Some(PUBLISH_EMPTY) => {
+                        publish(&mut output, &params["textDocument"]["uri"], json!([]))?
+                    }
+                    _ => {}
                 }
                 continue;
             }
@@ -107,6 +119,16 @@ fn read_frame(input: &mut impl BufRead) -> Result<Option<Value>> {
     let mut body = vec![0; len];
     input.read_exact(&mut body)?;
     Ok(Some(serde_json::from_slice(&body)?))
+}
+
+fn publish(output: &mut impl Write, uri: &Value, diagnostics: Value) -> Result<()> {
+    send(
+        output,
+        &json!({
+            "jsonrpc": "2.0", "method": "textDocument/publishDiagnostics",
+            "params": {"uri": uri, "diagnostics": diagnostics}
+        }),
+    )
 }
 
 fn send(output: &mut impl Write, message: &Value) -> Result<()> {

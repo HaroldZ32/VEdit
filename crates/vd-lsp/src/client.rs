@@ -88,6 +88,15 @@ struct Session {
     pid: u32,
 }
 
+impl Drop for Session {
+    fn drop(&mut self) {
+        self.mainloop.abort();
+        if let Some(reader) = &self.stderr_reader {
+            reader.abort();
+        }
+    }
+}
+
 /// A Verible language-server session.
 ///
 /// The server is started lazily on the first call that needs it, restarted when
@@ -104,6 +113,7 @@ pub struct LspClient {
     initialize_params_json: Option<Value>,
     initialize_result_json: Option<Value>,
     restarts: u32,
+    restart_pending: bool,
     stderr_tail: Arc<Mutex<VecDeque<String>>>,
 }
 
@@ -134,6 +144,7 @@ impl LspClient {
             initialize_params_json: None,
             initialize_result_json: None,
             restarts: 0,
+            restart_pending: false,
             stderr_tail: Arc::new(Mutex::new(VecDeque::new())),
         }
     }
@@ -143,11 +154,13 @@ impl LspClient {
         &self.config
     }
 
-    /// True once a server process is running.
+    /// True once an initialized server's protocol loop is running.
     pub fn is_running(&self) -> bool {
-        self.session
-            .as_ref()
-            .is_some_and(|session| !session.mainloop.is_finished())
+        self.capabilities.is_some()
+            && self
+                .session
+                .as_ref()
+                .is_some_and(|session| !session.mainloop.is_finished())
     }
 
     /// True when a session was started and its main loop has since ended (the
@@ -163,7 +176,7 @@ impl LspClient {
     pub fn pid(&self) -> Option<u32> {
         self.session
             .as_ref()
-            .filter(|session| !session.mainloop.is_finished())
+            .filter(|_| self.is_running())
             .map(|session| session.pid)
     }
 
@@ -197,13 +210,16 @@ impl LspClient {
 
     /// Give the stderr reader a bounded chance to finish after a startup or
     /// transport failure. A child or descendant can keep the pipe open.
-    pub(crate) async fn drain_stderr(&mut self) {
-        if let Some(mut reader) = self.session.as_mut().and_then(|s| s.stderr_reader.take()) {
-            if tokio::time::timeout(Duration::from_millis(100), &mut reader)
-                .await
-                .is_err()
-            {
-                reader.abort();
+    async fn drain_stderr(&mut self) {
+        if let Some(session) = self.session.as_mut() {
+            if let Some(reader) = &mut session.stderr_reader {
+                if tokio::time::timeout(Duration::from_millis(100), &mut *reader)
+                    .await
+                    .is_err()
+                {
+                    reader.abort();
+                }
+                session.stderr_reader = None;
             }
         }
     }
@@ -527,34 +543,34 @@ impl LspClient {
     /// Only when the session could not be ended at all; a server that stopped
     /// answering is killed and reaped, which is not an error.
     pub async fn shutdown(&mut self) -> Result<()> {
-        let Some(mut session) = self.session.take() else {
+        let running = self.is_running();
+        let Some(session) = self.session.as_ref() else {
             return Ok(());
         };
-        let request = session.server.request::<Shutdown>(());
-        match tokio::time::timeout(self.config.shutdown_timeout, request).await {
-            Ok(_) => {}
-            Err(_) => self.record_stderr_line("shutdown request timed out; killing the server"),
-        }
-        match session.server.notify::<Exit>(()) {
-            Ok(()) => {}
-            Err(error) => self.record_stderr_line(&format!("exit notification failed: {error}")),
-        }
-        let waited = tokio::time::timeout(self.config.shutdown_timeout, session.child.wait()).await;
-        if waited.is_err() {
-            match session.child.kill().await {
-                Ok(()) => {}
-                Err(error) => self.record_stderr_line(&format!("kill failed: {error}")),
+        if running {
+            let server = session.server.clone();
+            if tokio::time::timeout(self.config.shutdown_timeout, server.request::<Shutdown>(()))
+                .await
+                .is_err()
+            {
+                self.record_stderr_line("shutdown request timed out");
             }
-            let _ = session.child.wait().await;
-        }
-        if !session.mainloop.is_finished() {
-            session.mainloop.abort();
-            let outcome = session.mainloop.await;
-            if outcome.is_err() {
-                self.record_stderr_line("main loop task was aborted");
+            if let Err(error) = server.notify::<Exit>(()) {
+                self.record_stderr_line(&format!("exit notification failed: {error}"));
+            }
+            if let Some(session) = self.session.as_mut() {
+                match tokio::time::timeout(self.config.shutdown_timeout, session.child.wait()).await
+                {
+                    Ok(Ok(_)) => {}
+                    Ok(Err(error)) => {
+                        self.record_stderr_line(&format!("shutdown wait failed: {error}"))
+                    }
+                    Err(_) => self.record_stderr_line("server did not exit after shutdown"),
+                }
             }
         }
-        self.capabilities = None;
+        self.reap_session().await?;
+        self.restart_pending = false;
         if self.restarts > 0 {
             self.record_stderr_line(&format!("session ended after {} restart(s)", self.restarts));
         }
@@ -563,13 +579,11 @@ impl LspClient {
 
     /// Ensure a live, initialised session and return its socket.
     async fn ensure_session(&mut self) -> Result<ServerSocket> {
-        let restarting = self.session_ended();
-        if restarting {
-            self.drain_stderr().await;
-            self.reap_dead_session();
+        if self.session.is_some() && !self.is_running() {
+            self.retire_failed_session().await?;
         }
         if self.session.is_none() {
-            if restarting || self.restarts > 0 {
+            if self.restart_pending || self.restarts > 0 {
                 if self.restarts >= MAX_RESTARTS {
                     bail!("language server failed after {MAX_RESTARTS} restart attempts; refusing to restart again");
                 }
@@ -584,19 +598,52 @@ impl LspClient {
         Ok(session.server.clone())
     }
 
-    fn reap_dead_session(&mut self) {
-        if let Some(session) = self.session.take() {
-            if !session.mainloop.is_finished() {
-                session.mainloop.abort();
+    pub(crate) async fn retire_failed_session(&mut self) -> Result<()> {
+        self.restart_pending = true;
+        self.reap_session().await
+    }
+
+    async fn reap_session(&mut self) -> Result<()> {
+        self.capabilities = None;
+        let Some(session) = self.session.as_mut() else {
+            return Ok(());
+        };
+        session.mainloop.abort();
+        // Protocol EOF does not imply process exit. Signal only the Child we own,
+        // and retain its handle if the bounded wait cannot confirm it was reaped.
+        let outcome: Result<()> = async {
+            if session
+                .child
+                .try_wait()
+                .context("checking language server exit")?
+                .is_none()
+            {
+                session
+                    .child
+                    .start_kill()
+                    .context("terminating language server")?;
+                tokio::time::timeout(self.config.shutdown_timeout, session.child.wait())
+                    .await
+                    .context("timed out reaping language server")?
+                    .context("reaping language server")?;
             }
-            // The child has exited (that is why the main loop finished); wait
-            // for it so the process table entry is reaped.
-            let child = session.child;
-            tokio::spawn(async move {
-                let mut child = child;
-                let _ = child.wait().await;
-            });
+            Ok(())
         }
+        .await;
+        self.drain_stderr().await;
+        outcome?;
+        if let Some(mut session) = self.session.take() {
+            match tokio::time::timeout(self.config.shutdown_timeout, &mut session.mainloop).await {
+                Ok(Ok(Err(error))) => self
+                    .state
+                    .record_log(format!("language server transport ended: {error}")),
+                Ok(_) => {}
+                Err(_) => {
+                    self.record_stderr_line("timed out closing the language server transport")
+                }
+            }
+        }
+        Ok(())
     }
 
     async fn start_session(&mut self) -> Result<()> {
@@ -618,11 +665,14 @@ impl LspClient {
         command.env_remove("LD_LIBRARY_PATH").env_remove("LOCPATH");
         let mut child = command.spawn().with_context(|| {
             format!(
-                "spawning verible-verilog-ls at {}",
+                "spawning {} language server at {}",
+                self.config.backend.as_str(),
                 self.config.ls_path.display()
             )
         })?;
-        let pid = child.id().unwrap_or_default();
+        let pid = child
+            .id()
+            .ok_or_else(|| anyhow!("language server has no process ID"))?;
         let stdout = child
             .stdout
             .take()
@@ -648,11 +698,12 @@ impl LspClient {
         });
 
         let state = self.state.clone();
+        let publisher = state.diagnostics.publisher();
         let (mainloop, server) = MainLoop::new_client(move |_socket| {
             let mut router = Router::new(state);
             router.notification::<PublishDiagnostics>(
-                |state: &mut ClientState, params: PublishDiagnosticsParams| {
-                    state.diagnostics.record(params);
+                move |_, params: PublishDiagnosticsParams| {
+                    publisher.record(params);
                     ControlFlow::Continue(())
                 },
             );
@@ -723,7 +774,13 @@ impl LspClient {
             pid,
         });
 
-        self.initialize(&server).await?;
+        if let Err(error) = self.initialize(&server).await {
+            self.retire_failed_session()
+                .await
+                .with_context(|| format!("{error:#}; cleaning up after initialization"))?;
+            return Err(error);
+        }
+        self.restart_pending = false;
         Ok(())
     }
 
@@ -754,11 +811,11 @@ impl LspClient {
         .map_err(|_| anyhow!("initialize timed out after {:?}", self.config.init_timeout))?
         .map_err(|error| anyhow!("initialize failed: {error}"))?;
         self.initialize_result_json = serde_json::to_value(capabilities_projection(&response)).ok();
-        self.capabilities = Some(response.capabilities.clone());
         server
             .notify::<lsp_types::notification::Initialized>(InitializedParams {})
             .map_err(|error| anyhow!("initialized notification failed: {error}"))?;
         self.reopen_documents(server)?;
+        self.capabilities = Some(response.capabilities);
         Ok(())
     }
 
@@ -866,17 +923,6 @@ impl LspClient {
             tail.pop_front();
         }
         tail.push_back(line.to_string());
-    }
-}
-
-impl Drop for LspClient {
-    fn drop(&mut self) {
-        if let Some(mut session) = self.session.take() {
-            if let Ok(()) = session.child.start_kill() {
-                // The child was still alive; SIGKILL was delivered.
-            }
-            session.mainloop.abort();
-        }
     }
 }
 

@@ -33,19 +33,28 @@ impl Project {
     }
 
     fn start(&self, mode: &str) -> Result<SessionHandle> {
-        // Keep libtest stdout off the LSP pipe. The shell execs the same test
-        // binary in server mode, so the reported child PID is the wire peer's.
-        let config = LspConfig::new("/bin/sh", &self.0)
+        // Keep libtest stdout off the LSP pipe. In the lingering case the
+        // supervised shell stays alive after its wire peer exits and fd 3 closes.
+        let script = if mode == "lingering-transport" {
+            concat!(
+                "exec 3>&1 1>/dev/null; \"$0\" --exact startup_failure_includes_child_stderr --nocapture; ",
+                "result=$?; exec 3>&-; if [ \"$result\" -eq 23 ]; then exec /bin/sleep 5; fi; exit \"$result\""
+            )
+        } else {
+            "exec 3>&1 1>/dev/null; exec \"$0\" --exact startup_failure_includes_child_stderr --nocapture"
+        };
+        let files = vec![self.file()];
+        let mut config = LspConfig::new("/bin/sh", &self.0)
             .with_backend(LspBackend::Slang)
             .with_extra_arg("-c")
-            .with_extra_arg(concat!(
-                "exec 3>&1 1>/dev/null; exec \"$0\" --exact ",
-                "startup_failure_includes_child_stderr --nocapture"
-            ))
+            .with_extra_arg(script)
             .with_extra_arg(std::env::current_exe()?)
             .with_environment([(server::MODE.to_string(), mode.to_string())].into())
             .with_timeouts(BUDGET, BUDGET, Duration::from_millis(500));
-        SessionHandle::with_budgets(config, vec![self.file()], BUDGET, BUDGET)
+        if mode == "indexed" {
+            config = config.with_project_index(&files)?;
+        }
+        SessionHandle::with_budgets(config, files, BUDGET, BUDGET)
     }
 
     fn events(&self) -> Result<String> {
@@ -200,6 +209,136 @@ fn idle_exit_stops_after_three_restarts() -> Result<()> {
     assert_eq!(final_status.restarts, MAX_RESTARTS);
     assert!(final_status.message.contains("3/3 restart(s)"));
     assert!(session.wait_for_stop());
+    Ok(())
+}
+
+fn diagnostics(project: &Project, session: &SessionHandle) -> Result<(bool, Vec<String>)> {
+    let id = session.request(SessionRequest::Diagnostics {
+        file: project.file(),
+    })?;
+    wait_for("diagnostics reply", || match session.poll(id) {
+        PollOutcome::Pending => Ok(None),
+        PollOutcome::Ready(SessionResponse::Diagnostics { published, rows }) => Ok(Some((
+            published,
+            rows.into_iter().map(|row| row.message).collect(),
+        ))),
+        other => bail!("unexpected diagnostics outcome: {other:?}"),
+    })
+}
+
+#[test]
+fn recovery_drops_old_publications_and_accepts_the_first_new_one() -> Result<()> {
+    for (mode, expected) in [
+        (
+            "silent-replacement",
+            vec![server::FIRST_DIAGNOSTIC.to_string()],
+        ),
+        ("silent-replacement-empty", Vec::new()),
+    ] {
+        let project = Project::new(mode)?;
+        let session = project.start(mode)?;
+        let initial = ready(&session, 0)?;
+        assert_eq!(diagnostics(&project, &session)?, (true, expected));
+        project.crash(&session, project.pid(0)?)?;
+        project.change(&session)?;
+        ready(&session, 1)?;
+        wire_barrier(&project, &session)?;
+        let silent = diagnostics(&project, &session)?;
+        assert_eq!(
+            silent,
+            (false, Vec::new()),
+            "{mode} inherited an old publication"
+        );
+        let silent_generation = session.status().generation;
+        assert!(silent_generation >= initial.generation);
+
+        session.change_document(&project.file(), server::PUBLISH_EMPTY.to_string())?;
+        wire_barrier(&project, &session)?;
+        let first_new = diagnostics(&project, &session)?;
+        assert_eq!(first_new, (true, Vec::new()));
+        let new_generation = session.status().generation;
+        assert!(new_generation > silent_generation);
+        println!("{mode}: generations {} -> {silent_generation} -> {new_generation}, silent={silent:?}, first new={first_new:?}", initial.generation);
+        assert!(session.wait_for_stop());
+    }
+    Ok(())
+}
+
+#[test]
+fn same_indexed_buffer_keeps_the_healthy_fast_path_and_cannot_revive_exhaustion() -> Result<()> {
+    let project = Project::new("indexed-limit")?;
+    let session = project.start("indexed")?;
+    let first = ready(&session, 0)?.server_pid.context("initial PID")?;
+    project.push_context(&session)?;
+    project.change(&session)?;
+    project.change(&session)?;
+    wire_barrier(&project, &session)?;
+    let events = project.events()?;
+    assert_eq!(
+        events
+            .lines()
+            .filter(|line| *line == format!("change {first} unsaved"))
+            .count(),
+        1,
+        "{events}"
+    );
+    println!("indexed healthy: same text sent once to PID {first}");
+
+    for restarts in 0..=MAX_RESTARTS {
+        let pid = ready(&session, restarts)?
+            .server_pid
+            .context("active PID")?;
+        project.crash(&session, pid)?;
+        project.change(&session)?;
+    }
+    wait_status(&session, "restart refusal", |status| {
+        status.phase == SessionPhase::Failed && status.message.contains("refusing to restart")
+    })?;
+    project.change(&session)?;
+    project.change(&session)?;
+    // No wire reply is possible after refusal. Observe the status while the
+    // worker handles both resubmissions without a request that could mask it.
+    let deadline = Instant::now() + Duration::from_millis(350);
+    while Instant::now() < deadline {
+        let status = session.status();
+        assert_eq!(
+            (status.phase, status.server_pid, status.restarts),
+            (SessionPhase::Failed, None, 3)
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let launches = project
+        .events()?
+        .lines()
+        .filter(|line| line.starts_with("spawn "))
+        .count();
+    assert_eq!(launches, 4);
+    println!(
+        "indexed exhausted: launches={launches}, {}",
+        session.status().message
+    );
+    assert!(session.wait_for_stop());
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn failed_transport_reaps_its_old_child_before_replacement() -> Result<()> {
+    let project = Project::new("lingering-transport")?;
+    let session = project.start("lingering-transport")?;
+    let old = ready(&session, 0)?.server_pid.context("initial PID")?;
+    project.crash(&session, project.pid(0)?)?;
+    project.change(&session)?;
+    let new = ready(&session, 1)?.server_pid.context("replacement PID")?;
+    assert_ne!(old, new);
+    wire_barrier(&project, &session)?;
+    assert!(
+        !std::path::Path::new(&format!("/proc/{old}")).exists(),
+        "old supervised child {old} survived replacement {new}"
+    );
+    println!("transport closed: old PID {old} reaped, replacement PID {new} answered");
+    assert!(session.wait_for_stop());
+    assert!(!std::path::Path::new(&format!("/proc/{new}")).exists());
     Ok(())
 }
 

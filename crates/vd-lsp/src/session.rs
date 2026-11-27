@@ -371,7 +371,7 @@ impl Inner {
         skipped: Vec<SkippedFile>,
         diagnostics: usize,
         generation: u64,
-        pid: Option<u32>,
+        pid: u32,
         restarts: u32,
         capabilities: Option<BackendCapabilities>,
     ) {
@@ -384,7 +384,7 @@ impl Inner {
         status.skipped = skipped;
         status.diagnostics = diagnostics;
         status.generation = generation;
-        status.server_pid = pid;
+        status.server_pid = Some(pid);
         status.restarts = restarts;
         status.message = format!(
             "ready: backend={} {opened}/{} file(s) open, {diagnostics} diagnostic(s), {} skipped",
@@ -408,10 +408,13 @@ impl Inner {
         }
     }
 
-    async fn fail_server(&self, client: &mut LspClient, reason: String) {
+    async fn fail_server(&self, client: &mut LspClient, mut reason: String) {
         if client.session_ended() {
-            client.drain_stderr().await;
+            if let Err(error) = client.retire_failed_session().await {
+                reason.push_str(&format!(" — cleanup failed: {error:#}"));
+            }
         }
+        self.refresh_from(client);
         self.fail(
             format!(
                 "{reason} ({}/{MAX_RESTARTS} restart(s)){}",
@@ -446,16 +449,21 @@ impl Inner {
         requests.insert(id, state);
     }
 
-    fn refresh_from(&self, generation: u64, diagnostics: usize) {
+    fn refresh_from(&self, client: &LspClient) {
+        let rx = client.diagnostics();
+        let snapshot = rx.borrow();
         let mut status = self.lock_status();
-        status.generation = generation;
-        status.diagnostics = diagnostics;
+        status.generation = snapshot.generation();
+        status.diagnostics = snapshot.diagnostic_count();
     }
 
     /// Publish the process that answered the command and mark a failed session recovered.
     fn note_success(&self, message: String, client: &LspClient) {
+        let Some(pid) = client.pid() else {
+            return;
+        };
         let mut status = self.lock_status();
-        status.server_pid = client.pid();
+        status.server_pid = Some(pid);
         status.restarts = client.restart_count();
         if status.phase == SessionPhase::Failed {
             status.phase = SessionPhase::Ready;
@@ -779,15 +787,12 @@ async fn session_loop(
             .open_document(uri.clone(), language_id(path), text)
             .await
         {
-            client.drain_stderr().await;
-            inner.fail(
-                format!(
-                    "cannot open {} on the server: {error}{}",
-                    path.display(),
-                    stderr_tail_text(&client)
-                ),
-                None,
-            );
+            let mut reason = format!("cannot open {} on the server: {error:#}", path.display());
+            if let Err(error) = client.shutdown().await {
+                reason.push_str(&format!(" — cleanup failed: {error:#}"));
+            }
+            reason.push_str(&stderr_tail_text(&client));
+            inner.fail(reason, None);
             return;
         }
         opened.push((uri, path.clone()));
@@ -821,12 +826,28 @@ async fn session_loop(
                 .filter(|(uri, _)| snapshot.for_uri(uri).is_some())
                 .count()
         };
-        if covered >= opened.len() || std::time::Instant::now() >= deadline {
+        if covered >= opened.len()
+            || client.session_ended()
+            || std::time::Instant::now() >= deadline
+        {
             break;
         }
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
-    let diagnostics = client.diagnostics().borrow().diagnostic_count();
+    let Some(pid) = client.pid() else {
+        inner
+            .fail_server(
+                &mut client,
+                "the language server exited before Ready".into(),
+            )
+            .await;
+        return;
+    };
+    let diagnostics = client.diagnostics();
+    let (generation, count) = {
+        let snapshot = diagnostics.borrow();
+        (snapshot.generation(), snapshot.diagnostic_count())
+    };
 
     let capabilities = client
         .server_capabilities()
@@ -834,9 +855,9 @@ async fn session_loop(
     inner.set_ready(
         opened.len(),
         skipped,
-        diagnostics,
-        client.diagnostics_generation(),
-        client.pid(),
+        count,
+        generation,
+        pid,
         client.restart_count(),
         capabilities,
     );
@@ -867,7 +888,7 @@ async fn session_loop(
             Command::Stop => break,
             Command::Request { id, request } => {
                 let outcome = serve(&mut client, request).await;
-                let error = outcome.as_ref().err().map(ToString::to_string);
+                let error = outcome.as_ref().err().map(|error| format!("{error:#}"));
                 inner.finish_request(id, outcome);
                 match error {
                     Some(error) => {
@@ -887,9 +908,7 @@ async fn session_loop(
                     }
                     None => inner.note_success(String::new(), &client),
                 }
-                let snapshot_generation = client.diagnostics_generation();
-                let count = client.diagnostics().borrow().diagnostic_count();
-                inner.refresh_from(snapshot_generation, count);
+                inner.refresh_from(&client);
             }
             Command::Change { path, text } => {
                 let outcome = apply_buffer_change(
@@ -910,13 +929,11 @@ async fn session_loop(
                     Err(error) => {
                         child_exit_noted = client.session_ended();
                         inner
-                            .fail_server(&mut client, format!("buffer change failed: {error}"))
+                            .fail_server(&mut client, format!("buffer change failed: {error:#}"))
                             .await;
                     }
                 }
-                let snapshot_generation = client.diagnostics_generation();
-                let count = client.diagnostics().borrow().diagnostic_count();
-                inner.refresh_from(snapshot_generation, count);
+                inner.refresh_from(&client);
             }
             Command::BuildContext {
                 include_dirs,
@@ -943,7 +960,7 @@ async fn session_loop(
                         inner
                             .fail_server(
                                 &mut client,
-                                format!("build context was not accepted: {error}"),
+                                format!("build context was not accepted: {error:#}"),
                             )
                             .await;
                     }
@@ -1333,7 +1350,7 @@ async fn apply_buffer_change(
     let uri =
         Url::from_file_path(path).map_err(|()| anyhow!("{} is not a file path", path.display()))?;
     let bytes = text.len();
-    if refresh_slang && !client.session_ended() && client.document_matches(&uri, &text)? {
+    if refresh_slang && client.is_running() && client.document_matches(&uri, &text)? {
         return Ok(bytes);
     }
     if client.is_open(&uri) {
