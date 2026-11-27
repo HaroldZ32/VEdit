@@ -32,7 +32,8 @@ class VcsHistoryPanel final : public QWidget {
     Q_OBJECT
 
 public:
-    explicit VcsHistoryPanel(QWidget *parent = nullptr);
+    enum class Scope { History, SvnProject };
+    explicit VcsHistoryPanel(QWidget *parent = nullptr, Scope scope = Scope::History);
     ~VcsHistoryPanel() override;
 
     void setSource(std::unique_ptr<VcsSource> source, bool deferRefresh = false);
@@ -43,6 +44,7 @@ public:
 
     // --- user actions (probe-callable) -------------------------------------
     void refresh();   // the first page
+    void leaveProjectHistory();
     void loadPage(int offset);
     void search(const QString &query);
     void nextPage();
@@ -62,6 +64,7 @@ public:
     Q_SIGNAL void svnWorkingFileRequested(const QString &path);
     Q_SIGNAL void svnBaseComparisonRequested(const QString &path, quint64 revision, quint64 peg);
     Q_SIGNAL void svnRemoteFileRequested(const QString &url, const QString &path, quint64 revision, bool deleted, bool compare);
+    Q_SIGNAL void svnProjectFileComparisonRequested(const QString &url, const FileStat &file, quint64 revision);
     Q_SIGNAL void svnComparisonRequested(const QString &path, const QList<quint64> &revisions,
                                          quint64 peg, bool workingCopy);
 
@@ -111,7 +114,14 @@ private:
     void compareSvnSelection(bool workingCopy);
     void promptSvnRevisions();
     void clearEditorFileHistory();
+    void buildProjectFiles();
+    void clearProjectFiles();
+    void applyProjectRevision(HistoryData data);
 
+    const Scope scope_;
+    QLabel *projectFilesMessage_ = nullptr;
+    QTreeWidget *projectFiles_ = nullptr;
+    std::vector<FileStat> projectFilesData_;
     Backend backend_ = Backend::None;
     quint64 svnSelectionEpoch_ = 0;
     quint64 fileRequestEpoch_ = 0;

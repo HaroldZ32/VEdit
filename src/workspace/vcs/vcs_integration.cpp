@@ -25,7 +25,7 @@
 #include <QPlainTextEdit>
 #include <QPointer>
 #include <QRegularExpression>
-#include <QSignalBlocker>
+#include <QScopedValueRollback>
 #include <QStatusBar>
 #include <QString>
 #include <QTabWidget>
@@ -200,8 +200,48 @@ private:
     quint64 sequence_ = 0;
 };
 
+class VcsTabs final : public QTabWidget {
+public:
+    VcsTabs()
+    {
+        connect(this, &QTabWidget::currentChanged, this, [this] { ++epoch_; });
+    }
+
+    void selectForFileHistory(QWidget *history)
+    {
+        const QScopedValueRollback defer(refreshDeferred_, true);
+        setCurrentWidget(history);
+    }
+
+    bool refreshDeferred() const { return refreshDeferred_; }
+
+    template<class Panel>
+    std::function<bool()> selectionGuard(Panel *panel, bool (Panel::*current)() const = nullptr)
+    {
+        return [tabs = QPointer(this), panel = QPointer(panel), tabEpoch = epoch_,
+                selection = panel->svnSelectionEpoch(), current] {
+            return tabs && panel && tabs->epoch_ == tabEpoch && panel->svnSelectionEpoch() == selection
+                && (!current || (panel.data()->*current)());
+        };
+    }
+
+protected:
+    void hideEvent(QHideEvent *event) override
+    {
+        ++epoch_;
+        QTabWidget::hideEvent(event);
+    }
+
+private:
+    quint64 epoch_ = 0;
+    bool refreshDeferred_ = false;
+};
+
 class SvnComparisonLoader final : public QObject {
     Q_DECLARE_TR_FUNCTIONS(SvnComparison)
+
+    static constexpr int kDeleted = 3;
+    static constexpr int kUnversioned = 7;
 
 public:
     explicit SvnComparisonLoader(vedit::app::ApplicationShell &shell)
@@ -229,7 +269,7 @@ public:
     }
 
     void start(QString root, QString path, QList<vcs::SvnRevision> revisions, quint64 peg, bool workingCopy,
-               std::function<bool()> selectionStillCurrent, EditorSvnFile editor = {})
+               std::function<bool()> selectionStillCurrent, EditorSvnFile editor = {}, int workingChangeKind = 0)
     {
         if (root.isEmpty() || path.isEmpty() || revisions.isEmpty()) {
             return;
@@ -242,9 +282,13 @@ public:
         request->selectionStillCurrent = std::move(selectionStillCurrent);
         request->generation = ++generation_;
         request->workingCopy = workingCopy;
+        request->workingChangeKind = workingChangeKind;
         request->editor = std::move(editor);
         shell_.statusBar()->showMessage(tr("Reading SVN revisions…"), 5000);
-        if (workingCopy) {
+        if (workingCopy && workingChangeKind == kUnversioned && request->revisions.front().kind == vcs::SvnRevisionKind::Base) {
+            request->snapshots.append({{}, snapshotLabel(request->path, request->revisions.front()), {}, true, request->path});
+            showComparison(*request);
+        } else if (workingCopy) {
             fetch(request);
         } else if (request->revisions.size() == 2) {
             fetch(request);
@@ -273,8 +317,10 @@ public:
         request->generation = ++generation_;
         request->selectionStillCurrent = std::move(selected);
         const auto spec = specification(*request, vcs::HistoryKind::SvnSnapshot, revision);
+        shell_.statusBar()->showMessage(tr("Reading SVN revisions…"), 5000);
         source_.requestHistory(spec, [this, request, revision](vcs::HistoryData data) {
             if (!accept(*request, data)) { return; }
+            shell_.statusBar()->clearMessage();
             showSnapshot(*request, revision, data);
         });
     }
@@ -304,18 +350,41 @@ public:
         });
     }
 
+    void compareProjectFile(const QString &root, const QString &url, const vcs::FileStat &file, quint64 revision,
+                            std::function<bool()> selected)
+    {
+        if (revision == 0) { return; }
+        auto request = std::make_shared<Request>();
+        request->root = root;
+        request->url = url;
+        request->path = QString::fromStdString(file.path);
+        request->selectionStillCurrent = std::move(selected);
+        request->generation = ++generation_;
+
+        const bool copied = file.svnAction == 'A' && !file.svnCopyFromPath.empty();
+        const quint64 previous = copied ? file.svnCopyFromRevision : revision - 1;
+        request->revisions = {{vcs::SvnRevisionKind::Number, previous}, {vcs::SvnRevisionKind::Number, revision}};
+        const QString left = copied ? QString::fromStdString(file.svnCopyFromPath)
+                                    : file.svnAction == 'A' ? QString() : request->path;
+        request->projectPaths = {left, file.svnAction == 'D' ? QString() : request->path};
+        shell_.statusBar()->showMessage(tr("Reading SVN revisions…"), 5000);
+        fetch(request);
+    }
+
 private:
     struct Request {
         QString root;
         QString url;
         QString path;
         EditorSvnFile editor;
+        QList<QString> projectPaths;
         QList<vcs::SvnRevision> revisions;
         QList<vedit::app::CompareInput> snapshots;
         std::function<bool()> selectionStillCurrent;
         quint64 generation = 0;
         quint64 peg = vcs::kDefaultSvnPeg;
         bool workingCopy = false;
+        int workingChangeKind = 0;
     };
 
     static vcs::HistoryRequest specification(const Request &request, vcs::HistoryKind kind, vcs::SvnRevision revision)
@@ -338,6 +407,11 @@ private:
         case vcs::SvnRevisionKind::Number: return QStringLiteral("r%1").arg(revision.number);
         }
         return {};
+    }
+
+    static QString snapshotLabel(const QString &path, vcs::SvnRevision revision)
+    {
+        return QStringLiteral("%1 · %2").arg(path, revisionName(revision));
     }
 
     bool accept(const Request &request, const vcs::HistoryData &data)
@@ -378,10 +452,24 @@ private:
 
     void fetch(const std::shared_ptr<Request> &request)
     {
-        const auto revision = request->revisions.at(request->snapshots.size());
+        const auto index = request->snapshots.size();
+        const auto revision = request->revisions.at(index);
         const auto kind = request->url.isEmpty() ? vcs::HistoryKind::SvnSnapshot : vcs::HistoryKind::SvnRemoteSnapshot;
-        const auto spec = specification(*request, kind, revision);
-        source_.requestHistory(spec, [this, request, revision](vcs::HistoryData data) {
+        auto spec = specification(*request, kind, revision);
+        QString label = snapshotLabel(request->path, revision);
+        if (!request->projectPaths.isEmpty()) {
+            const QString &repositoryPath = request->projectPaths.at(index);
+            if (repositoryPath.isEmpty()) {
+                appendSnapshot(request, {{}, label, {}, true, request->path});
+                return;
+            }
+            spec.path = repositoryPath.toStdString();
+            spec.peg = revision.number;
+            label = snapshotLabel(repositoryPath, revision);
+        } else if (request->workingCopy && revision.kind == vcs::SvnRevisionKind::Base) {
+            spec.path = QDir(request->root).absoluteFilePath(request->path).toStdString();
+        }
+        source_.requestHistory(spec, [this, request, revision, label](vcs::HistoryData data) {
             if (!accept(*request, data)) {
                 return;
             }
@@ -389,34 +477,41 @@ private:
                 shell_.statusBar()->showMessage(tr("The active file has no SVN BASE revision."), 8000);
                 return;
             }
-            const QString label = QStringLiteral("%1 · %2").arg(request->path, revisionName(revision));
-            request->snapshots.append({{}, label, QByteArray::fromStdString(data.patch), data.snapshotMissing, request->path});
-            if (request->snapshots.size() < request->revisions.size()) {
-                fetch(request);
+            appendSnapshot(request, {{}, label, QByteArray::fromStdString(data.patch), data.snapshotMissing, request->path});
+        });
+    }
+
+    void appendSnapshot(const std::shared_ptr<Request> &request, vedit::app::CompareInput snapshot)
+    {
+        request->snapshots.append(std::move(snapshot));
+        if (request->snapshots.size() < request->revisions.size()) {
+            fetch(request);
+        } else {
+            showComparison(*request);
+        }
+    }
+
+    void showComparison(Request &request)
+    {
+        if (request.workingCopy) {
+            const QString repository = QFileInfo(svnWorkingCopyRoot(request.root)).canonicalFilePath();
+            const QString path = request.editor.absolutePath.isEmpty()
+                ? QDir::cleanPath(QDir(repository).absoluteFilePath(request.path)) : request.editor.absolutePath;
+            const QFileInfo info(path);
+            const bool exists = info.exists();
+            const auto canonical = info.canonicalFilePath();
+            if (repository.isEmpty() || !path.startsWith(repository + u'/') || info.isSymLink() ||
+                (exists && (!info.isFile() || !canonical.startsWith(repository + u'/'))) ||
+                (request.editor.view && (!exists || QDir(repository).relativeFilePath(canonical) != request.path))) {
+                shell_.statusBar()->showMessage(tr("The working file is outside the SVN working copy or is not a regular file."), 8000);
                 return;
             }
-            if (request->workingCopy) {
-                QDir repository(request->root);
-                while (!repository.exists(QStringLiteral(".svn")) && repository.cdUp()) {
-                }
-                const QString path = request->editor.absolutePath.isEmpty() ? repository.absoluteFilePath(request->path) : request->editor.absolutePath;
-                const QString working = tr("%1 · Working Copy").arg(request->path);
-                const QFileInfo info(path);
-                const bool exists = info.exists();
-                const auto canonical = info.canonicalFilePath();
-                const auto repositoryPath = QFileInfo(repository.absolutePath()).canonicalFilePath();
-                if ((!request->editor.absolutePath.isEmpty() && (!exists || info.isSymLink() ||
-                     QDir(repositoryPath).relativeFilePath(canonical) != request->path)) ||
-                    (exists && (!info.isFile() || !canonical.startsWith(repositoryPath + u'/')))) {
-                    shell_.statusBar()->showMessage(tr("The working file is outside the SVN working copy or is not a regular file."), 8000);
-                    return;
-                }
-                request->snapshots.append({exists ? path : QString(), working, {}, !exists,
-                                           request->path, request->editor.view});
-            }
-            shell_.statusBar()->clearMessage();
-            vedit::app::showFileComparison(shell_, request->snapshots.at(0), request->snapshots.at(1));
-        });
+            const bool missing = !exists || request.workingChangeKind == kDeleted;
+            request.snapshots.append({missing ? QString() : path, tr("%1 · Working Copy").arg(request.path), {},
+                                      missing, request.path, request.editor.view});
+        }
+        shell_.statusBar()->clearMessage();
+        vedit::app::showFileComparison(shell_, request.snapshots.at(0), request.snapshots.at(1));
     }
 
     vedit::app::ApplicationShell &shell_;
@@ -453,59 +548,59 @@ void installVcs(vedit::app::ApplicationShell &shell, const IntegrationOptions &o
     auto *gutter = new SvnGutter(shell);
     auto *comparison = new SvnComparisonLoader(shell);
     const auto factory = [&shell, gutter, comparison, workingCopiesFile]() {
-        auto *tabs = new QTabWidget();
+        auto *tabs = new VcsTabs();
         tabs->setObjectName(QStringLiteral("vcs-tabs"));
         auto *panel = new vcs::VcsPanel(tabs);
         QObject::connect(panel, &vcs::VcsPanel::svnStatusReady, gutter, [gutter] { gutter->refresh(); });
         auto *history = new vcs::VcsHistoryPanel(tabs);
+        auto *projectHistory = new vcs::VcsHistoryPanel(tabs, vcs::VcsHistoryPanel::Scope::SvnProject);
         history->setSource(std::make_unique<vcs::FfiVcsSource>(), true);
+        projectHistory->setSource(std::make_unique<vcs::FfiVcsSource>(), true);
+        QObject::connect(projectHistory, &vcs::VcsHistoryPanel::svnProjectFileComparisonRequested, comparison,
+                         [comparison, tabs, projectHistory](const QString &url, const vcs::FileStat &file, quint64 revision) {
+                             comparison->compareProjectFile(QString::fromStdString(projectHistory->root()), url, file, revision,
+                                                            tabs->selectionGuard(projectHistory));
+                         });
         history->setSavedRepositoriesFile(QFileInfo(shell.sessionStore()->path()).dir().filePath(QStringLiteral("svn-repositories.json")));
         QObject::connect(&shell, &vedit::app::ApplicationShell::activeEditorChanged,
                          history, &vcs::VcsHistoryPanel::editorFileChanged);
         QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged,
                          history, &vcs::VcsHistoryPanel::editorFileChanged);
         QObject::connect(panel, &vcs::VcsPanel::svnWorkingComparisonRequested, comparison,
-                         [comparison, panel](const QString &path, vcs::SvnRevision revision) {
-                             const auto selection = panel->svnSelectionEpoch();
+                         [comparison, tabs, panel](const QString &path, vcs::SvnRevision revision) {
                              comparison->start(QString::fromStdString(panel->root()), path, {revision}, vcs::kDefaultSvnPeg, true,
-                                               [panel = QPointer(panel), selection] {
-                                                   return panel && selection == panel->svnSelectionEpoch() && panel->svnSelectionCurrent();
-                                               });
+                                               tabs->selectionGuard(panel, &vcs::VcsPanel::svnSelectionCurrent),
+                                               {}, panel->svnChangeKind(path));
                          });
         QObject::connect(panel, &vcs::VcsPanel::svnFileHistoryRequested, history,
                          [tabs, history](const QString &path, std::function<bool()> stillCurrent) {
-                             const QSignalBlocker block(tabs);
-                             tabs->setCurrentWidget(history);
+                             tabs->selectForFileHistory(history);
                              history->openFileHistory(path, std::move(stillCurrent));
                          });
         QObject::connect(history, &vcs::VcsHistoryPanel::svnSnapshotRequested, comparison,
-                         [comparison, history](const QString &path, quint64 revision, quint64 peg) {
-                             const auto selection = history->svnSelectionEpoch();
-                             comparison->openSnapshot(QString::fromStdString(history->root()), path, {vcs::SvnRevisionKind::Number, revision}, peg, [history = QPointer(history), selection] {
-                                 return history && history->svnSelectionEpoch() == selection;
-                             });
+                         [comparison, tabs, history](const QString &path, quint64 revision, quint64 peg) {
+                             comparison->openSnapshot(QString::fromStdString(history->root()), path,
+                                                      {vcs::SvnRevisionKind::Number, revision}, peg,
+                                                      tabs->selectionGuard(history, &vcs::VcsHistoryPanel::editorFileHistoryCurrent));
                          });
         QObject::connect(panel, &vcs::VcsPanel::svnWorkingSnapshotRequested, comparison,
-                         [comparison, panel](const QString &path, vcs::SvnRevision revision) {
-                             const auto selection = panel->svnSelectionEpoch();
-                             comparison->openSnapshot(QString::fromStdString(panel->root()), path, revision, vcs::kDefaultSvnPeg, [panel = QPointer(panel), selection] {
-                                 return panel && panel->svnSelectionEpoch() == selection;
-                             });
+                         [comparison, tabs, panel](const QString &path, vcs::SvnRevision revision) {
+                             comparison->openSnapshot(QString::fromStdString(panel->root()), path, revision,
+                                                      vcs::kDefaultSvnPeg, tabs->selectionGuard(panel));
                          });
         QObject::connect(history, &vcs::VcsHistoryPanel::svnBaseComparisonRequested, comparison,
-                         [comparison, history](const QString &path, quint64 revision, quint64 peg) {
-                             const auto selection = history->svnSelectionEpoch();
-                             comparison->start(QString::fromStdString(history->root()), path, {{vcs::SvnRevisionKind::Number, revision}, {vcs::SvnRevisionKind::Base, 0}}, peg, false,
-                                               [history = QPointer(history), selection] { return history && history->svnSelectionEpoch() == selection; });
+                         [comparison, tabs, history](const QString &path, quint64 revision, quint64 peg) {
+                             comparison->start(QString::fromStdString(history->root()), path,
+                                               {{vcs::SvnRevisionKind::Number, revision}, {vcs::SvnRevisionKind::Base, 0}},
+                                               peg, false, tabs->selectionGuard(history, &vcs::VcsHistoryPanel::editorFileHistoryCurrent));
                          });
         QObject::connect(history, &vcs::VcsHistoryPanel::svnRemoteFileRequested, comparison,
-                         [comparison, history](const QString &url, const QString &path, quint64 revision, bool deleted, bool compare) {
-                             const auto selection = history->svnSelectionEpoch();
+                         [comparison, tabs, history](const QString &url, const QString &path, quint64 revision, bool deleted, bool compare) {
                              comparison->openRemote(QString::fromStdString(history->root()), url, path, revision, deleted, compare,
-                                                    [history = QPointer(history), selection] { return history && history->svnSelectionEpoch() == selection; });
+                                                    tabs->selectionGuard(history));
                          });
         QObject::connect(history, &vcs::VcsHistoryPanel::svnComparisonRequested, comparison,
-                         [&shell, comparison, history](const QString &path, const QList<quint64> &selected, quint64 peg, bool workingCopy) {
+                         [&shell, comparison, tabs, history](const QString &path, const QList<quint64> &selected, quint64 peg, bool workingCopy) {
                              if (!history->editorFileHistoryCurrent()) { return; }
                              const QString root = QString::fromStdString(history->root());
                              EditorSvnFile editor;
@@ -517,10 +612,9 @@ void installVcs(vedit::app::ApplicationShell &shell, const IntegrationOptions &o
                              for (const quint64 revision : selected) {
                                  revisions.append({vcs::SvnRevisionKind::Number, revision});
                              }
-                             const auto selection = history->svnSelectionEpoch();
-                             comparison->start(root, path, revisions, peg, workingCopy, [history = QPointer(history), selection] {
-                                 return history && selection == history->svnSelectionEpoch() && history->editorFileHistoryCurrent();
-                             }, std::move(editor));
+                             comparison->start(root, path, revisions, peg, workingCopy,
+                                               tabs->selectionGuard(history, &vcs::VcsHistoryPanel::editorFileHistoryCurrent),
+                                               std::move(editor));
                          });
         const auto openWorkingFile = [&shell](const QString &root, const QString &path) {
             const QString full = QFileInfo(QDir(root).absoluteFilePath(path)).canonicalFilePath();
@@ -541,10 +635,18 @@ void installVcs(vedit::app::ApplicationShell &shell, const IntegrationOptions &o
                          [&shell](const QString &path) { shell.setProjectRoot(path); });
         tabs->addTab(panel, QCoreApplication::translate("VEdit", "Working tree"));
         tabs->addTab(history, QCoreApplication::translate("VEdit", "History"));
-        auto *workspaces = new SvnWorkspaces(*panel, workingCopiesFile, [panel, history, gutter, comparison](const QString &root) {
+        const int projectIndex = tabs->addTab(projectHistory, QCoreApplication::translate("VEdit", "Project History"));
+        auto *workspaces = new SvnWorkspaces(*panel, workingCopiesFile,
+            [&shell, tabs, projectIndex, projectHistory, panel, history, gutter, comparison](const QString &root) {
             comparison->setWorkbenchRoot(root);
             history->setRoot(root.toStdString());
             if (!root.isEmpty() && history->isVisible()) { history->refresh(); }
+            const QString working = svnWorkingCopyRoot(root);
+            const QString project = QFileInfo(shell.projectRoot()).canonicalFilePath();
+            const QString projectRoot = !working.isEmpty() && svnWorkingCopyRoot(project) == working ? project : working;
+            projectHistory->setRoot(projectRoot.toStdString());
+            tabs->setTabVisible(projectIndex, !projectRoot.isEmpty());
+            if (!projectRoot.isEmpty() && projectHistory->isVisible()) { projectHistory->refresh(); }
             applyRoot(panel, root);
             if (root.isEmpty()) { gutter->clearClosedMarks(); }
         }, [panel] { panel->refreshSvnRemote(false); }, std::make_unique<vcs::FfiVcsSource>());
@@ -555,8 +657,13 @@ void installVcs(vedit::app::ApplicationShell &shell, const IntegrationOptions &o
         setProject(shell.projectRoot());
         panel->setSource(std::make_unique<vcs::FfiVcsSource>());
         QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged, panel, setProject);
-        QObject::connect(tabs, &QTabWidget::currentChanged, history, [tabs, history](int) {
+        QObject::connect(tabs, &QTabWidget::currentChanged, history, [tabs, history, projectHistory, wasProject = false](int) mutable {
+            const bool isProject = tabs->currentWidget() == projectHistory;
+            if (wasProject && !isProject) { projectHistory->leaveProjectHistory(); }
+            wasProject = isProject;
+            if (tabs->refreshDeferred()) { return; }
             if (tabs->currentWidget() == history) { history->refresh(); }
+            if (isProject) { projectHistory->refresh(); }
         });
         // Batch 6a (rev3): the chosen VCS toolchain is probe-visible. The line
         // itself is printed once by the lane; here it becomes a property so an
@@ -591,11 +698,10 @@ void installVcs(vedit::app::ApplicationShell &shell, const IntegrationOptions &o
         shell.panels()->showPanel(vcsId, &shell);
         auto *dock = shell.panels()->dock(vcsId);
         if (!dock) { return; }
-        auto *tabs = dock->findChild<QTabWidget *>(QStringLiteral("vcs-tabs"));
-        auto *history = dock->findChild<vcs::VcsHistoryPanel *>();
+        auto *tabs = dynamic_cast<VcsTabs *>(dock->findChild<QTabWidget *>(QStringLiteral("vcs-tabs")));
+        auto *history = dock->findChild<vcs::VcsHistoryPanel *>(QStringLiteral("vcs-history-panel"));
         if (!tabs || !history || !file.isActive(shell)) { return; }
-        const QSignalBlocker block(tabs);
-        tabs->setCurrentWidget(history);
+        tabs->selectForFileHistory(history);
         history->openEditorFileHistory(file.root.toStdString(), file.relativePath,
                                        [&shell, file] { return file.isActive(shell); });
     });

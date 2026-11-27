@@ -801,7 +801,7 @@ void svnComparison(const QString &directory)
     workspace::installVcs(shell, {});
     shell.panels()->showPanel(QStringLiteral("vcs"), &shell);
     shell.show();
-    auto *history = shell.findChild<VcsHistoryPanel *>();
+    auto *history = shell.findChild<VcsHistoryPanel *>(QStringLiteral("vcs-history-panel"));
     auto *panel = shell.findChild<VcsPanel *>();
     if (!check("svn.panel.reachable", history && panel && until([&] { return panel->backend() == Backend::Subversion; }))) {
         return;

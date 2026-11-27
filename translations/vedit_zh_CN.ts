@@ -4370,6 +4370,10 @@ This cannot be undone.</source>
         <translation>工作树</translation>
     </message>
     <message>
+        <source>Project History</source>
+        <translation>项目历史</translation>
+    </message>
+    <message>
         <location filename="../src/workspace/vcs/vcs_integration.cpp" line="74"/>
         <source>History</source>
         <translation>历史</translation>
@@ -8956,6 +8960,26 @@ Right-click here or choose File → Open Folder.</source>
 </context>
 <context>
     <name>vedit::workspace::vcs::VcsHistoryPanel</name>
+    <message>
+        <source>Subversion Project History</source>
+        <translation>Subversion 项目历史</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation>变更类型</translation>
+    </message>
+    <message>
+        <source>Select a revision to see its changed files.</source>
+        <translation>选择修订以查看其中更改的文件。</translation>
+    </message>
+    <message>
+        <source>Could not read changed files: %1</source>
+        <translation>无法读取已更改的文件：%1</translation>
+    </message>
+    <message>
+        <source>No changed files in this revision.</source>
+        <translation>此修订中没有已更改的文件。</translation>
+    </message>
     <message>
         <source>Working-copy repository</source>
         <translation>工作副本的仓库</translation>

@@ -269,11 +269,17 @@ struct CommitEntry {
     std::string subject;
 };
 
+enum class SvnNodeKind { Unknown = 0, File = 1, Directory = 2 };
+
 struct FileStat {
     std::string path;
     // -1 when git reported the file as binary.
     long long additions = 0;
     long long deletions = 0;
+    char svnAction = '\0';
+    SvnNodeKind svnNodeKind = SvnNodeKind::Unknown;
+    std::string svnCopyFromPath = {};
+    quint64 svnCopyFromRevision = 0;
 };
 
 struct BlameLine {

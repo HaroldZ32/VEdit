@@ -97,8 +97,8 @@ QString commitRowsText(const std::vector<CommitEntry> &commits)
 
 } // namespace
 
-VcsHistoryPanel::VcsHistoryPanel(QWidget *parent)
-    : QWidget(parent)
+VcsHistoryPanel::VcsHistoryPanel(QWidget *parent, Scope scope)
+    : QWidget(parent), scope_(scope)
 {
     buildUi();
     showState(QCoreApplication::translate("VEdit", "Open a working tree to browse its history."), false);
@@ -108,7 +108,8 @@ VcsHistoryPanel::~VcsHistoryPanel() = default;
 
 void VcsHistoryPanel::buildUi()
 {
-    setObjectName(QStringLiteral("vcs-history-panel"));
+    const bool projectHistory = scope_ == Scope::SvnProject;
+    setObjectName(projectHistory ? QStringLiteral("svn-project-history-panel") : QStringLiteral("vcs-history-panel"));
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(8, 6, 8, 6);
     layout->setSpacing(4);
@@ -156,6 +157,11 @@ void VcsHistoryPanel::buildUi()
     repositories->addWidget(addRepository_);
     repositories->addWidget(removeRepository_);
     layout->addLayout(repositories);
+    if (projectHistory) {
+        repository_->hide();
+        addRepository_->hide();
+        removeRepository_->hide();
+    }
     connect(addRepository_, &QPushButton::clicked, this, [this] { addSavedRepository(); });
     connect(removeRepository_, &QPushButton::clicked, this, [this] { removeSavedRepository(); });
     connect(repository_, &QComboBox::currentIndexChanged, this, [this] {
@@ -223,9 +229,15 @@ void VcsHistoryPanel::buildUi()
     compareRow->addWidget(svnWorkingButton_);
     compareRow->addStretch();
     layout->addLayout(compareRow);
+    if (projectHistory) {
+        path_->hide();
+        file_button_->hide();
+        blame_button_->hide();
+        compare_button_->hide();
+    }
 
     // --- commits + detail tabs --------------------------------------------
-    splitter_ = new QSplitter(Qt::Horizontal, this);
+    splitter_ = new QSplitter(projectHistory ? Qt::Vertical : Qt::Horizontal, this);
     splitter_->setObjectName(QStringLiteral("vcs-history-columns"));
     commits_ = new QTreeWidget(splitter_);
     commits_->setObjectName(QStringLiteral("vcs-history-commits"));
@@ -241,7 +253,7 @@ void VcsHistoryPanel::buildUi()
     commits_->header()->setSectionResizeMode(3, QHeaderView::Stretch);
     splitter_->addWidget(commits_);
 
-    tabs_ = new QTabWidget(splitter_);
+    tabs_ = new QTabWidget(this);
     tabs_->setObjectName(QStringLiteral("vcs-history-tabs"));
     detail_ = new QPlainTextEdit(tabs_);
     detail_->setObjectName(QStringLiteral("vcs-history-detail"));
@@ -263,7 +275,13 @@ void VcsHistoryPanel::buildUi()
     tabs_->addTab(file_history_, QCoreApplication::translate("VEdit", "File history"));
     tabs_->addTab(blame_, QCoreApplication::translate("VEdit", "Blame"));
     tabs_->addTab(compare_, QCoreApplication::translate("VEdit", "Compare"));
-    splitter_->addWidget(tabs_);
+    if (projectHistory) {
+        tabs_->hide();
+        buildProjectFiles();
+        commits_->setSelectionMode(QAbstractItemView::SingleSelection);
+    } else {
+        splitter_->addWidget(tabs_);
+    }
     splitter_->setStretchFactor(0, 2);
     splitter_->setStretchFactor(1, 3);
     layout->addWidget(splitter_, 1);
@@ -303,7 +321,7 @@ void VcsHistoryPanel::buildUi()
             menu.addAction(tr("Open Working File"), this, [this, epoch] {
                 if (epoch == svnSelectionEpoch_) { emit svnWorkingFileRequested(svnHistoryPath_); }
             });
-        } else if (svnDetailRevision_ == revision) {
+        } else if (!projectFiles_ && svnDetailRevision_ == revision) {
             auto *files = menu.addMenu(tr("Changed Files"));
             for (const auto &path : svnRevisionFiles_) {
                 auto *file = files->addMenu(path);
@@ -335,8 +353,81 @@ void VcsHistoryPanel::buildUi()
         updateActions();
     });
     connect(path_, &QLineEdit::returnPressed, this, [this] { openFileHistory(path_->text()); });
-    connect(commits_, &QTreeWidget::itemSelectionChanged, this, [this]() { onSelectionChanged(); });
+    if (projectHistory) {
+        connect(commits_, &QTreeWidget::currentItemChanged, this, [this] { onSelectionChanged(); });
+    } else {
+        connect(commits_, &QTreeWidget::itemSelectionChanged, this, [this] { onSelectionChanged(); });
+    }
     updateActions();
+}
+
+void VcsHistoryPanel::buildProjectFiles()
+{
+    auto *details = new QWidget(splitter_);
+    auto *layout = new QVBoxLayout(details);
+    layout->setContentsMargins(0, 0, 0, 0);
+    projectFilesMessage_ = new QLabel(details);
+    projectFilesMessage_->setWordWrap(true);
+    projectFilesMessage_->setTextFormat(Qt::PlainText);
+    layout->addWidget(projectFilesMessage_);
+
+    projectFiles_ = new QTreeWidget(details);
+    projectFiles_->setObjectName(QStringLiteral("svn-project-changed-files"));
+    projectFiles_->setRootIsDecorated(false);
+    projectFiles_->setHeaderLabels({tr("Action"), tr("Changed Files")});
+    projectFiles_->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    projectFiles_->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+    layout->addWidget(projectFiles_, 1);
+    splitter_->addWidget(details);
+    clearProjectFiles();
+
+    connect(projectFiles_, &QTreeWidget::currentItemChanged, this, [this] { ++svnSelectionEpoch_; });
+    connect(projectFiles_, &QTreeWidget::itemDoubleClicked, this, [this](QTreeWidgetItem *item) {
+        const auto row = projectFiles_->indexOfTopLevelItem(item);
+        if (row >= 0 && !svnDetailRepository_.isEmpty() && !svnDetailRevision_.isEmpty()) {
+            emit svnProjectFileComparisonRequested(svnDetailRepository_, projectFilesData_.at(static_cast<std::size_t>(row)),
+                                                   svnDetailRevision_.toULongLong());
+        }
+    });
+}
+
+void VcsHistoryPanel::clearProjectFiles()
+{
+    if (!projectFiles_) { return; }
+    ++detailEpoch_;
+    ++svnSelectionEpoch_;
+    svnDetailRevision_.clear();
+    svnDetailRepository_.clear();
+    projectFilesData_.clear();
+    projectFiles_->clear();
+    projectFilesMessage_->setText(tr("Select a revision to see its changed files."));
+    projectFilesMessage_->show();
+}
+
+void VcsHistoryPanel::applyProjectRevision(HistoryData data)
+{
+    if (data.error) {
+        projectFilesMessage_->setText(tr("Could not read changed files: %1").arg(QString::fromStdString(data.note)));
+        return;
+    }
+    svnDetailRevision_ = QString::fromStdString(data.hash);
+    if (svnDetailRevision_.startsWith(u'r')) { svnDetailRevision_.remove(0, 1); }
+    svnDetailRepository_ = QString::fromStdString(data.from);
+    QString prefix = QString::fromStdString(data.to);
+    if (!prefix.endsWith(u'/')) { prefix.append(u'/'); }
+    for (auto &file : data.files) {
+        if (file.svnNodeKind == SvnNodeKind::Directory || file.svnAction == '\0') { continue; }
+        const auto repositoryPath = QString::fromStdString(file.path);
+        if (!repositoryPath.startsWith(prefix) || repositoryPath.size() == prefix.size()) { continue; }
+        auto *row = new QTreeWidgetItem(projectFiles_);
+        const auto path = repositoryPath.sliced(prefix.size());
+        row->setText(0, QString(QChar::fromLatin1(file.svnAction)));
+        row->setText(1, path);
+        row->setToolTip(1, path);
+        projectFilesData_.push_back(std::move(file));
+    }
+    projectFilesMessage_->setText(tr("No changed files in this revision."));
+    projectFilesMessage_->setVisible(projectFilesData_.empty());
 }
 
 void VcsHistoryPanel::setSource(std::unique_ptr<VcsSource> source, bool deferRefresh)
@@ -359,6 +450,7 @@ void VcsHistoryPanel::setRoot(const std::string &root)
     svnHistoryPath_.clear();
     svnDetailRevision_.clear();
     svnRevisionFiles_.clear();
+    clearProjectFiles();
     path_->clear();
     svnPeg_ = kDefaultSvnPeg;
     commits_->clear();
@@ -464,10 +556,21 @@ void VcsHistoryPanel::refresh()
     }
 }
 
+void VcsHistoryPanel::leaveProjectHistory()
+{
+    ++historyPageEpoch_;
+    clearProjectFiles();
+}
+
 void VcsHistoryPanel::loadPage(int offset)
 {
     if (offset < 0) {
         offset = 0;
+    }
+    if (projectFiles_) {
+        const QSignalBlocker block(commits_);
+        commits_->clear();
+        clearProjectFiles();
     }
     HistoryRequest request;
     request.url = repository_->currentData().toString().toStdString();
@@ -529,6 +632,7 @@ void VcsHistoryPanel::selectCommit(const QString &hash)
 void VcsHistoryPanel::onSelectionChanged()
 {
     ++svnSelectionEpoch_;
+    clearProjectFiles();
     const QTreeWidgetItem *item = commits_->currentItem();
     if (item == nullptr || item->data(0, Qt::UserRole).toString().isEmpty()) {
         updateActions();
@@ -725,7 +829,8 @@ void VcsHistoryPanel::applyCommits(HistoryData data)
         detail_->clear();
         search_->setPlaceholderText(tr("Search text or revision (r123)"));
     }
-    const QString title = svn ? tr("Subversion Repository History") : QCoreApplication::translate("VEdit", "Git history");
+    const QString title = (scope_ == Scope::SvnProject) ? tr("Subversion Project History")
+        : svn ? tr("Subversion Repository History") : QCoreApplication::translate("VEdit", "Git history");
     offset_ = data.offset;
     has_more_ = data.hasMore;
     error_->setVisible(false);
@@ -750,7 +855,8 @@ void VcsHistoryPanel::applyCommits(HistoryData data)
     // Newest first; the hash rides in UserRole so a probe never parses the text.
     commits_->clear();
     commits_->setColumnCount(4);
-    commits_->setHeaderLabels({QCoreApplication::translate("VEdit", "Commit"), QCoreApplication::translate("VEdit", "Date"), QCoreApplication::translate("VEdit", "Author"), QCoreApplication::translate("VEdit", "Subject")});
+    const auto firstColumn = projectFiles_ ? tr("Revision") : QCoreApplication::translate("VEdit", "Commit");
+    commits_->setHeaderLabels({firstColumn, QCoreApplication::translate("VEdit", "Date"), QCoreApplication::translate("VEdit", "Author"), QCoreApplication::translate("VEdit", "Subject")});
     for (const CommitEntry &commit : data.commits) {
         auto *item = new QTreeWidgetItem(commits_);
         item->setText(0, QString::fromStdString(commit.shortHash));
@@ -784,6 +890,10 @@ void VcsHistoryPanel::applyCommits(HistoryData data)
 
 void VcsHistoryPanel::applyCommit(HistoryData data)
 {
+    if (projectFiles_) {
+        applyProjectRevision(std::move(data));
+        return;
+    }
     if (data.error) {
         detail_->setPlainText(data.note.empty() ? QCoreApplication::translate("VEdit", "The commit could not be read.")
                                                 : QCoreApplication::translate("VEdit", "The commit could not be read: %1")
@@ -820,6 +930,7 @@ void VcsHistoryPanel::applyCommit(HistoryData data)
 void VcsHistoryPanel::applyFileHistory(HistoryData data)
 {
     if (data.backend == Backend::Subversion) {
+        showState({}, false);
         backend_ = data.backend;
         svnHistoryPath_ = QString::fromStdString(data.path);
         bool pegOk = false;
@@ -935,9 +1046,9 @@ void VcsHistoryPanel::updateActions()
     const qsizetype selected = commits_->selectedItems().size();
     const bool currentFile = editorFileHistoryCurrent();
     const bool svnSelection = currentFile && hasSource && idle && !svnHistoryPath_.isEmpty() && svnHistoryPath_ == path_->text();
-    svnWorkingButton_->setVisible(svn);
+    svnWorkingButton_->setVisible(svn && scope_ != Scope::SvnProject);
     svnWorkingButton_->setEnabled(svnSelection && selected == 1);
-    svnRevisionsButton_->setVisible(svn);
+    svnRevisionsButton_->setVisible(svn && scope_ != Scope::SvnProject);
     svnRevisionsButton_->setEnabled(svn && currentFile && hasSource && idle && !path_->text().isEmpty());
     const bool repositoryHistory = !svn || svnHistoryPath_.isEmpty();
     const bool remoteHistory = repository_->currentIndex() > 0;
@@ -946,8 +1057,8 @@ void VcsHistoryPanel::updateActions()
     previous_button_->setVisible(repositoryHistory);
     next_button_->setVisible(repositoryHistory);
     page_->setVisible(repositoryHistory);
-    blame_button_->setVisible(!svn);
-    tabs_->setVisible(repositoryHistory);
+    blame_button_->setVisible(!svn && scope_ != Scope::SvnProject);
+    tabs_->setVisible(repositoryHistory && scope_ != Scope::SvnProject);
     for (int index = 1; index < tabs_->count(); ++index) { tabs_->setTabVisible(index, !svn); }
     compare_button_->setText(svn && selected == 1 ? tr("Compare With Previous Revision") : tr("Compare selected"));
     search_button_->setEnabled(currentFile && hasSource && idle);
