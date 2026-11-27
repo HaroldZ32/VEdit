@@ -1,0 +1,105 @@
+Based on 25b4dfaba740b2cba63460ce3bd74b7f1c34870b with final health test and fixture overlaid and an empty Cargo target
+$ cargo +stable test --locked --offline -j 4 -p vd-lsp --test session_health build_context_timeout_requires_wire_recovery -- --exact --nocapture
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling stable_deref_trait v1.2.1
+   Compiling litemap v0.8.3
+   Compiling utf_types v1.0.0
+   Compiling writeable v0.6.4
+   Compiling icu_properties_data v2.4.0
+   Compiling utf8_iter v1.1.0
+   Compiling icu_normalizer_data v2.4.0
+   Compiling libc v0.2.191
+   Compiling serde_core v1.0.229
+   Compiling pin-project-lite v0.2.17
+   Compiling smallvec v1.16.4
+   Compiling syn v3.0.9
+   Compiling futures-sink v0.3.34
+   Compiling futures-core v0.3.34
+   Compiling memchr v2.8.3
+   Compiling serde v1.0.229
+   Compiling zmij v1.0.23
+   Compiling rustix v1.1.6
+   Compiling serde_json v1.0.154
+   Compiling percent-encoding v2.3.2
+   Compiling futures-io v0.3.34
+   Compiling form_urlencoded v1.2.2
+   Compiling errno v0.3.14
+   Compiling futures-channel v0.3.34
+   Compiling syn v2.0.119
+   Compiling thiserror v2.0.21
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling futures-task v0.3.34
+   Compiling once_cell v1.21.4
+   Compiling itoa v1.0.18
+   Compiling slab v0.4.12
+   Compiling tracing-core v0.1.36
+   Compiling synstructure v0.14.0
+   Compiling signal-hook-registry v1.4.8
+   Compiling mio v1.2.4
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.7
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.4
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling futures-macro v0.3.34
+   Compiling zerotrie v0.2.5
+   Compiling zerovec v0.11.9
+   Compiling futures-util v0.3.34
+   Compiling tracing-attributes v0.1.31
+   Compiling tinystr v0.8.5
+   Compiling icu_locale_core v2.4.0
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.4.0
+   Compiling icu_provider v2.4.0
+   Compiling tokio-macros v2.7.2
+   Compiling icu_properties v2.4.0
+   Compiling icu_normalizer v2.4.0
+   Compiling thiserror-impl v2.0.21
+   Compiling serde_repr v0.1.21
+   Compiling bytes v1.12.1
+   Compiling anyhow v1.0.104
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling bitflags v1.3.2
+   Compiling tokio v1.54.1
+   Compiling futures v0.3.34
+   Compiling tracing v0.1.44
+   Compiling url v2.5.8
+   Compiling waitpid-any v0.3.0
+   Compiling tower-service v0.3.3
+   Compiling tower-layer v0.3.3
+   Compiling lsp-types v0.95.1
+   Compiling tokio-util v0.7.20
+   Compiling async-lsp v0.2.4
+   Compiling vd-lsp v0.5.0 (/home/haroldzhao/MyProj/DshProj/VEdit/target/diagnostics-timeout-red.Mw7jZ2TF/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.33s
+     Running tests/session_health.rs (build-target/debug/deps/session_health-4cbef3ed992473c5)
+
+running 1 test
+
+thread 'build_context_timeout_requires_wire_recovery' (1364) panicked at crates/vd-lsp/tests/session_health.rs:439:9:
+assertion `left == right` failed: recovery must reach the live peer
+spawn 1382
+applied 1382 "+incdir+\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204\"\n-D\"WIDTH=8 + 4\"\n\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204/top.sv\"\n"
+applied 1382 "+incdir+\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204\"\n-D\"WIDTH=32\"\n\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204/top.sv\"\n"
+reply withheld 1382
+
+  left: ["applied 1382 \"+incdir+\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204\\\"\\n-D\\\"WIDTH=8 + 4\\\"\\n\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204/top.sv\\\"\\n\"", "applied 1382 \"+incdir+\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204\\\"\\n-D\\\"WIDTH=32\\\"\\n\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204/top.sv\\\"\\n\""]
+ right: ["applied 1382 \"+incdir+\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204\\\"\\n-D\\\"WIDTH=8 + 4\\\"\\n\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204/top.sv\\\"\\n\"", "applied 1382 \"+incdir+\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204\\\"\\n-D\\\"WIDTH=32\\\"\\n\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204/top.sv\\\"\\n\"", "applied 1382 \"+incdir+\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204\\\"\\n-D\\\"WIDTH=8 + 4\\\"\\n\\\"/tmp/vd-lsp-health-context-timeout-1363-1795760662328686204/top.sv\\\"\\n\""]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test build_context_timeout_requires_wire_recovery ... FAILED
+
+failures:
+
+failures:
+    build_context_timeout_requires_wire_recovery
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.69s
+
+error: test failed, to rerun pass `-p vd-lsp --test session_health`
+EXIT=101
