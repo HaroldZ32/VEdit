@@ -1,0 +1,205 @@
+Tested code bb7d1458eb993b7c2c706f7b15aa5f2bf2e684bc
+
+Runner exit status
+final stress exit=0
+final svn17-en exit=0
+final svn17-zh exit=0
+final trace-xcb exit=0
+final diagnostics exit=0
+final abi exit=0
+
+Pinned Rust and generated ABI
+rustc 1.99.0 (b940084d7 2026-09-28)
+test diagnostics::tests::late_older_version_does_not_replace_current_diagnostics ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 39 filtered out; finished in 0.00s
+
+Registered documentation gate
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+
+Native trace old baseline and exact-commit xcb run
+sources=1176 dependencies=0 signals=0 elapsed_ms=1627 slang_peak_rss_kib=526656
+failure=the elaborated AST JSON exceeded the 100663296 byte limit (the hierarchy view holds the whole document in memory; the module catalog streams it)
+baseline_exit=1
+PASS open editor
+PASS trace actions and project model
+PASS Project menu owns the four live trace actions
+PASS folder alone disables trace
+PASS real filelist import
+PASS import enables trace
+oversize cold action elapsed_ms=2679 event_ticks=257 max_gap_ms=21
+PASS oversize driver jumps to child output declaration
+PASS oversize load jumps to the same signal's RHS occurrence
+oversize warm action elapsed_ms=0
+PASS measure the real trace AST
+oversize trace ast_bytes=138188283
+PASS compiled trace AST exceeds 96 MiB
+PASS driver and load reuse one elaboration
+PASS cached trace can show its result before invalidation
+PASS source edit invalidates the cached large trace
+oversize cached invalidation elapsed_ms=27
+PASS trace starts a controlled pending job
+PASS second edit cancels the active generation
+PASS replacement trace returns the driver
+oversize replacement elapsed_ms=1939
+PASS stale compiler exited before replacement started
+oversize window destruction elapsed_ms=25
+trace_elapsed_s=5.08 trace_max_single_process_rss_kib=522588 exit=0
+test_container_cgroup_peak_bytes=1374244864
+
+Native delayed real-slang-server stress
+REALTIME-STRESS lines=45003 open_ms=26 largest_key_ms=2 gui_gap_ms=64 latest_diagnostic_ms=2337 burst_analyses=1 immediate=1 worker_busy=1 typed=1 latest=1 stale=0 cleared=1 switched=1 unsaved=1 manual_only=1
+
+Selective CTests and editor benchmark
+ 1/15 Test #14: vedit-signal-trace-selftest ............   Passed    1.23 sec
+ 2/15 Test #15: vedit-signal-trace-oversize-selftest ...   Passed    5.48 sec
+ 3/15 Test #20: vedit-file-compare-selftest ............   Passed   17.88 sec
+ 4/15 Test #21: vedit-file-compare-close-active-diff ...   Passed    0.12 sec
+ 5/15 Test #22: vedit-file-compare-exit-active-diff ....   Passed    0.13 sec
+ 6/15 Test #23: vedit-file-compare-stale-diff ..........   Passed    0.25 sec
+33: OPEN-BENCH stress lines=46126 open_ms=32 input_ms=21 max_gui_gap_ms=20 seed_ms=1009
+ 7/15 Test #33: vedit-editor-open-bench ................   Passed    1.53 sec
+ 8/15 Test #34: vedit-app-batch-layout-selftest ........   Passed    1.05 sec
+ 9/15 Test #44: vedit-signature-help-selftest ..........   Passed    0.34 sec
+10/15 Test #67: vedit-workspace-diagnostics-selftest ...   Passed    4.49 sec
+11/15 Test #74: vedit-active-watcher-cap-selftest ......   Passed    6.16 sec
+77: SKIP product.explicit-pass  the project file set never arrived
+12/15 Test #77: vedit-project-lint-e2e .................   Passed  144.49 sec
+13/15 Test #78: vedit-realtime-depth-switch-e2e ........   Passed    7.19 sec
+14/15 Test #89: vedit-realtime-context-e2e .............   Passed   21.41 sec
+15/15 Test #95: vedit-workspace-vcs-selftest ...........   Passed   15.98 sec
+100% tests passed, 0 tests failed out of 15
+Total Test time (real) = 227.76 sec
+
+Genuine legacy native SVN, English
+SVN_OLD_VERSION=1.7.14 SVNADMIN_OLD_VERSION=1.7.14 QT_PLATFORM=xcb
+CHECK svn.ui.fixture PASS
+CHECK svn.ui.delay-proxy PASS
+CHECK svn.ui.ready PASS
+CHECK svn.ui.project-history-sibling PASS
+CHECK svn.ui.history-deferred PASS
+CHECK svn.ui.assign-changelist PASS
+CHECK svn.ui.open-file PASS
+CHECK svn.ui.editor-gutter PASS
+CHECK svn.ui.patch-changelist PASS
+CHECK svn.ui.commit-selected PASS
+CHECK svn.ui.gutter-clears-on-commit PASS
+CHECK svn.ui.previous-message-picker PASS
+CHECK svn.ui.repository-log PASS
+CHECK svn.ui.text-search PASS
+CHECK svn.ui.revision-search PASS
+CHECK svn.ui.file-log PASS
+CHECK svn.ui.revision-to-base PASS
+CHECK svn.ui.add-saved-repository PASS
+CHECK svn.ui.persist-saved-repository PASS
+CHECK svn.ui.remote-detail PASS
+CHECK svn.ui.open-remote-revision PASS
+CHECK svn.ui.remote-shared-comparison PASS
+CHECK svn.ui.remove-saved-repository PASS
+CHECK svn.ui.remote-fixture PASS
+CHECK svn.ui.remote-refresh PASS
+CHECK svn.ui.incoming-shared-comparison PASS
+CHECK svn.ui.file-menu-checkout PASS
+CHECK svn.ui.unselected-edit-on-disk PASS
+CHECK svn.ui.editor-file-menu PASS
+CHECK svn.ui.editor-copy-discovered PASS
+CHECK svn.ui.editor-different-copy-selected PASS
+CHECK svn.ui.editor-fixture PASS
+CHECK svn.ui.editor-file-tabs PASS
+CHECK svn.ui.editor-unsaved-buffer PASS
+CHECK svn.ui.editor-base PASS
+CHECK svn.ui.editor-history PASS
+CHECK svn.ui.editor-history-controls PASS
+CHECK svn.ui.history-layout-controls PASS
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+CHECK svn.ui.editor-compare-working-enabled PASS
+CHECK svn.ui.editor-revision-to-buffer PASS
+CHECK svn.ui.editor-revision-pair PASS
+CHECK svn.ui.editor-non-svn-actions PASS
+CHECK svn.ui.editor-reject-stale-base PASS
+CHECK svn.ui.editor-buffer-preserved PASS
+CHECK svn.ui.project-history-fixture PASS
+CHECK svn.ui.working-snapshot-rows PASS
+CHECK svn.ui.working-single-click-selects PASS
+CHECK svn.ui.working-base-double-click PASS
+CHECK svn.ui.working-added-double-click PASS
+CHECK svn.ui.working-deleted-double-click PASS
+CHECK svn.ui.working-unversioned-double-click PASS
+CHECK svn.ui.delay-working-new-selection PASS
+CHECK svn.ui.delay-working-away-back PASS
+CHECK svn.ui.delay-explicit-hidden-dock PASS
+CHECK svn.ui.delay-explicit-hidden-dock-compares PASS
+CHECK svn.ui.project-history-commit PASS
+CHECK svn.ui.project-history-scope PASS
+CHECK svn.ui.project-history-revision-selection PASS
+CHECK svn.ui.project-history-modified PASS
+CHECK svn.ui.project-history-added PASS
+CHECK svn.ui.project-history-deleted PASS
+CHECK svn.ui.project-history-copied PASS
+CHECK svn.ui.delay-project-snapshot-new-revision PASS
+CHECK svn.ui.delay-project-detail-new-revision PASS
+CHECK svn.ui.delay-file-history-log PASS
+CHECK svn.ui.delay-file-snapshot-away PASS
+CHECK svn.ui.delay-project-log-away PASS
+CHECK svn.ui.delay-project-log-working-copy-switch PASS
+SVN-WORKBENCH failures=0
+
+Genuine legacy native SVN, Chinese
+SVN_OLD_VERSION=1.7.14 SVNADMIN_OLD_VERSION=1.7.14 QT_PLATFORM=xcb
+CHECK svn.ui.zh-catalog PASS
+CHECK svn.ui.fixture PASS
+CHECK svn.ui.ready PASS
+CHECK svn.ui.project-history-sibling PASS
+CHECK svn.ui.zh-history-action PASS
+CHECK svn.ui.zh-file-history PASS
+CHECK svn.ui.zh-file-history-clears-opening-prompt PASS
+CHECK svn.ui.history-layout-controls PASS
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+CHECK svn.ui.history-compare-previous-fits PASS
+CHECK svn.ui.history-compare-working-fits PASS
+SVN-WORKBENCH failures=0
+
+Genuine legacy SVN Rust backend
+test checkout_history_and_comparison_work_without_recent_client_options ... EVIDENCE underlying SVN client: 1.7.14
+EVIDENCE negative control: svn: invalid option: --show-item
+EVIDENCE working tree status and exact BASE for modified, added, copied-add and deleted files
+EVIDENCE project log r3/r2 and seven in-subtree A/D/M/R rows with decoded paths and copy/move origins
+EVIDENCE file histories and exact comparison pegs matched and unsupported text was rejected
+EVIDENCE stale WC at r4 sees its original node's r5 edit and r6 deletion, excluding unrelated r7 re-add
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.99s
+
+Signed RPM verification
+subversion-1.7.14-16.el7.x86_64.rpm: rsa sha1 (md5) pgp md5 OK
+subversion-libs-1.7.14-16.el7.x86_64.rpm: rsa sha1 (md5) pgp md5 OK
+e879fbf37e3687a390aeb96edc8cf627f1eee15cd93b77de191de48d341bf75f  subversion-1.7.14-16.el7.x86_64.rpm
+290f354af035f3161b792f57a774970370e16bdc9f98bfa686363bd1481c6bf1  subversion-libs-1.7.14-16.el7.x86_64.rpm
+
+Product C ABI
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+
+Supplementary T13 pinned LSP test results
+rustc 1.99.0 (b940084d7 2026-09-28)
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.22s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.80s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.58s
+
+Manual project lint with imported filelist
+88: CHECK PASS gate.no-project-pass  serial=0 running=0
+88: CHECK PASS import.no-lint-pass  serial=0 -> 0 running=0
+88: CHECK PASS closure.real-direct-child
+88: CHECK PASS closure.real-no-grandchild
+88: CHECK PASS g1c.project-lint-action
+88: CHECK PASS g1c.project-lint-drops-the-loser
+88: CHECK PASS g1c.project-lint-keeps-the-other-two
+88: CHECK PASS g1c.project-lint-count-is-file-set-minus-shadowed  requested=5 projectSet=6
+88: SUMMARY checks=81 failures=0 skips=1
+100% tests passed, 0 tests failed out of 1
+Total Test time (real) =  11.20 sec

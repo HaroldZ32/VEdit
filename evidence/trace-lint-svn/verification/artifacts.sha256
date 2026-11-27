@@ -1,0 +1,11 @@
+36daeb5d1562913196bc3850b51afc15818cd893bc00fa78bb55def51a1d1440  target/release/libvd_ffi.a
+4dffb841399b0d97bedbe5f86c9d8b830b53b52424ef084f4274105145b32531  crates/vd-ffi/include/vd_ffi.h
+5c6a890200bf458531f935192febb19f4002b2ebd15bb056c6caf2389244af98  docs/USER_GUIDE.md
+5e001bd4295fe21e6daf1bdab272b9ec2cd0fd1e37bc3c02281bb337081785a6  target/qt6-build/src/app/vedit-app
+70ca67ea799064f1afd5096ac964c6c75dd628415f54d085d54b8b66fb27e81c  target/qt6-build/src/app/vedit-file-compare-selftest
+cf2884a3499b8fdcf2087fd672088f1015f493de41bbdb3d51c97b611646b72f  target/qt6-build/src/app/vedit-svn-workbench-selftest
+f53aa4baed091b1e4f0ce38a5280d6fdf00b09df4fe9afabf9edf6eca1fb0d79  target/qt6-build/src/app/vedit-signal-trace-selftest
+d362d5ef1ec000869b6d06325535bf9414be99b2f85cf8b04677f9503f629073  target/qt6-build/src/app/vedit-editor-open-bench
+d0d889c9248ca3f5f0e308245b3ec18345c69349527684a724e65cd79c1891a9  target/qt6-build/src/app/workspace-lane-diagnostics/vedit-realtime-context-e2e
+ad465ac65c8ce1539942870ec69ea3efa03f8bf50945a7a0d64a13b8a5c5dc8d  target/qt6-build/src/app/workspace-lane-diagnostics/vedit-realtime-depth-switch-e2e
+d6d45b31bf12a2b2bfe3a30d7a23e47cf3b1283f7908aae9c2fe749a15d5b5bf  target/qt6-build/src/app/workspace-lane-diagnostics/vedit-module-closure-e2e
