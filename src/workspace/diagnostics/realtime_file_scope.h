@@ -165,7 +165,7 @@ inline ShadowedFileSet shadowedFileSetFrom(const QStringList &files)
 /// Is `path` one of the files the catalog dropped from the compiler input?
 inline bool isShadowedFile(const ShadowedFileSet &shadowed, const QString &path)
 {
-    return isGoldenFile(shadowed, path);
+    return !shadowed.isEmpty() && isGoldenFile(shadowed, path);
 }
 
 /// G1-c: `files` without the shadowed ones. `keep` (the ACTIVE document) is
@@ -267,7 +267,8 @@ inline QStringList realtimeFileSetFor(const GoldenFileSet &golden,
                                       const QString &path,
                                       int closureCap,
                                       bool *truncated = nullptr,
-                                      const QHash<QString, QStringList> &edited = {})
+                                      const QHash<QString, QStringList> &edited = {},
+                                      const ShadowedFileSet &shadowed = {})
 {
     QStringList files{path};
     if (truncated != nullptr) {
@@ -286,7 +287,7 @@ inline QStringList realtimeFileSetFor(const GoldenFileSet &golden,
             continue;
         }
         // The filelist remains authoritative over dependencies of edited text.
-        if (!golden.isEmpty() && !isGoldenFile(golden, child)) {
+        if ((!golden.isEmpty() && !isGoldenFile(golden, child)) || isShadowedFile(shadowed, child)) {
             continue;
         }
         if (files.size() >= closureCap) {
@@ -300,12 +301,10 @@ inline QStringList realtimeFileSetFor(const GoldenFileSet &golden,
     return files;
 }
 
-/// A61.3 + G1-a: the session set - the union of the golden OPEN documents'
-/// closures. A document outside the golden set contributes NOTHING (it is not
-/// merely filtered out of the result: its entry would pull its own definitions
-/// into the compile set, which is the reported defect). `outsideFileCount`
-/// reports how many DISTINCT open documents were excluded (0 when there is no
-/// project file set), so the exclusion is observable rather than silent.
+/// The session covers the one-level closures of eligible open documents. Reserve
+/// space for the active document's closure before filling the remaining slots in
+/// tab order. `outsideFileCount` counts distinct open documents outside the file
+/// list. Shadowed documents also contribute no files to the union.
 inline QStringList openDocumentSessionSet(const GoldenFileSet &golden,
                                           const QVariantMap &closure,
                                           const QStringList &openDocuments,
@@ -313,14 +312,27 @@ inline QStringList openDocumentSessionSet(const GoldenFileSet &golden,
                                           int sessionCap,
                                           int *outsideFileCount = nullptr,
                                           bool *truncated = nullptr,
-                                          const QHash<QString, QStringList> &edited = {})
+                                          const QHash<QString, QStringList> &edited = {},
+                                          const QString &activePath = {},
+                                          const ShadowedFileSet &shadowed = {})
 {
     QStringList unionFiles;
-    if (truncated != nullptr) {
-        *truncated = false;
-    }
-    if (outsideFileCount != nullptr) {
-        *outsideFileCount = 0;
+    bool overflow = false;
+    const auto appendClosure = [&](const QString &path) {
+        const auto files = realtimeFileSetFor(golden, closure, path, closureCap, nullptr, edited, shadowed);
+        for (const QString &file : files) {
+            if (unionFiles.contains(file)) {
+                continue;
+            }
+            if (unionFiles.size() >= sessionCap) {
+                overflow = true;
+                break;
+            }
+            unionFiles.append(file);
+        }
+    };
+    if (activeDocumentJoinsProjectSession(golden, shadowed, activePath)) {
+        appendClosure(activePath);
     }
     QSet<QString> outsideSeen;
     for (const QString &tab : openDocuments) {
@@ -328,29 +340,20 @@ inline QStringList openDocumentSessionSet(const GoldenFileSet &golden,
             continue;
         }
         if (!golden.isEmpty() && !isGoldenFile(golden, tab)) {
-            const QString key = normalizeFileKey(tab);
-            if (!outsideSeen.contains(key)) {
-                outsideSeen.insert(key);
-                if (outsideFileCount != nullptr) {
-                    ++(*outsideFileCount);
-                }
-            }
+            outsideSeen.insert(normalizeFileKey(tab));
             continue;
         }
-        for (const QString &file : realtimeFileSetFor(golden, closure, tab, closureCap, nullptr, edited)) {
-            if (unionFiles.contains(file)) {
-                continue;
-            }
-            if (unionFiles.size() >= sessionCap) {
-                if (truncated != nullptr) {
-                    *truncated = true;
-                }
-                break;
-            }
-            unionFiles.append(file);
+        if (!overflow && tab != activePath && !isShadowedFile(shadowed, tab)) {
+            appendClosure(tab);
         }
     }
-    unionFiles.sort(); // a stable union order keeps the session reusable
+    if (outsideFileCount != nullptr) {
+        *outsideFileCount = static_cast<int>(outsideSeen.size());
+    }
+    if (truncated != nullptr) {
+        *truncated = overflow;
+    }
+    unionFiles.sort();
     return unionFiles;
 }
 
