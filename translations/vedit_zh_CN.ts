@@ -900,6 +900,30 @@ Diagnostics: %5</source>
         <translation>%1——已分析 %2（%3）：%4 条诊断</translation>
     </message>
     <message>
+        <source>%1 — %2</source>
+        <translation>%1——%2</translation>
+    </message>
+    <message>
+        <source>%1 — session FAILED (restarts %2): %3</source>
+        <translation>%1——语言服务会话失败（重启 %2 次）：%3</translation>
+    </message>
+    <message>
+        <source>the language server did not analyse this file — no build context / no response / the session failed</source>
+        <translation>语言服务未分析此文件，可能缺少构建上下文、服务无响应或会话失败</translation>
+    </message>
+    <message>
+        <source>the language server session failed — %1</source>
+        <translation>语言服务会话失败——%1</translation>
+    </message>
+    <message>
+        <source>Not analysed — the language server produced no symbols and no diagnostics for this file (no build context / no response / the session failed).</source>
+        <translation>未分析——语言服务未返回此文件的符号或诊断（可能缺少构建上下文、服务无响应或会话失败）。</translation>
+    </message>
+    <message>
+        <source>analysis is starting</source>
+        <translation>正在开始分析</translation>
+    </message>
+    <message>
         <location filename="../src/workspace/diagnostics/diagnostics_panel.cpp" line="302"/>
         <source>editor buffer, not saved yet</source>
         <translation>编辑器缓冲区，尚未保存</translation>

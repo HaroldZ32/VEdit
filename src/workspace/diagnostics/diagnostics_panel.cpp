@@ -365,25 +365,27 @@ void DiagnosticsPanel::refreshFromController()
         const QString toolchain = controller_->toolchainReport().missing().isEmpty()
             ? QString()
             : controller_->toolchainReport().userMessage();
-        if (!toolchain.isEmpty()) {
+        const QString file = QFileInfo(controller_->analyzeFileName()).fileName();
+        const SessionSnapshot &session = controller_->session();
+        if (!file.isEmpty() && controller_->documentAnalysisAvailable()
+            && session.state == BackendState::Failed) {
+            status_->setText(
+                QCoreApplication::translate("VEdit", "%1 — session FAILED (restarts %2): %3")
+                    .arg(file).arg(session.restarts)
+                    .arg(session.message.isEmpty()
+                        ? QCoreApplication::translate("VEdit", "no reason was reported")
+                        : session.message));
+        } else if (!toolchain.isEmpty()) {
             status_->setText(toolchain);
-        } else if (!controller_->analyzeFileName().isEmpty()) {
-            // batch-20261118 AC-3: a session that went Failed after Ready is a
-            // STATE on this line (with the bounded restart count and the
-            // server's own stderr tail), not a silent "pending" analysis.
-            const SessionSnapshot session = controller_->session();
-            if (session.state == BackendState::Failed) {
-                status_->setText(
-                    QCoreApplication::translate("VEdit",
-                                                "%1 — session FAILED (restarts %2): %3")
-                        .arg(QFileInfo(controller_->analyzeFileName()).fileName())
-                        .arg(session.restarts)
-                        .arg(session.message));
+        } else if (!file.isEmpty()) {
+            const QString reason = controller_->realtimeReason();
+            if (!reason.isEmpty()) {
+                status_->setText(QCoreApplication::translate("VEdit", "%1 — %2").arg(file, reason));
             } else {
                 const QDateTime at = controller_->lastAnalysisAt();
                 status_->setText(
                     QCoreApplication::translate("VEdit", "%1 — analyzed %2 (%3): %4 diagnostic(s)")
-                        .arg(QFileInfo(controller_->analyzeFileName()).fileName(),
+                        .arg(file,
                              at.isValid() ? at.toString(QStringLiteral("HH:mm:ss"))
                                           : QCoreApplication::translate("VEdit", "pending"),
                              controller_->analyzeWasDirty()
